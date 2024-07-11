@@ -57,7 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (
     req.files &&
     Array.isArray(req.files.coverImage) &&
-    req.files.coverImage.kength > 0
+    req.files.coverImage.length > 0
   ) {
     coverImageLocalPath = req.files.coverImage[0].path;
   }
@@ -105,10 +105,9 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const { email, username, password } = req.body;
 
-  if (!(username || email)) {
-    throw new ApiError(400, "username or email is required");
-  }
-
+  // if (!(username || email)) {
+  //   throw new ApiError(400, "username or email is required");
+  // }
 
   const user = await User.findOne({
     $or: [{ username }, { email }],
@@ -146,6 +145,7 @@ const loginUser = asyncHandler(async (req, res) => {
         {
           user: loggedInUser,
           accessToken,
+          refreshToken
         },
         "User logged in successfully"
       )
@@ -156,8 +156,8 @@ const logout = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
     {
-      $set: {
-        refreshToken: undefined,
+      $unset: {
+        refreshToken: 1,
       },
     },
     {
@@ -168,11 +168,12 @@ const logout = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
-  };  
+  };
 
-  return res.status(200).clearCookie("accessToken", options)
-  .json(new ApiResponse(200, {}, "uSER LOGGED OUT"))
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .json(new ApiResponse(200, {}, "uSER LOGGED OUT"));
 });
-
 
 export { registerUser, loginUser, logout };

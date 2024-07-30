@@ -16,11 +16,11 @@ const videoSchema = new Schema(
       required: true,
     },
     description: {
-      type: String, // cloudinary url
+      type: String, 
       required: true,
     },
     duration: {
-      type: String, // cloudinary url
+      type: String, 
       required: true,
     },
     views: {

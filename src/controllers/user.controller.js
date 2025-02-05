@@ -134,8 +134,9 @@ const loginUser = asyncHandler(async (req, res) => {
   console.log('Logged in user:', loggedInUser);
 
   const options = {
-    httpOnly: true,
-    secure: true,
+    httpOnly: false,
+    secure: false,
+    sameSite: "None"
   };
 
   return res
@@ -420,8 +421,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                 {
                   $project: {
                     fullName: 1,
-                    username: 1,
-                    avatar: 1
+                    username: 1
                   }
                 }
               ]
@@ -432,6 +432,18 @@ const getWatchHistory = asyncHandler(async (req, res) => {
               owner: {
                 $first: "$owner"
               }
+            },
+
+          },
+          {
+            $project: {
+              _id: 1,
+              thumbnail: 1,
+              title: 1,
+              description: 1,
+              owner: 1,
+              duration: 1,
+              views: 1
             }
           }
         ]
@@ -445,4 +457,31 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 })
 
 
-export { registerUser, loginUser, logout, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImg, getUserChannelProfile, getWatchHistory };
+const addToWatchHistory = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+  const userId = req.user._id;
+
+  if (!videoId) {
+    return res.status(400).json({ message: "Video ID is required" });
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  const watchHistory = user.watchHistory;
+
+  // Check if the last watched video is the same
+  if (watchHistory.length > 0 && watchHistory[watchHistory.length - 1].toString() === videoId) {
+    return res.status(200).json({ message: "Video already in watch history" });
+  }
+
+  // Add new video ID to watch history
+  user.watchHistory.push(videoId);
+
+  await user.save();
+  res.status(200).json({ message: "Watch history updated", watchHistory: user.watchHistory });
+});
+
+export { registerUser, loginUser, logout, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImg, getUserChannelProfile, getWatchHistory, addToWatchHistory };

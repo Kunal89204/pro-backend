@@ -30,9 +30,8 @@ const deleteFromCloudinar = async (publicId, resource_type) => {
     console.log("File deleted successfully", response)
     return response;
   } catch (error) {
-    return null;
     console.log(error)
-    throw error
+    return null;
   }
 }
 

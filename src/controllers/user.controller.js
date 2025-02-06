@@ -58,33 +58,33 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with email or username already exists");
   }
 
-  const avatarLocalPath = req.files?.avatar[0]?.path;
-  // const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  // const avatarLocalPath = req.files?.avatar[0]?.path;
+  // // const coverImageLocalPath = req.files?.coverImage[0]?.path;
 
-  let coverImageLocalPath;
-  if (
-    req.files &&
-    Array.isArray(req.files.coverImage) &&
-    req.files.coverImage.length > 0
-  ) {
-    coverImageLocalPath = req.files.coverImage[0].path;
-  }
+  // let coverImageLocalPath;
+  // if (
+  //   req.files &&
+  //   Array.isArray(req.files.coverImage) &&
+  //   req.files.coverImage.length > 0
+  // ) {
+  //   coverImageLocalPath = req.files.coverImage[0].path;
+  // }
 
-  if (!avatarLocalPath) {
-    throw new ApiError(400, "Avatar File is required");
-  }
+  // if (!avatarLocalPath) {
+  //   throw new ApiError(400, "Avatar File is required");
+  // }
 
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
-  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  // const avatar = await uploadOnCloudinary(avatarLocalPath);
+  // const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
-  if (!avatar) {
-    throw new ApiError(400, "Avatar File is required");
-  }
+  // if (!avatar) {
+  //   throw new ApiError(400, "Avatar File is required");
+  // }
 
   const user = await User.create({
     fullName,
-    avatar: avatar.url,
-    coverImage: coverImage?.url || "",
+    // avatar: avatar.url,
+    // coverImage: coverImage?.url || "",
     email,
     password,
     username: username.toLowerCase(),
@@ -396,7 +396,6 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, channel[0], "User channel fetched successfully"));
 });
 
-
 const getWatchHistory = asyncHandler(async (req, res) => {
   const user = await User.aggregate([
     {
@@ -406,7 +405,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     },
     {
       $lookup: {
-        from: 'videos',
+        from: "videos",
         localField: "watchHistory",
         foreignField: "_id",
         as: "watchHistory",
@@ -429,11 +428,8 @@ const getWatchHistory = asyncHandler(async (req, res) => {
           },
           {
             $addFields: {
-              owner: {
-                $first: "$owner"
-              }
-            },
-
+              owner: { $first: "$owner" }
+            }
           },
           {
             $project: {
@@ -443,18 +439,27 @@ const getWatchHistory = asyncHandler(async (req, res) => {
               description: 1,
               owner: 1,
               duration: 1,
-              views: 1
+              views: 1,
+              createdAt: 1 // Fetch createdAt for sorting later
             }
           }
         ]
       }
+    },
+    {
+      $addFields: {
+        watchHistory: {
+          $reverseArray: "$watchHistory" // Reverse the order to match YouTube's style
+        }
+      }
     }
-  ])
+  ]);
 
   return res.status(200).json(
-    new ApiResponse(200, user[0].watchHistory, "WatchHistory Fetched Successfully")
-  )
-})
+    new ApiResponse(200, user[0]?.watchHistory || [], "Watch History Fetched Successfully")
+  );
+});
+
 
 
 const addToWatchHistory = asyncHandler(async (req, res) => {
@@ -470,18 +475,18 @@ const addToWatchHistory = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "User not found" });
   }
 
-  const watchHistory = user.watchHistory;
+  let watchHistory = user.watchHistory;
 
-  // Check if the last watched video is the same
-  if (watchHistory.length > 0 && watchHistory[watchHistory.length - 1].toString() === videoId) {
-    return res.status(200).json({ message: "Video already in watch history" });
-  }
+  // Remove videoId if it already exists in history
+  watchHistory = watchHistory.filter(id => id.toString() !== videoId);
 
-  // Add new video ID to watch history
-  user.watchHistory.push(videoId);
+  // Add the video to the end of the watch history
+  watchHistory.push(videoId);
 
+  user.watchHistory = watchHistory;
   await user.save();
-  res.status(200).json({ message: "Watch history updated", watchHistory: user.watchHistory });
+
+  res.status(200).json({ message: "Watch history updated", watchHistory });
 });
 
 export { registerUser, loginUser, logout, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImg, getUserChannelProfile, getWatchHistory, addToWatchHistory };

@@ -1,10 +1,11 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { deleteFromCloudinar, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from 'jsonwebtoken'
 import mongoose from "mongoose";
+import { getPublicIdFromUrl } from "../utils/publicIdExtracter.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -276,6 +277,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.file?.path
+  const { publicUrl } = req.body
 
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file is missing")
@@ -287,8 +289,8 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Error while uploading on avatar")
   }
 
-  await User.findByIdAndUpdate(
-    req.user?._id,
+  const user = await User.findByIdAndUpdate(
+    req?.user?._id,
     {
       $set: {
         avatar: avatar.url
@@ -296,6 +298,10 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     },
     { new: true }
   ).select("-password")
+
+  if (publicUrl) {
+    await deleteFromCloudinar(getPublicIdFromUrl(publicUrl))
+  }
 
   return res
     .status(200)
@@ -307,10 +313,13 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
 const updateUserCoverImg = asyncHandler(async (req, res) => {
   const coverImageLocalPath = req.file?.path
+  const { publicUrl } = req.body;
 
   if (!coverImageLocalPath) {
     throw new ApiError(400, "CoverImage file is missing")
   }
+
+
 
   const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
@@ -327,6 +336,14 @@ const updateUserCoverImg = asyncHandler(async (req, res) => {
     },
     { new: true }
   ).select("-password")
+
+  let deleteOldCoverImage;
+  if (publicUrl) {
+    deleteOldCoverImage = await deleteFromCloudinar(getPublicIdFromUrl(publicUrl))
+  }
+
+
+
 
   return res
     .status(200)
@@ -396,12 +413,13 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, channel[0], "User channel fetched successfully"));
 });
 
+
 const getWatchHistory = asyncHandler(async (req, res) => {
   const user = await User.aggregate([
     {
       $match: {
-        _id: new mongoose.Types.ObjectId(req.user._id)
-      }
+        _id: new mongoose.Types.ObjectId(req.user._id),
+      },
     },
     {
       $lookup: {
@@ -409,57 +427,59 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         localField: "watchHistory",
         foreignField: "_id",
         as: "watchHistory",
-        pipeline: [
-          {
-            $lookup: {
-              from: "users",
-              localField: "owner",
-              foreignField: "_id",
-              as: "owner",
-              pipeline: [
-                {
-                  $project: {
-                    fullName: 1,
-                    username: 1
-                  }
-                }
-              ]
-            }
-          },
-          {
-            $addFields: {
-              owner: { $first: "$owner" }
-            }
-          },
-          {
-            $project: {
-              _id: 1,
-              thumbnail: 1,
-              title: 1,
-              description: 1,
-              owner: 1,
-              duration: 1,
-              views: 1,
-              createdAt: 1 // Fetch createdAt for sorting later
-            }
-          }
-        ]
-      }
+      },
     },
     {
-      $addFields: {
+      $unwind: "$watchHistory", // Unwind the array to work on individual video objects
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "watchHistory.owner",
+        foreignField: "_id",
+        as: "watchHistory.owner",
+      },
+    },
+    {
+      $unwind: "$watchHistory.owner", // Get owner as an object instead of an array
+    },
+    {
+      $group: {
+        _id: "$_id",
+        watchHistory: { $push: "$watchHistory" }, // Reconstruct watchHistory array
+      },
+    },
+    {
+      $project: {
+        _id: 0, // Remove user _id, keep only watchHistory
         watchHistory: {
-          $reverseArray: "$watchHistory" // Reverse the order to match YouTube's style
+          $reverseArray: {
+            $map: {
+              input: "$watchHistory",
+              as: "video",
+              in: {
+                _id: "$$video._id",
+                thumbnail: "$$video.thumbnail",
+                title: "$$video.title",
+                description: "$$video.description",
+                duration: "$$video.duration",
+                views: "$$video.views",
+                owner: {
+                  _id: "$$video.owner._id",
+                  fullName: "$$video.owner.fullName"
+                }
+              }
+            }
+          }
         }
-      }
-    }
+      },
+    },
   ]);
 
   return res.status(200).json(
     new ApiResponse(200, user[0]?.watchHistory || [], "Watch History Fetched Successfully")
   );
 });
-
 
 
 const addToWatchHistory = asyncHandler(async (req, res) => {
@@ -475,18 +495,21 @@ const addToWatchHistory = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "User not found" });
   }
 
-  let watchHistory = user.watchHistory;
+  let { watchHistory } = user;
 
-  // Remove videoId if it already exists in history
+  // Remove the videoId if it already exists
   watchHistory = watchHistory.filter(id => id.toString() !== videoId);
 
-  // Add the video to the end of the watch history
+  // Push videoId to the end
   watchHistory.push(videoId);
 
+  // Update the user's watch history
   user.watchHistory = watchHistory;
   await user.save();
 
   res.status(200).json({ message: "Watch history updated", watchHistory });
 });
+
+
 
 export { registerUser, loginUser, logout, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImg, getUserChannelProfile, getWatchHistory, addToWatchHistory };

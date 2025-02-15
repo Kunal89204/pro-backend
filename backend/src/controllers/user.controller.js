@@ -6,6 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from 'jsonwebtoken'
 import mongoose from "mongoose";
 import { getPublicIdFromUrl } from "../utils/publicIdExtracter.js";
+import { Video } from "../models/video.model.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -415,69 +416,19 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 
 
 const getWatchHistory = asyncHandler(async (req, res) => {
-  const user = await User.aggregate([
-    {
-      $match: {
-        _id: new mongoose.Types.ObjectId(req.user._id),
-      },
-    },
-    {
-      $lookup: {
-        from: "videos",
-        localField: "watchHistory",
-        foreignField: "_id",
-        as: "watchHistory",
-      },
-    },
-    {
-      $unwind: "$watchHistory", // Unwind the array to work on individual video objects
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "watchHistory.owner",
-        foreignField: "_id",
-        as: "watchHistory.owner",
-      },
-    },
-    {
-      $unwind: "$watchHistory.owner", // Get owner as an object instead of an array
-    },
-    {
-      $group: {
-        _id: "$_id",
-        watchHistory: { $push: "$watchHistory" }, // Reconstruct watchHistory array
-      },
-    },
-    {
-      $project: {
-        _id: 0, // Remove user _id, keep only watchHistory
-        watchHistory: {
-          $reverseArray: {
-            $map: {
-              input: "$watchHistory",
-              as: "video",
-              in: {
-                _id: "$$video._id",
-                thumbnail: "$$video.thumbnail",
-                title: "$$video.title",
-                description: "$$video.description",
-                duration: "$$video.duration",
-                views: "$$video.views",
-                owner: {
-                  _id: "$$video.owner._id",
-                  fullName: "$$video.owner.fullName"
-                }
-              }
-            }
-          }
-        }
-      },
-    },
-  ]);
+  const user = await User.findById(req?.user?._id).populate({
+    path: "watchHistory",
+    model: "Video",
+    select: "thumbnail views title description _id duration",
+    populate: {
+      path: "owner",
+      model: 'User',
+      select: "fullName _id"
+    }
+  });
 
   return res.status(200).json(
-    new ApiResponse(200, user[0]?.watchHistory || [], "Watch History Fetched Successfully")
+    new ApiResponse(200, user?.watchHistory?.reverse() || [], "Watch History Fetched Successfully")
   );
 });
 
@@ -495,10 +446,15 @@ const addToWatchHistory = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "User not found" });
   }
 
+  const video = await Video.findById(videoId);
+  if (!video) {
+    return res.status(404).json({ message: "Video not found" });
+  }
+
   let { watchHistory } = user;
 
   // Remove the videoId if it already exists
-  watchHistory = watchHistory.filter(id => id.toString() !== videoId);
+  watchHistory = watchHistory.filter((id) => id.toString() !== videoId);
 
   // Push videoId to the end
   watchHistory.push(videoId);
@@ -507,7 +463,18 @@ const addToWatchHistory = asyncHandler(async (req, res) => {
   user.watchHistory = watchHistory;
   await user.save();
 
-  res.status(200).json({ message: "Watch history updated", watchHistory });
+  // Check if the user has already viewed the video
+  if (!video.viewers.includes(userId)) {
+    video.viewers.push(userId);
+    video.views += 1;
+    await video.save();
+  }
+
+  res.status(200).json({
+    message: "Watch history updated",
+    watchHistory,
+    views: video.views, // Return updated view count
+  });
 });
 
 

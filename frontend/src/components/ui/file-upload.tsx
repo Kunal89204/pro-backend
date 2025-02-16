@@ -36,16 +36,20 @@ export const FileUpload = ({
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileChange = (newFiles: File[]) => {
-        const validFiles = newFiles.filter(file => 
-            type === "video" 
-                ? file.type.startsWith('video/') 
-                : file.type.startsWith('image/')
-        );
+        const validFiles = newFiles.filter((file) => {
+            return type === "video" 
+                ? file.type.startsWith("video/") 
+                : file.type.startsWith("image/");
+        });
+    
         const singleFile = validFiles.slice(0, 1);
         setFiles(singleFile);
-        onChange && onChange(singleFile);
+        
+        if (onChange) {
+            onChange(singleFile);
+        }
     };
-
+    
     const handleClick = () => {
         fileInputRef.current?.click();
     };

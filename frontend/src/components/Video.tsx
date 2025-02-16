@@ -1,5 +1,5 @@
 
-import { Box, Flex, Menu, MenuButton, MenuItem, MenuList, Text, IconButton, Avatar, Badge, useColorModeValue } from "@chakra-ui/react";
+import { Box, Flex, Menu, MenuButton, MenuItem, MenuList, Text, IconButton, Avatar, Badge, useColorMode } from "@chakra-ui/react";
 import { IconDotsVertical } from "@tabler/icons-react";
 import Image, { StaticImageData } from "next/image";
 import React from "react";
@@ -10,7 +10,13 @@ import { useThemeColors } from "@/hooks/useThemeColors";
 
 
 
-const formatDuration = (seconds: number | string | any) => {
+
+
+const formatDuration = (input: number | string | bigint): string => {
+    const seconds = typeof input === "bigint" ? Number(input) : Number(input); // Convert to number
+
+    if (isNaN(seconds) || seconds < 0) return "0:00"; // Handle invalid cases
+
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);
@@ -47,6 +53,7 @@ const Video: React.FC<VideoProps> = ({
 
 
     const {textColor, secondaryTextColor} = useThemeColors()
+    const {colorMode} = useColorMode()
 
    
     return (
@@ -76,8 +83,8 @@ const Video: React.FC<VideoProps> = ({
                                 {title}
                             </Text></Link>
                         <Menu >
-                            <MenuButton height={0} width={6} minW={0} as={IconButton} icon={<IconDotsVertical width={20} />} variant="unstyled" aria-label="Options" />
-                            <MenuList >
+                            <MenuButton height={0} width={6} minW={0} as={IconButton} icon={<IconDotsVertical width={20} className={colorMode == "light"?"text-black":"text-white"} />} variant="unstyled" aria-label="Options" />
+                            <MenuList textColor={textColor}>
                                 <MenuItem >Save to Playlist</MenuItem>
                                 <MenuItem >Share</MenuItem>
                                 <MenuItem >Report</MenuItem>

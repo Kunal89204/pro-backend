@@ -6,7 +6,11 @@ import React from 'react'
 
 
 
-const formatDuration = (seconds: number | string | any) => {
+const formatDuration = (input: number | string | bigint): string => {
+    const seconds = typeof input === "string" ? Number(input) : Number(input);
+
+    if (isNaN(seconds) || seconds < 0) return "0:00"; // Handle invalid values
+
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);

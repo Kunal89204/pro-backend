@@ -17,7 +17,7 @@ const Profile = () => {
   const dispatch = useDispatch()
 
   // Color modes import
-  const {bgColor, textColor, secondaryTextColor, buttonBg,  hoverBg} = useThemeColors()
+  const {textColor, secondaryTextColor, buttonBg} = useThemeColors()
 
   // Cover Image States
   const [coverImage, setCoverImage] = useState<File | undefined>();
@@ -36,7 +36,7 @@ const Profile = () => {
 
   const coverImageMutation = useMutation({
     mutationFn: () =>
-      myQuery.updateCoverImage(token, coverImage, user?.data?.coverImage),
+      myQuery.updateCoverImage(token, coverImage, user?.data?.coverImage || ""),
     onSuccess: () => {
       refetch();
       setSelectedBanner(null);
@@ -45,7 +45,7 @@ const Profile = () => {
 
   const avatarImageMutation = useMutation({
     mutationFn: () =>
-      myQuery.updateUserAvatar(token, avatarImage, user?.data?.avatar),
+      myQuery.updateUserAvatar(token, avatarImage, user?.data?.avatar || ""),
     onSuccess: (data) => {
       const user = data?.data
       dispatch(setAuth({ user: { username: user?.username, email: user?.email, fullName: user?.fullName, avatarImage: user?.avatar }, token: token }))

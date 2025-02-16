@@ -25,7 +25,7 @@ export function SidebarDemo({ children }: { children: ReactNode }) {
     
     const username = useSelector((state: RootState) => state.user.username);
     const fullName = useSelector((state: RootState) => state.user.fullName);
-    const avatar: string | StaticImageData | any = useSelector((state: RootState) => state.user.avatarImage);
+    const avatar: string | StaticImageData |undefined = useSelector((state: RootState) => state.user.avatarImage);
     const dispatch = useDispatch();
     const { bgColor } = useThemeColors();
     const {colorMode} = useColorMode()

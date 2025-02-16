@@ -28,9 +28,24 @@ interface LoginCredentials {
   password: string
 }
 
+interface   UserData {
+ accessToken: string
+ user:{ _id: string;
+  fullName: string;
+  username: string;
+  email: string;
+  avatar: string;
+  coverImage: string;
+  createdAt: string;
+  updatedAt: string;
+  wathcedVideos: string[];
+  __v: number;
+ }
+}
+
 interface LoginResponse {
   statusCode: number
-  data: any
+  data: UserData
   message: string
   success: boolean,
   accessToken: string

@@ -1,9 +1,9 @@
 "use client"
 import { Box, Button, Flex, FormControl, FormLabel, Input, Text, VStack } from '@chakra-ui/react'
 import Image from 'next/image'
-import React, { FormEvent, use, useState } from 'react'
+import React, { FormEvent,  useState } from 'react'
 import loginImage from "../../../../public/assets/login_image.jpg"
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation} from '@tanstack/react-query'
 import { myQuery } from '@/api/query'
 import Link from 'next/link'
 

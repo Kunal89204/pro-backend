@@ -6,7 +6,7 @@ import { RootState } from '@/lib/store'
 import { useQuery } from '@tanstack/react-query'
 import { myQuery } from '@/api/query'
 import { logout } from '@/lib/slices/authSlice'
-import { Box, useColorModeValue } from '@chakra-ui/react'
+import { Box } from '@chakra-ui/react'
 import {useThemeColors} from "../hooks/useThemeColors"
 
 

@@ -21,10 +21,24 @@ interface LoginCredentials {
     password: string
 }
 
-interface User {
-    data: any
+interface   UserData {
+    _id: string;
+    fullName: string;
     username: string;
     email: string;
+    avatar: string;
+    coverImage: string;
+    createdAt: string;
+    updatedAt: string;
+    wathcedVideos: string[];
+    __v: number;
+}
+
+interface User {
+    statusCode: number;
+    data: UserData;
+    message: string;
+    success: boolean;
 
 }
 

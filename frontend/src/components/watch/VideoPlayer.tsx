@@ -4,21 +4,42 @@ import { IconBookmark, IconShare, IconThumbUp } from '@tabler/icons-react';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
-const VideoPlayer = ({ data }: { data: any }) => {
+// Define types
+interface Owner {
+    avatar: string;
+    fullName: string;
+}
+
+interface VideoData {
+    videoFile: string;
+    title: string;
+    description: string;
+    owner: Owner;
+}
+
+interface ApiResponse {
+    data: VideoData;
+}
+
+interface VideoPlayerProps {
+    data: ApiResponse;
+}
+
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
     const vdo = data?.data;
     const [showFullDesc, setShowFullDesc] = useState(false);
     const descriptionLimit = 235; // Character limit before showing "See More"
-    const { bgColor, textColor, secondaryTextColor, secondaryBgColor } = useThemeColors()
+    const { textColor, secondaryTextColor, secondaryBgColor } = useThemeColors();
 
     return (
-        <Box className=' w-full '>
+        <Box className='w-full'>
             <video className='aspect-video w-full rounded-xl' src={vdo?.videoFile} controls autoPlay></video>
 
             <Heading as={'h2'} fontSize={'2xl'} py={1} color={textColor}>{vdo?.title}</Heading>
 
             <Flex justifyContent={'space-between'} flexDir={{ base: 'column', lg: "row" }} alignItems={{ base: 'stretch', lg: 'center' }}>
                 <Flex gap={2} py={3} alignItems={'center'}>
-                    <Image src={vdo?.owner?.avatar} alt='' width={1000} height={1000} className='w-10 lg:w-12 aspect-square object-cover rounded-full' />
+                    <Image src={vdo?.owner?.avatar} alt='Owner Avatar' width={1000} height={1000} className='w-10 lg:w-12 aspect-square object-cover rounded-full' />
                     <Box>
                         <Text color={textColor} fontWeight={'semibold'} noOfLines={1}>{vdo?.owner?.fullName}</Text>
                         <Text color={secondaryTextColor} fontSize={'xs'} fontWeight={'600'}>100 subscribers</Text>
@@ -29,7 +50,7 @@ const VideoPlayer = ({ data }: { data: any }) => {
                 </Flex>
 
                 <Flex gap={2}>
-                    <Button className='flex gap-2'> <IconThumbUp /> Like</Button>
+                    <Button className='flex gap-2'><IconThumbUp /> Like</Button>
                     <Button className='flex gap-2'><IconShare /> Share</Button>
                     <Button><IconBookmark /> Save</Button>
                 </Flex>

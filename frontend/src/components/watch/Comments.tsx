@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
 import {
-  Box, Text, Input, Button, Avatar, VStack, HStack, Collapse, Divider, Flex, useColorMode
+  Box, Text, Input, Button, Avatar, VStack, HStack, Collapse, Divider, Flex
 } from "@chakra-ui/react";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import {
-  IconMessageCircle, IconThumbUp, IconThumbDown, IconChevronDown, IconChevronUp
+  IconMessageCircle, IconThumbUp, IconThumbDown
 } from "@tabler/icons-react";
 
 // Define comment type
@@ -64,7 +64,6 @@ const commentsData: Comment[] = [
 
 const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number }) => {
   const { textColor, secondaryTextColor } = useThemeColors();
-  const { colorMode } = useColorMode();
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyText, setReplyText] = useState("");

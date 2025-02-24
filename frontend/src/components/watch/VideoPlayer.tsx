@@ -15,6 +15,8 @@ interface VideoData {
     title: string;
     description: string;
     owner: Owner;
+    createdAt: string;
+    views: number;
 }
 
 interface ApiResponse {
@@ -31,18 +33,33 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
     const descriptionLimit = 235; // Character limit before showing "See More"
     const { textColor, secondaryTextColor, secondaryBgColor } = useThemeColors();
 
+    // Format the date (e.g., "4 Feb 2025")
+    const formattedDate = vdo?.createdAt
+        ? new Date(vdo.createdAt).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+        }).replace(",", "")
+        : "";
+
     return (
         <Box className='w-full'>
             <video className='aspect-video w-full rounded-xl' src={vdo?.videoFile} controls autoPlay></video>
 
-            <Heading as={'h2'} fontSize={'2xl'} py={1} color={textColor}>{vdo?.title}</Heading>
+            <Heading as={'h2'} fontSize={'2xl'} py={1} color={textColor}>
+                {vdo?.title}
+            </Heading>
 
             <Flex justifyContent={'space-between'} flexDir={{ base: 'column', lg: "row" }} alignItems={{ base: 'stretch', lg: 'center' }}>
                 <Flex gap={2} py={3} alignItems={'center'}>
                     <Image src={vdo?.owner?.avatar} alt='Owner Avatar' width={1000} height={1000} className='w-10 lg:w-12 aspect-square object-cover rounded-full' />
                     <Box>
-                        <Text color={textColor} fontWeight={'semibold'} noOfLines={1}>{vdo?.owner?.fullName}</Text>
-                        <Text color={secondaryTextColor} fontSize={'xs'} fontWeight={'600'}>100 subscribers</Text>
+                        <Text color={textColor} fontWeight={'semibold'} noOfLines={1}>
+                            {vdo?.owner?.fullName}
+                        </Text>
+                        <Text color={secondaryTextColor} fontSize={'xs'} fontWeight={'600'}>
+                            100 subscribers
+                        </Text>
                     </Box>
                     <Box mx={4} alignSelf={'end'}>
                         <Button>Subscribe</Button>
@@ -57,11 +74,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
             </Flex>
 
             <Box bg={secondaryBgColor} borderRadius={'10px'} my={2} p={2} position={'relative'}>
+                <Flex color={textColor} gap={2} fontSize={'sm'} fontWeight={'semibold'}>
+                    <Text>{vdo?.views} Views</Text>
+                    <Text>{formattedDate}</Text>
+                </Flex>
                 <Text fontWeight={'semibold'} color={textColor}>Description</Text>
                 <Text color={secondaryTextColor}>
                     {showFullDesc ? vdo?.description : vdo?.description?.slice(0, descriptionLimit)}
                     {vdo?.description?.length > descriptionLimit && (
-                        <Button variant={'link'} position={'absolute'} right={10} bottom={2} color={textColor} fontWeight={'semibold'} onClick={() => setShowFullDesc(!showFullDesc)}>
+                        <Button
+                            variant={'link'}
+                            position={'absolute'}
+                            right={10}
+                            bottom={2}
+                            color={textColor}
+                            fontWeight={'semibold'}
+                            onClick={() => setShowFullDesc(!showFullDesc)}
+                        >
                             {showFullDesc ? " See Less" : " See More"}
                         </Button>
                     )}

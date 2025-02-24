@@ -21,6 +21,7 @@ import {
 import VideoForm from './VideoForm'
 import Upload from './Upload'
 import Image from 'next/image'
+import { useThemeColors } from '@/hooks/useThemeColors'
 
 
 const steps = [
@@ -43,6 +44,8 @@ const Create: React.FC = () => {
 
     })
     const [canProceed, setCanProceed] = useState(false)
+
+const {buttonBg} =    useThemeColors()
 
     const { activeStep, goToNext, goToPrevious, setActiveStep } = useSteps({
         index: 0,
@@ -175,7 +178,7 @@ const Create: React.FC = () => {
             <div className="flex justify-between mt-4">
                 {activeStep > 0 && <Button onClick={goToPrevious}>Previous</Button>}
                 {activeStep < steps.length - 1 && (
-                    <Button onClick={handleNext} isDisabled={!canProceed}>Next</Button>
+                    <Button onClick={handleNext} isDisabled={!canProceed} bg={buttonBg}>Next</Button>
                 )}
             </div>
         </div>

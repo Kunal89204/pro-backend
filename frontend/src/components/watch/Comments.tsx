@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import {
-  Box, Text, Input, Button, Avatar, VStack, HStack, Collapse, Divider, Flex
+  Box, Text, Input, Button, Avatar, VStack, HStack, Collapse, Divider, Flex,
+  useColorMode
 } from "@chakra-ui/react";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import {
@@ -64,6 +65,7 @@ const commentsData: Comment[] = [
 
 const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number }) => {
   const { textColor, secondaryTextColor } = useThemeColors();
+  const {colorMode} = useColorMode()
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyText, setReplyText] = useState("");
@@ -86,13 +88,13 @@ const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number 
           </Flex>
           <Text mt={1} color={textColor}>{comment.text}</Text>
           <HStack mt={2} spacing={4}>
-            <IconThumbUp size={16} cursor="pointer" />
-            <IconThumbDown size={16} cursor="pointer" />
-            <Text fontSize="sm" cursor="pointer" onClick={() => setShowReplyInput(!showReplyInput)}>
+            <IconThumbUp size={16} cursor="pointer" color={colorMode == "light"?"black":"white"} />
+            <IconThumbDown color={colorMode == "light"?"black":"white"} size={16} cursor="pointer" />
+            <Text color={textColor} fontSize="sm" cursor="pointer" onClick={() => setShowReplyInput(!showReplyInput)}>
               Reply
             </Text>
             {comment.replies.length > 0 && (
-              <Text fontSize="sm" cursor="pointer" onClick={() => setShowReplies(!showReplies)}>
+              <Text fontSize="sm" cursor="pointer" color={textColor} onClick={() => setShowReplies(!showReplies)}>
                 {showReplies ? "Hide Replies" : "View Replies"}
               </Text>
             )}
@@ -126,9 +128,10 @@ const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number 
 };
 
 const Comments = () => {
+  const { textColor, secondaryTextColor } = useThemeColors();
   return (
     <Box py={4}>
-      <Text fontSize="2xl" fontWeight="semibold">Comments</Text>
+      <Text fontSize="2xl" fontWeight="semibold" color={textColor}>Comments</Text>
       {/* User's Comment Input */}
       <HStack mt={4} spacing={3}>
         <Avatar src="https://i.pravatar.cc/40" size={'sm'} />

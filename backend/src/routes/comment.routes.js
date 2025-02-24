@@ -1,11 +1,11 @@
-import { Router } from "express";
-import { addComment, getComments } from '../controllers/comment.controller'
-import verifyJWT from '../middlewares/auth.middleware'
 
-const router = Router()
+// const router = Router()
+// import { Router } from "express";
+// import { verifyJWT } from "../middlewares/auth.middleware.js";
+// import {checkComment} from '../controllers/comment.controller.js'
 
-router.use(verifyJWT)
 
-router.get('/addComment', addComment)
 
-export default router
+// router.route("/add").post(verifyJWT, checkComment)
+
+// export default router;

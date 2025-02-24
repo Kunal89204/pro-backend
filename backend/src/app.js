@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 const app = express();
 app.use(
   cors({
-    origin: [process.env.CORS_CLIENT_URL, "http://localhost:3000" , "https://insanity-tube.vercel.app"],
+    origin: [process.env.CORS_CLIENT_URL, "http://localhost:3000", "https://insanity-tube.vercel.app"],
     credentials: true,
   })
 );
@@ -22,11 +22,13 @@ app.use(cookieParser());
 // Routes import
 import userRouter from './routes/user.routes.js';
 import videoRouter from './routes/video.routes.js';
-// import commentRouter from './routes/comment.routes.js'
+// import commentsRouter from './routes/comment.routes.js'
+
 
 // routes
-app.use("/api/v1/users", userRouter);  
-app.use("/api/v1/video", videoRouter);  
-// app.use("/api/v1/comment", commentRouter);  
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/video", videoRouter);
+// app.use('/api/v1/comment', commentsRouter)
+
 
 export { app };

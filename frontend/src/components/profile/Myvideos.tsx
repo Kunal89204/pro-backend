@@ -12,7 +12,7 @@ const Myvideos: React.FC = () => {
     const token = useSelector((state: RootState) => state.token)
     console.log(token)
 
-    const { data, isError, error, isLoading } = useQuery({
+    const { data} = useQuery({
         queryKey: ['myvideos'],
         queryFn: () => myQuery.getUserVideos(token)
     })
@@ -20,7 +20,15 @@ const Myvideos: React.FC = () => {
     console.log(data)
     return (
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-6 gap-4'>
-            {data?.videos?.map((vdo, i) => (
+            {data?.videos?.map((vdo:{
+                duration:number,
+                thumbnail:string,
+                _id:string,
+                createdAt:string,
+                title:string,
+                views:number
+
+            }, i:number) => (
                 <Video
                 key={i}
                 duration={vdo.duration}

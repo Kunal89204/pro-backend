@@ -128,7 +128,7 @@ const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number 
 };
 
 const Comments = () => {
-  const { textColor, secondaryTextColor } = useThemeColors();
+  const { textColor } = useThemeColors();
   return (
     <Box py={4}>
       <Text fontSize="2xl" fontWeight="semibold" color={textColor}>Comments</Text>

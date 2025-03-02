@@ -31,8 +31,8 @@ const formatDuration = (input: number | string | bigint): string => {
 interface VideoProps {
     title: string;
     thumbnail: StaticImageData | string;
-    logo: StaticImageData | string;
-    channelName: string;
+    logo?: StaticImageData | string;
+    channelName?: string;
     views: number;
     uploadTime: number | string;
     duration: number | string,

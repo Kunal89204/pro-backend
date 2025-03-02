@@ -4,7 +4,8 @@ import {
     getVideoById,
     publishAVideo,
     togglePublishStatus,
-    updateVideo
+    updateVideo,
+     userVideos
 
 } from "../controllers/video.controller.js"
 import {verifyJWT} from "../middlewares/auth.middleware.js"
@@ -31,11 +32,15 @@ router
         publishAVideo
     );
 
-router
-    .route("/:videoId")
+router.route('/uservideos').get(userVideos)
+
+router.route("/:videoId([0-9a-fA-F]{24})") // ✅ Only match valid ObjectIds
     .get(getVideoById)
     .patch(upload.single("thumbnail"), updateVideo);
 
+
 router.route("/toggle/publish/:videoId").patch(togglePublishStatus);
+
+
 
 export default router

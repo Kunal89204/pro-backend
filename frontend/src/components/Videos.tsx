@@ -7,18 +7,22 @@ import { useQuery } from '@tanstack/react-query'
 import { myQuery } from '@/api/query'
 import { logout } from '@/lib/slices/authSlice'
 import { Box } from '@chakra-ui/react'
-import {useThemeColors} from "../hooks/useThemeColors"
+import { useThemeColors } from "../hooks/useThemeColors"
 
 
 const Videos: React.FC = () => {
     const token = useSelector((state: RootState) => state.token)
     const dispatch = useDispatch()
-const {bgColor} = useThemeColors()
+    const { bgColor } = useThemeColors()
 
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ['videos'],
-        queryFn: () => myQuery.getAllVideos(token)
-    })
+        queryFn: () => myQuery.getAllVideos(token),
+        staleTime: 1000 * 60 * 5, // 5 minutes (data stays fresh for 5 minutes)
+        refetchOnMount: false, // Prevent refetch when coming back
+        refetchOnWindowFocus: false, // Prevent refetch when switching tabs
+    });
+    
 
     if (isLoading) {
         return <>Loading....</>

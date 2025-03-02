@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
-import {Video} from '../models/video.model.js'
+import { Video } from '../models/video.model.js'
 import { generateThumbnail } from "../utils/generateThumbnail.js";
 
 
@@ -137,18 +137,18 @@ const publishAVideo = asyncHandler(async (req, res) => {
 });
 
 const getVideoById = asyncHandler(async (req, res) => {
-    const {videoId} = req.params;
-    
+    const { videoId } = req.params;
+
     if (!videoId) {
         throw new ApiError(400, "Video ID is required");
     }
-    
-    const video = await Video.findById(videoId).populate('owner', "-password -watchHistory -email -coverImage -createdAt -updatedAt -__v -refreshToken", );
-    
+
+    const video = await Video.findById(videoId).populate('owner', "-password -watchHistory -email -coverImage -createdAt -updatedAt -__v -refreshToken",);
+
     if (!video) {
         throw new ApiError(404, "Video not found");
     }
-    
+
     return res
         .status(200)
         .json(
@@ -157,32 +157,32 @@ const getVideoById = asyncHandler(async (req, res) => {
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
-    const {videoId} = req.params;
-    const {title, description} = req.body;
-    
+    const { videoId } = req.params;
+    const { title, description } = req.body;
+
     if (!videoId) {
         throw new ApiError(400, "Video ID is required");
     }
-    
+
     if (!title && !description) {
         throw new ApiError(400, "At least one field is required to update");
     }
-    
+
     const video = await Video.findById(videoId);
-    
+
     if (!video) {
         throw new ApiError(404, "Video not found");
     }
-    
+
     if (video.owner.toString() !== req.user._id.toString()) {
         throw new ApiError(403, "Unauthorized to update this video");
     }
-    
+
     if (title) video.title = title;
     if (description) video.description = description;
-    
+
     await video.save();
-    
+
     return res
         .status(200)
         .json(
@@ -191,34 +191,73 @@ const updateVideo = asyncHandler(async (req, res) => {
 })
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
-    const {videoId} = req.params;
-    
+    const { videoId } = req.params;
+
     if (!videoId) {
         throw new ApiError(400, "Video ID is required");
     }
-    
+
     const video = await Video.findById(videoId);
-    
+
     if (!video) {
         throw new ApiError(404, "Video not found");
     }
-    
+
     if (video.owner.toString() !== req.user._id.toString()) {
         throw new ApiError(403, "Unauthorized to toggle video status");
     }
-    
+
     video.isPublished = !video.isPublished;
     await video.save();
-    
+
     return res
         .status(200)
         .json(
             new ApiResponse(
-                200, 
-                video, 
+                200,
+                video,
                 `Video ${video.isPublished ? "published" : "unpublished"} successfully`
             )
         );
 })
 
-export {getAllVideos, getVideoById, publishAVideo, togglePublishStatus, updateVideo}
+const userVideos = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        // Default values for pagination
+        let page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 10;
+
+        // Ensure page & limit are positive
+        if (page < 1) page = 1;
+        if (limit < 1) limit = 10;
+
+        const skip = (page - 1) * limit;
+
+        // Fetch videos with pagination
+        const videos = await Video.find({ owner: userId })
+            .sort({ createdAt: -1 }) // Sort by newest videos first
+            .skip(skip)
+            .limit(limit);
+
+        // Count total videos for pagination info
+        const totalVideos = await Video.countDocuments({ owner: userId });
+
+        res.json({
+            success: true,
+            page,
+            limit,
+            totalVideos,
+            totalPages: Math.ceil(totalVideos / limit),
+            videos
+        });
+
+    } catch (error) {
+        console.error("Error fetching user videos:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
+
+export { getAllVideos, getVideoById, publishAVideo, togglePublishStatus, updateVideo, userVideos }

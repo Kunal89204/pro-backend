@@ -8,6 +8,7 @@ import Image from "next/image";
 import { Flex, Box, Text, Button, Avatar, Input } from "@chakra-ui/react";
 import { setAuth } from "@/lib/slices/authSlice";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import Myvideos from "@/components/profile/Myvideos";
 
 
 const Profile = () => {
@@ -217,6 +218,9 @@ const Profile = () => {
           </div>
         )}
       </div>
+
+
+      <Myvideos  />
     </div>
   );
 };

@@ -200,6 +200,21 @@ export const myQuery = {
         } catch (error) {
             return error
         }
+    },
+
+    getUserVideos:async (token:string) => {
+        try {
+            const response = await axiosInstance.get('video/uservideos', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                }
+            })
+            return response.data
+        } catch (error) {
+            console.log(error)
+            return error
+        }
     }
 
 }

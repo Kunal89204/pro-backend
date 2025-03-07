@@ -37,6 +37,7 @@ const Myvideos: React.FC = () => {
                 uploadTime={vdo.createdAt}
                 title={vdo.title}
                 views={vdo.views}
+                isProfile={true}
 
                  />
             ))}

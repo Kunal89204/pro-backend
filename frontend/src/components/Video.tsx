@@ -35,8 +35,9 @@ interface VideoProps {
     channelName?: string;
     views: number;
     uploadTime: number | string;
-    duration: number | string,
-    videoId: string
+    duration: number | string;
+    videoId: string;
+    isProfile: boolean
 }
 
 
@@ -48,14 +49,15 @@ const Video: React.FC<VideoProps> = ({
     views,
     uploadTime,
     duration,
-    videoId
+    videoId,
+    isProfile
 }) => {
 
 
-    const {textColor, secondaryTextColor} = useThemeColors()
-    const {colorMode} = useColorMode()
+    const { textColor, secondaryTextColor } = useThemeColors()
+    const { colorMode } = useColorMode()
 
-   
+
     return (
         <Box borderRadius="xl" overflow="hidden">
 
@@ -75,7 +77,7 @@ const Video: React.FC<VideoProps> = ({
                 </Badge>
             </Box>
             <Flex gap={3} py={3} alignItems="start">
-                <Avatar src={typeof logo === "string" ? logo : undefined} name={channelName} width={'35px'} height={'35px'} />
+                {!isProfile && <Avatar src={typeof logo === "string" ? logo : undefined} name={channelName} width={'35px'} height={'35px'} />}
                 <Box flex={1}>
                     <Flex justify="space-between" >
                         <Link href={`/watch/${videoId}`}>
@@ -83,7 +85,7 @@ const Video: React.FC<VideoProps> = ({
                                 {title}
                             </Text></Link>
                         <Menu >
-                            <MenuButton height={0} width={6} minW={0} as={IconButton} icon={<IconDotsVertical width={20} className={colorMode == "light"?"text-black":"text-white"} />} variant="unstyled" aria-label="Options" />
+                            <MenuButton height={0} width={6} minW={0} as={IconButton} icon={<IconDotsVertical width={20} className={colorMode == "light" ? "text-black" : "text-white"} />} variant="unstyled" aria-label="Options" />
                             <MenuList textColor={textColor}>
                                 <MenuItem >Save to Playlist</MenuItem>
                                 <MenuItem >Share</MenuItem>

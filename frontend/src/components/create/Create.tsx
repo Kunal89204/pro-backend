@@ -122,6 +122,8 @@ const {buttonBg} =    useThemeColors()
                                         src={thumbnailPreviewUrl}
                                         alt="Thumbnail preview"
                                         className="max-w-[200px] rounded-lg"
+                                        width={1000}
+                                        height={1000}
                                     />
                                 </div>
                             )}

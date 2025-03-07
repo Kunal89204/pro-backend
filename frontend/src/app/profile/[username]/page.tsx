@@ -5,10 +5,11 @@ import { myQuery } from "@/api/query";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import Image from "next/image";
-import { Flex, Box, Text, Button, Avatar, Input } from "@chakra-ui/react";
+import { Flex, Box, Text, Button, Avatar, Input, useColorMode } from "@chakra-ui/react";
 import { setAuth } from "@/lib/slices/authSlice";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import Myvideos from "@/components/profile/Myvideos";
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 
 
 const Profile = () => {
@@ -16,9 +17,10 @@ const Profile = () => {
   const coverFileInputRef = useRef<HTMLInputElement>(null);
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch()
+  const { colorMode } = useColorMode()
 
   // Color modes import
-  const {textColor, secondaryTextColor, buttonBg} = useThemeColors()
+  const { textColor, secondaryTextColor, buttonBg } = useThemeColors()
 
   // Cover Image States
   const [coverImage, setCoverImage] = useState<File | undefined>();
@@ -189,7 +191,7 @@ const Profile = () => {
                   <Button
                     variant={"unstyled"}
                     textColor={secondaryTextColor}
-                  
+
                     px={4}
                     my={4}
                     bg={buttonBg}
@@ -199,7 +201,7 @@ const Profile = () => {
                   <Button
                     variant={"unstyled"}
                     textColor={secondaryTextColor}
-                    
+
                     px={4}
                     my={4}
                     bg={buttonBg}
@@ -219,8 +221,20 @@ const Profile = () => {
         )}
       </div>
 
+      <Tabs variant={'solid-rounded'} colorScheme="blue">
+        <TabList >
+          <Tab mx={1} color={colorMode == 'dark' ? "white" : "black"}>Videos</Tab>
+          <Tab mx={1} color={colorMode == 'dark' ? "white" : "black"}>Tweets</Tab>
+          <Tab mx={1} color={colorMode == 'dark' ? "white" : "black"}>Playlists</Tab>
+        </TabList>
 
-      <Myvideos  />
+        <TabPanels>
+          <TabPanel><Myvideos /></TabPanel>
+          <TabPanel><p>Tweets</p></TabPanel>
+          <TabPanel><p>Playlists</p></TabPanel>
+        </TabPanels>
+      </Tabs>
+
     </div>
   );
 };

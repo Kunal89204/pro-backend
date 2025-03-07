@@ -55,6 +55,7 @@ const Videos: React.FC = () => {
                     views={item.views}
                     duration={item.duration}
                     videoId={item._id}
+                    isProfile={false}
                 />
             ))}
         </Box>

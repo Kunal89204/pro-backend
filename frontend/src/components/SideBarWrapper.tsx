@@ -68,7 +68,7 @@ export function SidebarDemo({ children }: { children: ReactNode }) {
     const [open, setOpen] = useState(false);
     
     return (
-        <Box className={cn("rounded-md flex flex-col md:flex-row w-full flex-1 mx-auto border border-neutral-200 overflow-hidden", "h-[100vh]")} bg={bgColor}>
+        <Box className={cn("rounded-md flex flex-col md:flex-row w-full flex-1 mx-auto  border-neutral-200 overflow-hidden", "h-[100vh]")} bg={bgColor}>
             <Sidebar open={open} setOpen={setOpen}>
                 <SidebarBody className="justify-between gap-10">
                     <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">

@@ -110,13 +110,20 @@ const publishAVideo = asyncHandler(async (req, res) => {
     // If no thumbnail is provided, generate one
     if (!thumbnailLocalPath) {
         thumbnailLocalPath = await generateThumbnail(videoLocalPath, "./public/temp");
+
+        if (!thumbnailLocalPath) {
+            console.log('error extracting thumbnail')
+        }
     }
+
+    console.log( thumbnailLocalPath)
 
     // Upload to Cloudinary
     const uploadedVideo = await uploadOnCloudinary(videoLocalPath);
     const uploadedThumbnail = await uploadOnCloudinary(thumbnailLocalPath);
 
     if (!uploadedVideo || !uploadedThumbnail) {
+        console.log('here is the error')
         throw new ApiError(500, "Error while uploading video or thumbnail");
     }
 

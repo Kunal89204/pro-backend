@@ -1,9 +1,12 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Video } from '../models/video.model.js'
 import { generateThumbnail } from "../utils/generateThumbnail.js";
+import mongoose from "mongoose";
+import { getPublicIdFromUrl } from "../utils/publicIdExtracter.js";
+
 
 
 
@@ -92,6 +95,8 @@ const getAllVideos = asyncHandler(async (req, res) => {
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description, publish } = req.body;
 
+
+
     if (!title || !description) {
         throw new ApiError(400, "Title and description are required");
     }
@@ -100,12 +105,15 @@ const publishAVideo = asyncHandler(async (req, res) => {
     const videoFile = req.files?.videoFile?.[0];
     let thumbnailFile = req.files?.thumbnail?.[0];
 
+
     if (!videoFile) {
         throw new ApiError(400, "Video file is required");
     }
 
     let videoLocalPath = videoFile.path;
     let thumbnailLocalPath = thumbnailFile?.path; // Optional: Only if provided
+
+
 
     // If no thumbnail is provided, generate one
     if (!thumbnailLocalPath) {
@@ -116,7 +124,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
         }
     }
 
-    console.log( thumbnailLocalPath)
+    console.log({ videoLocalPath, thumbnailLocalPath })
 
     // Upload to Cloudinary
     const uploadedVideo = await uploadOnCloudinary(videoLocalPath);
@@ -153,8 +161,12 @@ const getVideoById = asyncHandler(async (req, res) => {
     const video = await Video.findById(videoId).populate('owner', "-password -watchHistory -email -coverImage -createdAt -updatedAt -__v -refreshToken",);
 
     if (!video) {
-        throw new ApiError(404, "Video not found");
+        return res.status(404).json({
+            success: false,
+            message: "Video does not exist or has been removed."
+        });
     }
+    
 
     return res
         .status(200)
@@ -266,5 +278,73 @@ const userVideos = async (req, res) => {
     }
 };
 
+const deleteVideo = asyncHandler(async (req, res) => {
+    try {
+        const { videoId } = req.params;
 
-export { getAllVideos, getVideoById, publishAVideo, togglePublishStatus, updateVideo, userVideos }
+        // Validate videoId
+        if (!videoId) {
+            return res.status(400).json({ 
+                success: false, 
+                status: 400, 
+                message: "Video ID is required" 
+            });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(videoId)) {
+            return res.status(400).json({ 
+                success: false, 
+                status: 400, 
+                message: "Invalid Video ID" 
+            });
+        }
+
+        // Find the video
+        const video = await Video.findById(videoId);
+        if (!video) {
+            return res.status(404).json({ 
+                success: false, 
+                status: 404, 
+                message: "Video not found" 
+            });
+        }
+
+
+     // Check if the user is permitted to delete the video
+     if (req.user._id.toString() !== video.owner.toString()) {
+        return res.status(403).json({
+            success: false,
+            status: 403,
+            message: "You are not authorized to delete this video"
+        });
+    }
+
+        // Extract Public IDs
+        const publicVideoId = getPublicIdFromUrl(video.videoFile);
+        const publicThumbnailId = getPublicIdFromUrl(video.thumbnail);
+
+        //  Promise.all for concurrent execution
+      const data =   await Promise.all([
+            deleteFromCloudinary(publicVideoId, "video"),
+            deleteFromCloudinary(publicThumbnailId),
+            Video.deleteOne({ _id: videoId })
+        ]);
+
+        return res.status(200).json({ 
+            success: true, 
+            status: 200, 
+            message: "Video deleted successfully", 
+            data
+        });
+    } catch (error) {
+        console.error("Error deleting video:", error);
+        return res.status(500).json({ 
+            success: false, 
+            status: 500, 
+            message: "Internal Server Error" 
+        });
+    }
+});
+
+
+export { getAllVideos, getVideoById, publishAVideo, togglePublishStatus, updateVideo, userVideos, deleteVideo }

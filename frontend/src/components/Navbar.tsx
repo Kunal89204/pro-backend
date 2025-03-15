@@ -9,7 +9,7 @@ import {
   IconButton,
   Input,
   InputGroup,
-  InputRightElement,
+  InputRightAddon,
   useColorMode,
 
 } from "@chakra-ui/react";
@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
         <Box></Box>
 
         {/* Search Bar */}
-        <InputGroup maxW={{ base: "full", lg: "40%" }} borderRadius="full" border="1px solid" borderColor={borderColor}>
+        <InputGroup maxW={{ base: "full", lg: "40%" }} borderRadius="full" border="0px solid" borderColor={borderColor}>
           <Input
             placeholder="Search..."
             bg={inputBg}
@@ -49,16 +49,19 @@ const Navbar: React.FC = () => {
             borderRadius="full"
             py={2}
             px={4}
+            _focusVisible={{outline:"none"}}
             _focus={{ outline: "none", borderColor: "primary.main" }}
           />
-          <InputRightElement>
+          <InputRightAddon borderRightRadius={'full'}>
             <IconButton
               aria-label="Search"
               icon={<IconSearch />}
               variant="ghost"
               borderRadius="full"
+              _hover={"none"}
+              _focus={"none"}
             />
-          </InputRightElement>
+          </InputRightAddon>
         </InputGroup>
 
         {/* Color Mode Toggle & Create Button */}

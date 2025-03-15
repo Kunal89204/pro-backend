@@ -215,6 +215,21 @@ export const myQuery = {
             console.log(error)
             return error
         }
+    },
+
+    deleteVideo:async (token:string, videoId:string|any) => {
+        try {
+            const response = await axiosInstance.delete(`/video/delete-video/${videoId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                }
+            })
+            return response.data
+        } catch (error) {
+            console.log(error)
+            return error
+        }
     }
 
 }

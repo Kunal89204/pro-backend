@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+    deleteVideo,
     getAllVideos,
     getVideoById,
     publishAVideo,
@@ -40,6 +41,8 @@ router.route("/:videoId([0-9a-fA-F]{24})") // ✅ Only match valid ObjectIds
 
 
 router.route("/toggle/publish/:videoId").patch(togglePublishStatus);
+
+router.route('/delete-video/:videoId').delete(deleteVideo)
 
 
 

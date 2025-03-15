@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
-import { deleteFromCloudinar, uploadOnCloudinary } from "../utils/cloudinary.js";
+import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from 'jsonwebtoken'
 import mongoose from "mongoose";
@@ -301,7 +301,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   ).select("-password")
 
   if (publicUrl) {
-    await deleteFromCloudinar(getPublicIdFromUrl(publicUrl))
+    await deleteFromCloudinary(getPublicIdFromUrl(publicUrl))
   }
 
   return res
@@ -340,7 +340,7 @@ const updateUserCoverImg = asyncHandler(async (req, res) => {
 
   let deleteOldCoverImage;
   if (publicUrl) {
-    deleteOldCoverImage = await deleteFromCloudinar(getPublicIdFromUrl(publicUrl))
+    deleteOldCoverImage = await deleteFromCloudinary(getPublicIdFromUrl(publicUrl))
   }
 
 

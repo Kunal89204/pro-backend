@@ -2,9 +2,9 @@ import React from 'react'
 import { VideoProps } from '@/types/types'
 import { useThemeColors } from '@/hooks/useThemeColors'
 import { formatDistanceToNow } from "date-fns"
-import { Box, Flex, Menu, MenuButton, MenuItem, MenuList, Text, IconButton, Avatar, Badge, useColorMode } from "@chakra-ui/react";
+import { Box, Flex, Menu, MenuButton, MenuItem, MenuList, Text, IconButton, Badge, useColorMode } from "@chakra-ui/react";
 import { IconDotsVertical } from "@tabler/icons-react";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import Link from 'next/link';
 import DeleteButton from './DeleteButton';
 

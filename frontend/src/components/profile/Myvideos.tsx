@@ -3,7 +3,6 @@ import { RootState } from '@/lib/store'
 import { useQuery } from '@tanstack/react-query'
 import React from 'react'
 import { useSelector } from 'react-redux'
-import Videos from '../Video'
 import Video from './Video'
 import { VideoProps } from '@/types/types'
 

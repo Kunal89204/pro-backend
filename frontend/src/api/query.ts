@@ -217,7 +217,7 @@ export const myQuery = {
         }
     },
 
-    deleteVideo:async (token:string, videoId:string|any) => {
+    deleteVideo:async (token:string, videoId:string) => {
         try {
             const response = await axiosInstance.delete(`/video/delete-video/${videoId}`, {
                 headers: {

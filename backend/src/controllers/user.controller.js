@@ -8,6 +8,12 @@ import mongoose from "mongoose";
 import { getPublicIdFromUrl } from "../utils/publicIdExtracter.js";
 import { Video } from "../models/video.model.js";
 
+
+
+import os from "os";
+import fs from "fs";
+import cloudinary from "cloudinary";
+
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -478,5 +484,71 @@ const addToWatchHistory = asyncHandler(async (req, res) => {
 });
 
 
+const healthCheck = asyncHandler(async (req, res) => {
+  try {
+    const checks = {};
 
-export { registerUser, loginUser, logout, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImg, getUserChannelProfile, getWatchHistory, addToWatchHistory };
+    // 1. Check Database Connection
+    try {
+      await mongoose.connection.db.admin().ping();
+      checks.database = { status: "healthy" };
+    } catch (err) {
+      checks.database = { status: "unhealthy", error: err.message };
+    }
+
+
+
+    // 3. Check System Resource Utilization
+    const memoryUsage = process.memoryUsage();
+    const totalMemory = os.totalmem();
+    const freeMemory = os.freemem();
+    const usedMemory = totalMemory - freeMemory;
+
+    checks.system = {
+      uptime: os.uptime(), // Server uptime in seconds
+      loadAvg: os.loadavg(), // CPU Load Average
+      memory: {
+        total: totalMemory,
+        used: usedMemory,
+        free: freeMemory,
+        processHeapUsed: memoryUsage.heapUsed,
+      },
+      cpuUsage: process.cpuUsage(),
+    };
+
+    // 4. Check Disk Space
+    try {
+      const diskStat = fs.statSync("/");
+      checks.disk = {
+        available: diskStat.blocks * diskStat.blksize,
+        free: diskStat.bfree * diskStat.blksize,
+      };
+    } catch (err) {
+      checks.disk = { status: "unhealthy", error: err.message };
+    }
+
+    // 5. API Health
+    checks.api = { status: "healthy", message: "User service is operational" };
+
+    // If any service is unhealthy, return a 503 status
+    const unhealthyServices = Object.values(checks).filter(
+      (check) => check.status === "unhealthy"
+    );
+
+    if (unhealthyServices.length > 0) {
+      throw new ApiError(503, "Some dependencies are unhealthy", checks);
+    }
+
+    return res.status(200).json(new ApiResponse(200, checks, "Service is healthy"));
+  } catch (error) {
+    console.error("Health check failed:", error);
+    return res.status(503).json(new ApiError(503, "Service is unhealthy", error));
+  }
+});
+
+
+
+
+
+
+export { registerUser, loginUser, logout, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImg, getUserChannelProfile, getWatchHistory, addToWatchHistory, healthCheck };

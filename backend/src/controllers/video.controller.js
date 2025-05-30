@@ -3,7 +3,6 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Video } from '../models/video.model.js'
-import { generateThumbnail } from "../utils/generateThumbnail.js";
 import mongoose from "mongoose";
 import { getPublicIdFromUrl } from "../utils/publicIdExtracter.js";
 
@@ -95,50 +94,47 @@ const getAllVideos = asyncHandler(async (req, res) => {
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description, publish } = req.body;
 
-
-
     if (!title || !description) {
         throw new ApiError(400, "Title and description are required");
     }
 
-    // Safely access files
     const videoFile = req.files?.videoFile?.[0];
-    let thumbnailFile = req.files?.thumbnail?.[0];
-
+    const customThumbnailFile = req.files?.thumbnail?.[0];
 
     if (!videoFile) {
         throw new ApiError(400, "Video file is required");
     }
 
-    let videoLocalPath = videoFile.path;
-    let thumbnailLocalPath = thumbnailFile?.path; // Optional: Only if provided
+    const videoLocalPath = videoFile.path;
 
+    // 1. Upload video to Cloudinary
+    const uploadedVideo = await uploadOnCloudinary(videoLocalPath, {
+        resource_type: 'video'
+    });
 
+    if (!uploadedVideo) {
+        throw new ApiError(500, "Error while uploading video");
+    }
 
-    // If no thumbnail is provided, generate one
-    if (!thumbnailLocalPath) {
-        thumbnailLocalPath = await generateThumbnail(videoLocalPath, "./public/temp");
+    let thumbnailUrl = "";
 
-        if (!thumbnailLocalPath) {
-            console.log('error extracting thumbnail')
+    // 2. If custom thumbnail is provided, upload it
+    if (customThumbnailFile) {
+        const uploadedThumbnail = await uploadOnCloudinary(customThumbnailFile.path);
+        if (!uploadedThumbnail) {
+            throw new ApiError(500, "Error while uploading custom thumbnail");
         }
+        thumbnailUrl = uploadedThumbnail.url;
+    } else {
+        // 3. Else generate thumbnail from Cloudinary video using transformation
+        // Example: First frame at 1 second
+        thumbnailUrl = `${uploadedVideo.secure_url.replace('.mp4', '.jpg')}?so=1`;
     }
 
-    console.log({ videoLocalPath, thumbnailLocalPath })
-
-    // Upload to Cloudinary
-    const uploadedVideo = await uploadOnCloudinary(videoLocalPath);
-    const uploadedThumbnail = await uploadOnCloudinary(thumbnailLocalPath);
-
-    if (!uploadedVideo || !uploadedThumbnail) {
-        console.log('here is the error')
-        throw new ApiError(500, "Error while uploading video or thumbnail");
-    }
-
-    // Save in DB
+    // 4. Save in DB
     const video = await Video.create({
-        videoFile: uploadedVideo.url,
-        thumbnail: uploadedThumbnail.url,
+        videoFile: uploadedVideo.secure_url,
+        thumbnail: thumbnailUrl,
         title,
         description,
         isPublished: publish,
@@ -146,10 +142,11 @@ const publishAVideo = asyncHandler(async (req, res) => {
         owner: req.user._id
     });
 
-    console.log({ uploadedVideo, uploadedThumbnail });
-
-    return res.status(201).json(new ApiResponse(201, video, "Video published successfully"));
+    return res.status(201).json(
+        new ApiResponse(201, video, "Video published successfully")
+    );
 });
+
 
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params;

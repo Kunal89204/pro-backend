@@ -18,9 +18,9 @@ const Videos: React.FC = () => {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["videos"],
     queryFn: () => myQuery.getAllVideos(token),
-    staleTime: 1000 * 60 * 5, // 5 minutes (data stays fresh for 5 minutes)
-    refetchOnMount: false, // Prevent refetch when coming back
-    refetchOnWindowFocus: false, // Prevent refetch when switching tabs
+    staleTime: 1000 * 60 * 5,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   if (isLoading) {
@@ -28,10 +28,20 @@ const Videos: React.FC = () => {
       <Box className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 3xl:grid-cols-5">
         {Array.from({ length: 8 }).map((_, i) => (
           <Box key={i}>
-            <Skeleton height="200px" width="100%" borderRadius={"14px"} isLoaded={!isLoading}/>
+            <Skeleton
+              height="200px"
+              width="100%"
+              borderRadius={"14px"}
+              isLoaded={!isLoading}
+            />
             <Flex py={2} gap={4}>
-              <SkeletonCircle size="10" isLoaded={!isLoading}/>
-              <SkeletonText height="20px" width="250px" noOfLines={3} isLoaded={!isLoading}/>
+              <SkeletonCircle size="10" isLoaded={!isLoading} />
+              <SkeletonText
+                height="20px"
+                width="250px"
+                noOfLines={3}
+                isLoaded={!isLoading}
+              />
             </Flex>
           </Box>
         ))}

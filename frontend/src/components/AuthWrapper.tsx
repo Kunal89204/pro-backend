@@ -6,22 +6,27 @@ import { useSelector } from "react-redux";
 
 const AuthWrapper = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
-  const pathname = usePathname(); // Use usePathname() instead of window.location.pathname
+  const pathname = usePathname();
   const isAuthenticated = useSelector(
     (state: RootState) => state.isAuthenticated
   );
 
+  // Redirect to /login if not authenticated and not on /login or /register
   useEffect(() => {
-    // Redirect to /login if not authenticated and not on /login or /register
-    if (!isAuthenticated && pathname !== "/login" && pathname !== "/register") {
+    if (
+      !isAuthenticated &&
+      pathname !== "/login" &&
+      pathname !== "/register"
+    ) {
       router.push("/login");
     }
   }, [isAuthenticated, pathname, router]);
 
+  // Redirect authenticated users away from /login and /register
   useEffect(() => {
     if (
-      (isAuthenticated && pathname === "/login") ||
-      pathname === "/register"
+      isAuthenticated &&
+      (pathname === "/login" || pathname === "/register")
     ) {
       router.push("/");
     }

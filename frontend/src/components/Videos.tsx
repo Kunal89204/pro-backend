@@ -28,10 +28,10 @@ const Videos: React.FC = () => {
       <Box className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 3xl:grid-cols-5">
         {Array.from({ length: 8 }).map((_, i) => (
           <Box key={i}>
-            <Skeleton height="200px" width="100%" borderRadius={"14px"} />
+            <Skeleton height="200px" width="100%" borderRadius={"14px"} isLoaded={!isLoading}/>
             <Flex py={2} gap={4}>
-              <SkeletonCircle size="10" />
-              <SkeletonText height="20px" width="250px" noOfLines={3} />
+              <SkeletonCircle size="10" isLoaded={!isLoading}/>
+              <SkeletonText height="20px" width="250px" noOfLines={3} isLoaded={!isLoading}/>
             </Flex>
           </Box>
         ))}

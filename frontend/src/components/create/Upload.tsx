@@ -1,10 +1,9 @@
-"use client"
-import { useMutation } from '@tanstack/react-query';
-import React from 'react'
-import { myQuery } from '@/api/query';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/lib/store';
-
+"use client";
+import { useMutation } from "@tanstack/react-query";
+import React from "react";
+import { myQuery } from "@/api/query";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
 
 interface UploadProps {
   videoFile: File[];
@@ -13,32 +12,37 @@ interface UploadProps {
     title: string;
     description: string;
   };
-  publish:boolean
+  publish: boolean;
   onSuccess: () => void;
 }
 
-const Upload: React.FC<UploadProps> = ({ videoFile, thumbnailFile, formData, publish, onSuccess }) => {
-  const token = useSelector((state:RootState) => state.token)
+const Upload: React.FC<UploadProps> = ({
+  videoFile,
+  thumbnailFile,
+  formData,
+  publish,
+  onSuccess,
+}) => {
+  const token = useSelector((state: RootState) => state.token);
   const uploadMutation = useMutation({
     mutationFn: async () => {
-      
       return myQuery.uploadVideo({
         token,
         title: formData.title,
         description: formData.description,
         publish,
         thumbnail: thumbnailFile[0],
-        videoFile: videoFile[0]
+        videoFile: videoFile[0],
       });
     },
     onSuccess: (data) => {
-      console.log('Upload successful:', data);
+      console.log("Upload successful:", data);
       onSuccess();
     },
     onError: (error) => {
-      console.error('Upload failed:', error);
+      console.error("Upload failed:", error);
       // Add error handling (e.g., show error message)
-    }
+    },
   });
 
   const handleUpload = () => {
@@ -64,7 +68,7 @@ const Upload: React.FC<UploadProps> = ({ videoFile, thumbnailFile, formData, pub
           </div>
           <div>
             <p className="font-medium">Publish</p>
-            <p>{publish?'yes':"No"}</p>
+            <p>{publish ? "yes" : "No"}</p>
           </div>
           {thumbnailFile.length > 0 && (
             <div>
@@ -74,18 +78,18 @@ const Upload: React.FC<UploadProps> = ({ videoFile, thumbnailFile, formData, pub
           )}
         </div>
       </div>
-      <button 
+      <button
         onClick={handleUpload}
         disabled={uploadMutation.isPending}
         className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-400"
       >
-        {uploadMutation.isPending ? 'Uploading...' : 'Upload'}
+        {uploadMutation.isPending ? "Uploading..." : "Upload"}
       </button>
       {uploadMutation.isError && (
         <p className="text-red-500 mt-2">Upload failed. Please try again.</p>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Upload
+export default Upload;

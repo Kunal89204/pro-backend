@@ -1,5 +1,5 @@
 "use client";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/Sidebar";
 import {
     IconHistory,
@@ -18,7 +18,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/lib/slices/authSlice";
 import { RootState } from "@/lib/store";
 import { Avatar, Box, Text, useColorMode } from "@chakra-ui/react";
-import { useThemeColors } from "@/hooks/useThemeColors";
+import { useThemeColors } from "@/hooks/useThemeColors"; 
+
 
 export function SidebarDemo({ children }: { children: ReactNode }) {
 
@@ -29,6 +30,11 @@ export function SidebarDemo({ children }: { children: ReactNode }) {
     const dispatch = useDispatch();
     const { bgColor } = useThemeColors();
     const {colorMode} = useColorMode()
+    const {isAuthenticated} = useSelector((state:RootState) => state)
+
+  if(!isAuthenticated){
+    return children
+  }
 
 
     

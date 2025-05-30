@@ -11,7 +11,12 @@ const Playlists:React.FC = () => {
   return (
     <Box>
       <Hero />
-      <Playlist></Playlist>
+      <div className='grid grid-cols-4 '>
+      <Playlist/>
+      <Playlist/>
+      <Playlist/>
+      <Playlist/>
+      </div>
     </Box>
   )
 }

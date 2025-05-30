@@ -496,8 +496,6 @@ const healthCheck = asyncHandler(async (req, res) => {
       checks.database = { status: "unhealthy", error: err.message };
     }
 
-
-
     // 3. Check System Resource Utilization
     const memoryUsage = process.memoryUsage();
     const totalMemory = os.totalmem();

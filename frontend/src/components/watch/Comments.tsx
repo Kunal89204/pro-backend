@@ -1,13 +1,26 @@
 "use client";
 import { useState } from "react";
 import {
-  Box, Text, Input, Button, Avatar, VStack, HStack, Collapse, Divider, Flex,
-  useColorMode
+  Box,
+  Text,
+  Input,
+  Button,
+  Avatar,
+  VStack,
+  HStack,
+  Collapse,
+  Divider,
+  Flex,
+  useColorMode,
 } from "@chakra-ui/react";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import {
-  IconMessageCircle, IconThumbUp, IconThumbDown
+  IconMessageCircle,
+  IconThumbUp,
+  IconThumbDown,
 } from "@tabler/icons-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
 
 // Define comment type
 interface Comment {
@@ -41,31 +54,39 @@ const commentsData: Comment[] = [
         avatar: "https://i.pravatar.cc/46",
         text: "Sure! What part do you need help with?",
         time: "2 hours ago",
-        replies: [{
-          id: 7,
-          user: "Alice Brown",
-          avatar: "https://i.pravatar.cc/42",
-          text: "Can someone explain this part?",
-          time: "3 hours ago",
-          replies: [
-            {
-              id:9,
-              user: "John Doe",
-              avatar: "https://i.pravatar.cc/46",
-              text: "Sure! What part do you need help with?",
-              time: "2 hours ago",
-              replies: [],
-            },
-          ],
-        },],
+        replies: [
+          {
+            id: 7,
+            user: "Alice Brown",
+            avatar: "https://i.pravatar.cc/42",
+            text: "Can someone explain this part?",
+            time: "3 hours ago",
+            replies: [
+              {
+                id: 9,
+                user: "John Doe",
+                avatar: "https://i.pravatar.cc/46",
+                text: "Sure! What part do you need help with?",
+                time: "2 hours ago",
+                replies: [],
+              },
+            ],
+          },
+        ],
       },
     ],
   },
 ];
 
-const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number }) => {
+const CommentItem = ({
+  comment,
+  depth = 0,
+}: {
+  comment: Comment;
+  depth?: number;
+}) => {
   const { textColor, secondaryTextColor } = useThemeColors();
-  const {colorMode} = useColorMode()
+  const { colorMode } = useColorMode();
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyText, setReplyText] = useState("");
@@ -83,18 +104,42 @@ const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number 
         <Avatar src={comment.avatar} size="sm" />
         <Box>
           <Flex alignItems="center" gap={2}>
-            <Text fontWeight="bold" color={textColor}>{comment.user}</Text>
-            <Text fontSize="xs" color={secondaryTextColor}>{comment.time}</Text>
+            <Text fontWeight="bold" color={textColor}>
+              {comment.user}
+            </Text>
+            <Text fontSize="xs" color={secondaryTextColor}>
+              {comment.time}
+            </Text>
           </Flex>
-          <Text mt={1} color={textColor}>{comment.text}</Text>
+          <Text mt={1} color={textColor}>
+            {comment.text}
+          </Text>
           <HStack mt={2} spacing={4}>
-            <IconThumbUp size={16} cursor="pointer" color={colorMode == "light"?"black":"white"} />
-            <IconThumbDown color={colorMode == "light"?"black":"white"} size={16} cursor="pointer" />
-            <Text color={textColor} fontSize="sm" cursor="pointer" onClick={() => setShowReplyInput(!showReplyInput)}>
+            <IconThumbUp
+              size={16}
+              cursor="pointer"
+              color={colorMode == "light" ? "black" : "white"}
+            />
+            <IconThumbDown
+              color={colorMode == "light" ? "black" : "white"}
+              size={16}
+              cursor="pointer"
+            />
+            <Text
+              color={textColor}
+              fontSize="sm"
+              cursor="pointer"
+              onClick={() => setShowReplyInput(!showReplyInput)}
+            >
               Reply
             </Text>
             {comment.replies.length > 0 && (
-              <Text fontSize="sm" cursor="pointer" color={textColor} onClick={() => setShowReplies(!showReplies)}>
+              <Text
+                fontSize="sm"
+                cursor="pointer"
+                color={textColor}
+                onClick={() => setShowReplies(!showReplies)}
+              >
                 {showReplies ? "Hide Replies" : "View Replies"}
               </Text>
             )}
@@ -109,7 +154,9 @@ const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number 
                 onChange={(e) => setReplyText(e.target.value)}
                 size="sm"
               />
-              <Button size="sm" colorScheme="blue" onClick={handleReplySubmit}>Post</Button>
+              <Button size="sm" colorScheme="blue" onClick={handleReplySubmit}>
+                Post
+              </Button>
             </HStack>
           )}
 
@@ -129,13 +176,21 @@ const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number 
 
 const Comments = () => {
   const { textColor } = useThemeColors();
+  const { user } = useSelector((state: RootState) => state);
+  const { avatarImage } = user;
   return (
     <Box py={4}>
-      <Text fontSize="2xl" fontWeight="semibold" color={textColor}>Comments</Text>
+      <Text fontSize="2xl" fontWeight="semibold" color={textColor}>
+        Comments
+      </Text>
       {/* User's Comment Input */}
       <HStack mt={4} spacing={3}>
-        <Avatar src="https://i.pravatar.cc/40" size={'sm'} />
-        <Input placeholder="Add a comment..." variant="filled" borderRadius={"full"} />
+        <Avatar src={avatarImage} size={"sm"} />
+        <Input
+          placeholder="Add a comment..."
+          variant="filled"
+          borderRadius={"full"}
+        />
         <Button colorScheme="blue" borderRadius={"full"}>
           <IconMessageCircle size={18} />
         </Button>

@@ -37,7 +37,6 @@ export default function RootLayout({
         <Providers>
           <AuthWrapper>
             <SidebarDemo>
-
               {children}
             </SidebarDemo>
           </AuthWrapper>

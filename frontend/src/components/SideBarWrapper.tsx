@@ -1,5 +1,5 @@
 "use client";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode,  useState } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/Sidebar";
 import {
     IconHistory,
@@ -31,6 +31,7 @@ export function SidebarDemo({ children }: { children: ReactNode }) {
     const { bgColor } = useThemeColors();
     const {colorMode} = useColorMode()
     const {isAuthenticated} = useSelector((state:RootState) => state)
+    const [open, setOpen] = useState(false);
 
   if(!isAuthenticated){
     return children
@@ -71,7 +72,7 @@ export function SidebarDemo({ children }: { children: ReactNode }) {
         }
     ];
     
-    const [open, setOpen] = useState(false);
+    
     
     return (
         <Box className={cn("rounded-md flex flex-col md:flex-row w-full flex-1 mx-auto  border-neutral-200 overflow-hidden", "h-[100vh]")} bg={bgColor}>

@@ -13,7 +13,7 @@ const Myvideos: React.FC = () => {
     const token = useSelector((state: RootState) => state.token)
   
 
-    const { data, isLoading, error, isError } = useQuery({
+    const { data } = useQuery({
         queryKey: ['myvideos'],
         queryFn: () => myQuery.getUserVideos(token)
     })

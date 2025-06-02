@@ -17,7 +17,7 @@ import { useThemeColors } from "@/hooks/useThemeColors";
 import { useRouter } from "next/navigation";
 import { IconDotsVertical } from "@tabler/icons-react";
 
-const Playlist = ({ data }: { data: any }) => {
+const Playlist = ({ data }: { data: {} }) => {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const [colors, setColors] = useState<string[]>(["#cccccc", "#999999"]); // Default colors
   const [isHovered, setIsHovered] = useState(false);

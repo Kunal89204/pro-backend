@@ -4,7 +4,7 @@ import React from "react";
 import { myQuery } from "@/api/query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
-import { Text, useColorMode } from "@chakra-ui/react";
+import { Text} from "@chakra-ui/react";
 import { useThemeColors } from "@/hooks/useThemeColors";
 
 interface UploadProps {
@@ -51,7 +51,7 @@ const Upload: React.FC<UploadProps> = ({
     uploadMutation.mutate();
   };
 
-  const { colorMode } = useColorMode();
+  
   const { secondaryTextColor, textColor } = useThemeColors();
   return (
     <div>

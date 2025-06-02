@@ -213,7 +213,7 @@ export function GridPattern() {
                     const index = row * columns + col;
                     // Set background and shadow colors via style for dark mode
                     const isEven = index % 2 === 0;
-                    let style: React.CSSProperties = {};
+                    const style: React.CSSProperties = {};
                     if (colorMode === "dark") {
                         style.backgroundColor = "#09090b"; // Tailwind neutral-950
                         if (!isEven) {

@@ -164,7 +164,7 @@ const Playlist = ({
               height="28px"
               width="28px"
               bg="transparent"
-              _hover={{ bg: colorMode === "light" ? "gray.100" : "gray.700" }}
+              _hover={{ bg: `${colors[0].replace("rgb", "rgba").replace(")", ", 0.3)")}` }}
               _active={{ bg: "transparent" }}
             />
             <MenuList
@@ -173,7 +173,7 @@ const Playlist = ({
               px={0}
               borderRadius="md"
               boxShadow="md"
-              bg={colorMode === "light" ? "white" : "gray.800"}
+              bg={`${colors[0].replace("rgb", "rgba").replace(")", ", 0.9)")}`}
               border="none"
             >
               <MenuItem
@@ -181,8 +181,8 @@ const Playlist = ({
                 px={3}
                 py={2}
                 bg="transparent"
-                _hover={{ bg: colorMode === "light" ? "gray.100" : "gray.700" }}
-                _focus={{ bg: colorMode === "light" ? "gray.100" : "gray.700" }}
+                _hover={{ bg: `${colors[0].replace("rgb", "rgba").replace(")", ", 0.3)")}` }}
+                _focus={{ bg:`${colors[0].replace("rgb", "rgba").replace(")", ", 0.8)")}` }}
                 color={colorMode === "light" ? "gray.800" : "gray.100"}
               >
                 Edit
@@ -192,8 +192,8 @@ const Playlist = ({
                 px={3}
                 py={2}
                 bg="transparent"
-                _hover={{ bg: colorMode === "light" ? "gray.100" : "gray.700" }}
-                _focus={{ bg: colorMode === "light" ? "gray.100" : "gray.700" }}
+                _hover={{ bg: `${colors[0].replace("rgb", "rgba").replace(")", ", 0.3)")}` }}
+                _focus={{ bg:`${colors[0].replace("rgb", "rgba").replace(")", ", 0.8)")}`}}
                 color={colorMode === "light" ? "gray.800" : "gray.100"}
               >
                 Delete

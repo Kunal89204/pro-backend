@@ -16,12 +16,14 @@ import {
     Button,
     Switch,
     Flex,
-    useToast
+    useToast,
+    useColorMode
 } from '@chakra-ui/react'
 import VideoForm from './VideoForm'
 import Upload from './Upload'
 import Image from 'next/image'
 import { useThemeColors } from '@/hooks/useThemeColors'
+
 
 
 const steps = [
@@ -33,6 +35,7 @@ const steps = [
 
 const Create: React.FC = () => {
     const toast = useToast()
+    const { colorMode } = useColorMode()
     const [file, setFile] = useState<File[]>([])
     const [videoPreviewUrl, setVideoPreviewUrl] = useState<string>('')
     const [thumbnailFile, setThumbnailFile] = useState<File[]>([])
@@ -43,6 +46,7 @@ const Create: React.FC = () => {
         description: '',
 
     })
+    const {secondaryTextColor}  = useThemeColors()
     const [canProceed, setCanProceed] = useState(false)
 
 const {buttonBg} =    useThemeColors()
@@ -129,7 +133,7 @@ const {buttonBg} =    useThemeColors()
                             )}
                         </div>
 
-                        <Flex alignItems={'center'} gap={2} fontWeight={'semibold'} fontSize={'xl'}>Publish <Switch
+                        <Flex alignItems={'center'} gap={2} color={secondaryTextColor} fontWeight={'semibold'} fontSize={'xl'}>Publish <Switch
                             colorScheme="blackAlpha"
                             isChecked={publish}
                             onChange={() => setPublish(prev => !prev)}
@@ -151,7 +155,12 @@ const {buttonBg} =    useThemeColors()
     }
 
     return (
-        <div className="w-full mt-32 max-w-4xl mx-auto min-h-96 border border-dashed bg-white dark:bg-black border-neutral-200 dark:border-neutral-800 rounded-lg p-6">
+        <div className="w-full mt-32 max-w-4xl mx-auto min-h-96 border border-dashed bg-white  border-neutral-200 dark:border-neutral-800 rounded-lg p-6" 
+        style={{
+            backgroundColor: colorMode === "dark" ? "black" : "",
+            borderColor: colorMode === "dark" ? "rgb(38 38 38 / var(--tw-border-opacity, 1))" : "",
+        }}
+        >
             {activeStep === 0 && <FileUpload onChange={handleFileUpload} />}
 
             <Stepper index={activeStep}>
@@ -159,15 +168,15 @@ const {buttonBg} =    useThemeColors()
                     <Step key={index}>
                         <StepIndicator>
                             <StepStatus
-                                complete={<StepIcon />}
-                                incomplete={<StepNumber />}
-                                active={<StepNumber />}
+                                complete={<StepIcon color={secondaryTextColor} />}
+                                incomplete={<StepNumber color={secondaryTextColor}/>}
+                                active={<StepNumber color={secondaryTextColor}/>}
                             />
                         </StepIndicator>
 
                         <Box flexShrink='0'>
-                            <StepTitle>{step.title}</StepTitle>
-                            <StepDescription>{step.description}</StepDescription>
+                            <StepTitle color={secondaryTextColor}>{step.title}</StepTitle>
+                            <StepDescription >{step.description}</StepDescription>
                         </Box>
 
                         <StepSeparator />

@@ -4,6 +4,8 @@ import React from "react";
 import { myQuery } from "@/api/query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
+import { Text, useColorMode } from "@chakra-ui/react";
+import { useThemeColors } from "@/hooks/useThemeColors";
 
 interface UploadProps {
   videoFile: File[];
@@ -49,31 +51,35 @@ const Upload: React.FC<UploadProps> = ({
     uploadMutation.mutate();
   };
 
+  const { colorMode } = useColorMode();
+  const { secondaryTextColor, textColor } = useThemeColors();
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-lg font-medium mb-2">Review Your Upload</h3>
+        <Text className="text-lg font-medium mb-2" color={textColor}>
+          Review Your Upload
+        </Text>
         <div className="space-y-4">
           <div>
-            <p className="font-medium">Title:</p>
-            <p>{formData.title}</p>
+            <Text className="font-medium" color={secondaryTextColor}>Title:</Text>
+            <Text color={textColor}>{formData.title}</Text>
           </div>
           <div>
-            <p className="font-medium">Description:</p>
-            <p>{formData.description}</p>
+            <Text className="font-medium" color={secondaryTextColor}>Description:</Text>
+            <Text color={textColor}>{formData.description}</Text>
           </div>
           <div>
-            <p className="font-medium">Video:</p>
-            <p>{videoFile[0]?.name}</p>
+            <Text className="font-medium" color={secondaryTextColor}>Video:</Text>
+            <Text color={textColor}>{videoFile[0]?.name}</Text>
           </div>
           <div>
-            <p className="font-medium">Publish</p>
-            <p>{publish ? "yes" : "No"}</p>
+            <Text className="font-medium" color={secondaryTextColor}>Publish</Text>
+            <Text color={textColor}>{publish ? "yes" : "No"}</Text>
           </div>
           {thumbnailFile.length > 0 && (
             <div>
-              <p className="font-medium">Thumbnail:</p>
-              <p>{thumbnailFile[0]?.name}</p>
+              <Text className="font-medium" color={secondaryTextColor}>Thumbnail:</Text>
+              <Text color={textColor}>{thumbnailFile[0]?.name}</Text>
             </div>
           )}
         </div>

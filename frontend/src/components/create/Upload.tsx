@@ -61,24 +61,34 @@ const Upload: React.FC<UploadProps> = ({
         </Text>
         <div className="space-y-4">
           <div>
-            <Text className="font-medium" color={secondaryTextColor}>Title:</Text>
+            <Text className="font-medium" color={secondaryTextColor}>
+              Title:
+            </Text>
             <Text color={textColor}>{formData.title}</Text>
           </div>
           <div>
-            <Text className="font-medium" color={secondaryTextColor}>Description:</Text>
+            <Text className="font-medium" color={secondaryTextColor}>
+              Description:
+            </Text>
             <Text color={textColor}>{formData.description}</Text>
           </div>
           <div>
-            <Text className="font-medium" color={secondaryTextColor}>Video:</Text>
+            <Text className="font-medium" color={secondaryTextColor}>
+              Video:
+            </Text>
             <Text color={textColor}>{videoFile[0]?.name}</Text>
           </div>
           <div>
-            <Text className="font-medium" color={secondaryTextColor}>Publish</Text>
+            <Text className="font-medium" color={secondaryTextColor}>
+              Publish
+            </Text>
             <Text color={textColor}>{publish ? "yes" : "No"}</Text>
           </div>
           {thumbnailFile.length > 0 && (
             <div>
-              <Text className="font-medium" color={secondaryTextColor}>Thumbnail:</Text>
+              <Text className="font-medium" color={secondaryTextColor}>
+                Thumbnail:
+              </Text>
               <Text color={textColor}>{thumbnailFile[0]?.name}</Text>
             </div>
           )}

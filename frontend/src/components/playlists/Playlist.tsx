@@ -1,14 +1,28 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { Badge, Box, Flex, Text } from "@chakra-ui/react";
+import {
+  Badge,
+  Box,
+  Flex,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+  useColorMode,
+} from "@chakra-ui/react";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { useRouter } from "next/navigation";
+import { IconDotsVertical } from "@tabler/icons-react";
 
-const Playlist = () => {
+const Playlist = ({ data }: { data: any }) => {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const [colors, setColors] = useState<string[]>(["#cccccc", "#999999"]); // Default colors
   const [isHovered, setIsHovered] = useState(false);
-
+  const router = useRouter();
+  const { colorMode } = useColorMode();
   useEffect(() => {
     const fetchColors = async () => {
       if (!imgRef.current) return;
@@ -48,14 +62,22 @@ const Playlist = () => {
     <div
       className="flex p-4 m-4 rounded-3xl transition-all duration-300"
       style={{
-        backgroundColor: isHovered ? colors[0] : undefined,
+        backgroundColor: isHovered
+          ? `${colors[0].replace("rgb", "rgba").replace(")", ", 0.3)")}`
+          : undefined,
         cursor: "pointer",
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <Box>
-        <Box borderRadius={"12px"} position={"relative"}>
+        <Box
+          borderRadius={"12px"}
+          position={"relative"}
+          onClick={() =>
+            router.push(`/watch/${data.videos[data.videos.length - 1]._id}`)
+          }
+        >
           {/* First Box (Lighter Shade) */}
           <Box
             className="absolute w-[90%] left-1/2 -translate-x-1/2 h-full -z-0 bottom-2 rounded-xl border border-black opacity-50"
@@ -71,9 +93,7 @@ const Playlist = () => {
           {/* Main Image */}
           <Image
             ref={imgRef}
-            src={
-              "http://res.cloudinary.com/dqvqvvwc8/image/upload/v1738686384/kzxbuc9529e8zatxfxn1.jpg"
-            }
+            src={data?.videos[data.videos.length - 1]?.thumbnail}
             alt=""
             width={1000}
             height={1000}
@@ -89,18 +109,81 @@ const Playlist = () => {
             textColor="white"
             borderRadius={3}
           >
-            7 videos
+            {data?.videos?.length} videos
           </Badge>
         </Box>
 
         {/* Playlist Details */}
-        <Text color={textColor} fontWeight={"semibold"}>
-          Coding
-        </Text>
-        <Flex alignItems={"center"} gap={2} fontSize={"sm"}>
-          <Text color={secondaryTextColor}>Private</Text>
-          <Box h={1} w={1} borderRadius={"full"} bg={"gray.500"}></Box>
-          <Text color={secondaryTextColor}>Playlist</Text>
+        <Flex justifyContent={"space-between"} alignItems={"start"} pt={2}>
+          <Box>
+            <Text color={textColor} fontWeight={"semibold"} fontSize={"18px"}>
+              {data?.name}
+            </Text>
+            <Flex alignItems={"center"} gap={2} fontSize={"sm"}>
+              <Text color={secondaryTextColor}>
+                {data?.isPublic ? "Public" : "Private"}
+              </Text>
+              <Box h={1} w={1} borderRadius={"full"} bg={"gray.500"}></Box>
+              <Text color={secondaryTextColor}>Playlist</Text>
+            </Flex>
+          </Box>
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              icon={
+                <IconDotsVertical
+                  width={18}
+                  className={
+                    colorMode === "light"
+                      ? "text-gray-400"
+                      : "text-gray-500"
+                  }
+                />
+              }
+              variant="ghost"
+              size="sm"
+              aria-label="Options"
+              p={1}
+              minW={0}
+              height="28px"
+              width="28px"
+              bg="transparent"
+              _hover={{ bg: colorMode === "light" ? "gray.100" : "gray.700" }}
+              _active={{ bg: "transparent" }}
+            />
+            <MenuList
+              minW="100px"
+              py={1}
+              px={0}
+              borderRadius="md"
+              boxShadow="md"
+              bg={colorMode === "light" ? "white" : "gray.800"}
+              border="none"
+            >
+              <MenuItem
+                fontSize="sm"
+                px={3}
+                py={2}
+                bg="transparent"
+                _hover={{ bg: colorMode === "light" ? "gray.100" : "gray.700" }}
+                _focus={{ bg: colorMode === "light" ? "gray.100" : "gray.700" }}
+                color={colorMode === "light" ? "gray.800" : "gray.100"}
+              >
+                Edit
+              </MenuItem>
+              <MenuItem
+                fontSize="sm"
+                px={3}
+                py={2}
+                bg="transparent"
+                _hover={{ bg: colorMode === "light" ? "gray.100" : "gray.700" }}
+                _focus={{ bg: colorMode === "light" ? "gray.100" : "gray.700" }}
+                color={colorMode === "light" ? "gray.800" : "gray.100"}
+              >
+                Delete
+              </MenuItem>
+            </MenuList>
+          </Menu>
         </Flex>
       </Box>
     </div>

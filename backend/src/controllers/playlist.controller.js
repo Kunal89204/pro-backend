@@ -105,7 +105,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 const getPlaylists = asyncHandler(async (req, res) => {
     try {
         // Fetch all playlists
-        const playlists = await Playlist.find();
+        const playlists = await Playlist.find().populate('videos', "_id thumbnail");
 
         // Check if playlists exist
         if (!playlists || playlists.length === 0) {
@@ -121,6 +121,41 @@ const getPlaylists = asyncHandler(async (req, res) => {
             success: true,
             message: "Playlists retrieved successfully.",
             data: playlists,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Internal server error.",
+            error: error.message,
+        });
+    }
+});
+
+const getPlaylistById = asyncHandler(async (req, res) => {
+    try {
+        const { playlistId } = req.params;
+        const playlist = await Playlist.findById(playlistId)
+        .populate({
+            path: 'videos',
+            select: '_id thumbnail title description duration views owner',
+            populate: {
+                path: 'owner',
+                select: '_id username avatar'
+            }
+        })
+        
+      
+        if (!playlist) {
+            return res.status(404).json({
+                success: false,
+                message: "Playlist not found.",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Playlist retrieved successfully.",
+            data: playlist,
         });
     } catch (error) {
         res.status(500).json({
@@ -239,4 +274,4 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
 
 
 
-export  {createPlaylist, addVideoToPlaylist, getPlaylists, deletePlaylist, removeVideoFromPlaylist}
+export  {createPlaylist, addVideoToPlaylist, getPlaylists, deletePlaylist, removeVideoFromPlaylist, getPlaylistById}

@@ -31,9 +31,25 @@ const Playlists: React.FC = () => {
     <Box>
       <Hero />
       <div className="grid grid-cols-4 ">
-        {data?.data?.map((playlist: {_id: string, title: string, videos: {_id: string, thumbnail: string, title: string, description: string, duration: number, views: number, owner: {_id: string, username: string, avatar: string}[]}[], owner: {_id: string, username: string, avatar: string}[]}) => (
-          <Playlist key={playlist._id} data={playlist} />
-        ))}
+        {data?.data?.map(
+          (playlist: {
+            _id: string;
+            name: string;
+            isPublic: boolean;
+            videos: {
+              _id: string;
+              thumbnail: string;
+              title: string;
+              description: string;
+              duration: number;
+              views: number;
+              owner: { _id: string; username: string; avatar: string }[];
+            }[];
+            owner: { _id: string; username: string; avatar: string }[];
+          }) => (
+            <Playlist key={playlist._id} data={playlist} />
+          )
+        )}
       </div>
     </Box>
   );

@@ -22,7 +22,7 @@ const Playlist = ({
 }: {
   data: {
     _id: string;
-    name: string;
+    title: string;
     isPublic: boolean;
     videos: {
       _id: string;
@@ -135,7 +135,7 @@ const Playlist = ({
         <Flex justifyContent={"space-between"} alignItems={"start"} pt={2}>
           <Box>
             <Text color={textColor} fontWeight={"semibold"} fontSize={"18px"}>
-              {data?.name}
+              {data?.title}
             </Text>
             <Flex alignItems={"center"} gap={2} fontSize={"sm"}>
               <Text color={secondaryTextColor}>
@@ -206,4 +206,4 @@ const Playlist = ({
   );
 };
 
-export default Playlist;
+export default Playlist; 

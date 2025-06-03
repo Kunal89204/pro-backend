@@ -37,7 +37,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
   
   // Video.js refs
   const videoRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<any>(null);
+  // Video.js player ref - using ReturnType to get the correct type
+  const playerRef = useRef<ReturnType<typeof videojs> | null>(null);
 
   // Format the date (e.g., "4 Feb 2025")
   const formattedDate = vdo?.createdAt
@@ -64,7 +65,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
       if (videoRef.current) {
         videoRef.current.appendChild(videoElement);
         
-        const player = (playerRef.current = videojs(videoElement, {
+        const player = videojs(videoElement, {
           autoplay: true,
           controls: true,
           responsive: true,
@@ -77,7 +78,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
               type: "video/mp4",
             },
           ],
-        }));
+        });
+
+        playerRef.current = player;
 
         player.ready(() => {
           console.log("Video.js player is ready");

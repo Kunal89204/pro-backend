@@ -1,4 +1,6 @@
+import { useColorMode } from '@chakra-ui/react';
 import React from 'react'
+
 
 interface FormData {
   title: string;
@@ -12,6 +14,7 @@ interface VideoFormProps {
 
 const VideoForm: React.FC<VideoFormProps> = ({ onFormDataChange, initialData }) => {
   const [formData, setFormData] = React.useState<FormData>(initialData);
+  const {colorMode} = useColorMode()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -32,7 +35,7 @@ const VideoForm: React.FC<VideoFormProps> = ({ onFormDataChange, initialData }) 
             name="title"
             value={formData.title}
             onChange={handleInputChange}
-            className="w-full p-2 border rounded-md"
+            className={`w-full p-2 border rounded-md ${colorMode === 'dark' ? 'text-white' : 'text-black'}`}
             placeholder="Enter video title"
         />
     </div>
@@ -42,7 +45,7 @@ const VideoForm: React.FC<VideoFormProps> = ({ onFormDataChange, initialData }) 
             name="description"
             value={formData.description}
             onChange={handleInputChange}
-            className="w-full p-2 border rounded-md"
+            className={`w-full p-2 border rounded-md ${colorMode === 'dark' ? 'text-white' : 'text-black'}`}
             rows={4}
             placeholder="Enter video description"
         />

@@ -124,7 +124,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
         if (!uploadedThumbnail) {
             throw new ApiError(500, "Error while uploading custom thumbnail");
         }
-        thumbnailUrl = uploadedThumbnail.url;
+        thumbnailUrl = uploadedThumbnail.secure_url;
     } else {
         // 3. Else generate thumbnail from Cloudinary video using transformation
         // Example: First frame at 1 second

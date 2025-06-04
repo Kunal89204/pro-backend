@@ -42,7 +42,7 @@ const Watch = ({ params }: { params: { id: string } }) => {
         queryFn:()=>myQuery.getComments(token,params.id)
     })
 
-    
+    console.log(commentsLoading)
 
     if (isLoading) {
         return <Center h="80vh"><Text fontSize="xl">Loading...</Text></Center>

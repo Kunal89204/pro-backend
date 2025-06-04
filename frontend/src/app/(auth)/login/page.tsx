@@ -77,15 +77,32 @@ const Login: React.FC = () => {
       })
     },
 
-    onError: (error:any) => {
-      console.log('There is an error with login', error.response?.data)
+    onError: (error: unknown) => {
+      // Try to extract error message from possible AxiosError shape
+      let errorMessage = 'An unknown error occurred';
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'response' in error &&
+        typeof (error as any).response === 'object' &&
+        (error as any).response !== null &&
+        'data' in (error as any).response &&
+        typeof (error as any).response.data === 'object' &&
+        (error as any).response.data !== null &&
+        'message' in (error as any).response.data
+      ) {
+        errorMessage = (error as any).response.data.message;
+        console.log('There is an error with login', (error as any).response.data);
+      } else {
+        console.log('There is an error with login', error);
+      }
       toast({
         title: 'Login Failed',
-        description: error.response?.data?.message,
+        description: errorMessage,
         status: 'error',
         duration: 3000,
         isClosable: true,
-      })
+      });
     },
   })
 

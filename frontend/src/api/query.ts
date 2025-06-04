@@ -112,25 +112,13 @@ export const myQuery = {
   },
 
   getAllVideos: async (token: string) => {
-    try {
-      const response = await axiosInstance.get("/video", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    const response = await axiosInstance.get("/video", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      return response.data;
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        console.error("Axios error:", error.response?.status);
-        throw new Error(
-          `Request failed with status ${error.response?.status || 500}`
-        );
-      } else {
-        console.error("Unexpected error:", error);
-        throw new Error("An unexpected error occurred");
-      }
-    }
+    return response.data;
   },
 
   getVideoById: async (token: string, videoId: string) => {
@@ -267,5 +255,14 @@ export const myQuery = {
     } catch (error) {
       return error;
     }
+  },
+
+  getComments: async (token: string, videoId: string) => {
+    const response = await axiosInstance.get(`/comment/${videoId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
   },
 };

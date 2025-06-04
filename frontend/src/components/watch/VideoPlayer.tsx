@@ -1,4 +1,5 @@
 import { useThemeColors } from "@/hooks/useThemeColors";
+import parseTextWithLinks from "@/utils/parseTextWithLinks";
 import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
 import { IconBookmark, IconShare, IconThumbUp } from "@tabler/icons-react";
 import Image from "next/image";
@@ -34,7 +35,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
   const [showFullDesc, setShowFullDesc] = useState(false);
   const descriptionLimit = 235; // Character limit before showing "See More"
   const { textColor, secondaryTextColor, secondaryBgColor } = useThemeColors();
-  
+
   // Video.js refs
   const videoRef = useRef<HTMLDivElement>(null);
   // Video.js player ref - using ReturnType to get the correct type
@@ -56,15 +57,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
     if (!playerRef.current && vdo?.videoFile) {
       // The Video.js player needs to be attached to an element
       const videoElement = document.createElement("video-js");
-      
+
       videoElement.classList.add("vjs-default-skin");
       videoElement.setAttribute("controls", "");
       videoElement.setAttribute("preload", "auto");
       videoElement.setAttribute("data-setup", "{}");
-      
+
       if (videoRef.current) {
         videoRef.current.appendChild(videoElement);
-        
+
         const player = videojs(videoElement, {
           autoplay: true,
           controls: true,
@@ -164,24 +165,24 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
         <Text fontWeight={"semibold"} color={textColor}>
           Description
         </Text>
-        <Text color={secondaryTextColor}>
-          {showFullDesc
-            ? vdo?.description
-            : vdo?.description?.slice(0, descriptionLimit)}
-          {vdo?.description?.length > descriptionLimit && (
-            <Button
-              variant={"link"}
-              position={"absolute"}
-              right={10}
-              bottom={2}
-              color={textColor}
-              fontWeight={"semibold"}
-              onClick={() => setShowFullDesc(!showFullDesc)}
-            >
-              {showFullDesc ? " See Less" : " See More"}
-            </Button>
-          )}
-        </Text>
+        <Text color={secondaryTextColor} position="relative">
+  {showFullDesc
+    ? parseTextWithLinks(vdo?.description || "")
+    : parseTextWithLinks((vdo?.description || "").slice(0, descriptionLimit))}
+  {vdo?.description?.length > descriptionLimit && (
+    <Button
+      variant="link"
+      position="absolute"
+      right={10}
+      bottom={2}
+      color={textColor}
+      fontWeight="semibold"
+      onClick={() => setShowFullDesc(!showFullDesc)}
+    >
+      {showFullDesc ? " See Less" : " See More"}
+    </Button>
+  )}
+</Text>
       </Box>
     </Box>
   );

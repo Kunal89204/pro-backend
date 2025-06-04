@@ -32,51 +32,51 @@ interface Comment {
   replies: Comment[];
 }
 
-const commentsData: Comment[] = [
-  {
-    id: 1,
-    user: "John Doe",
-    avatar: "https://i.pravatar.cc/46",
-    text: "This is an amazing video! Thanks for sharing.",
-    time: "2 hours ago",
-    replies: [],
-  },
-  {
-    id: 2,
-    user: "Alice Brown",
-    avatar: "https://i.pravatar.cc/42",
-    text: "Can someone explain this part?",
-    time: "3 hours ago",
-    replies: [
-      {
-        id: 5,
-        user: "John Doe",
-        avatar: "https://i.pravatar.cc/46",
-        text: "Sure! What part do you need help with?",
-        time: "2 hours ago",
-        replies: [
-          {
-            id: 7,
-            user: "Alice Brown",
-            avatar: "https://i.pravatar.cc/42",
-            text: "Can someone explain this part?",
-            time: "3 hours ago",
-            replies: [
-              {
-                id: 9,
-                user: "John Doe",
-                avatar: "https://i.pravatar.cc/46",
-                text: "Sure! What part do you need help with?",
-                time: "2 hours ago",
-                replies: [],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-];
+// const commentsData: Comment[] = [
+//   {
+//     id: 1,
+//     user: "John Doe",
+//     avatar: "https://i.pravatar.cc/46",
+//     text: "This is an amazing video! Thanks for sharing.",
+//     time: "2 hours ago",
+//     replies: [],
+//   },
+//   {
+//     id: 2,
+//     user: "Alice Brown",
+//     avatar: "https://i.pravatar.cc/42",
+//     text: "Can someone explain this part?",
+//     time: "3 hours ago",
+//     replies: [
+//       {
+//         id: 5,
+//         user: "John Doe",
+//         avatar: "https://i.pravatar.cc/46",
+//         text: "Sure! What part do you need help with?",
+//         time: "2 hours ago",
+//         replies: [
+//           {
+//             id: 7,
+//             user: "Alice Brown",
+//             avatar: "https://i.pravatar.cc/42",
+//             text: "Can someone explain this part?",
+//             time: "3 hours ago",
+//             replies: [
+//               {
+//                 id: 9,
+//                 user: "John Doe",
+//                 avatar: "https://i.pravatar.cc/46",
+//                 text: "Sure! What part do you need help with?",
+//                 time: "2 hours ago",
+//                 replies: [],
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//     ],
+//   },
+// ];
 
 const CommentItem = ({
   comment,
@@ -90,6 +90,8 @@ const CommentItem = ({
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyText, setReplyText] = useState("");
+
+  console.log("I am here inside comment item",comment)
 
   const handleReplySubmit = () => {
     console.log("Replying to Comment ID:", comment.id);
@@ -133,7 +135,7 @@ const CommentItem = ({
             >
               Reply
             </Text>
-            {comment.replies.length > 0 && (
+            {comment?.replies?.length > 0 && (
               <Text
                 fontSize="sm"
                 cursor="pointer"
@@ -163,7 +165,7 @@ const CommentItem = ({
           {/* Nested Replies */}
           <Collapse in={showReplies} animateOpacity>
             <VStack mt={3} pl={6} align="start" spacing={3} w="full">
-              {comment.replies.map((reply) => (
+              {comment?.replies?.map((reply) => (
                 <CommentItem key={reply.id} comment={reply} depth={depth + 1} />
               ))}
             </VStack>
@@ -174,10 +176,12 @@ const CommentItem = ({
   );
 };
 
-const Comments = () => {
+const Comments = ({comments}:{comments:Comment[]}) => {
   const { textColor } = useThemeColors();
   const { user } = useSelector((state: RootState) => state);
   const { avatarImage } = user;
+
+  console.log("I am here",comments)
   return (
     <Box py={4}>
       <Text fontSize="2xl" fontWeight="semibold" color={textColor}>
@@ -198,8 +202,8 @@ const Comments = () => {
 
       <Divider pt={4} />
       <VStack align="start" mt={5} spacing={4} w="full">
-        {commentsData.map((comment) => (
-          <CommentItem key={comment.id} comment={comment} />
+        {comments?.map((comment:Comment,i:number) => (
+          <CommentItem key={i} comment={comment} />
         ))}
       </VStack>
     </Box>

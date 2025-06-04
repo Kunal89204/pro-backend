@@ -178,15 +178,7 @@ const Home: React.FC = () => {
           </Button>
         ))}
       </Flex>
-      {/* 
-        Optionally, add this CSS to your global styles or a CSS module to hide the scrollbar for a cleaner look:
-        .hide-scrollbar {
-          scrollbar-width: none;
-        }
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-      */}
+      
       <Videos />
     </div>
   );

@@ -77,10 +77,11 @@ const Login: React.FC = () => {
       })
     },
 
-    onError: (error) => {
+    onError: (error:any) => {
+      console.log('There is an error with login', error.response?.data)
       toast({
         title: 'Login Failed',
-        description: error.message,
+        description: error.response?.data?.message,
         status: 'error',
         duration: 3000,
         isClosable: true,

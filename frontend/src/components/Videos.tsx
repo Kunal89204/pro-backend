@@ -15,7 +15,7 @@ const Videos: React.FC = () => {
   const dispatch = useDispatch();
   const { bgColor } = useThemeColors();
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, error }:{data:any, isLoading:boolean, isError:boolean, error:any} = useQuery({
     queryKey: ["videos"],
     queryFn: () => myQuery.getAllVideos(token),
     staleTime: 1000 * 60 * 5,
@@ -50,9 +50,9 @@ const Videos: React.FC = () => {
   }
 
   if (isError) {
-    if (error.message == "Request failed with status 401") {
-      dispatch(logout());
-    }
+    console.log("error", error.message, error?.response?.data?.message);
+    dispatch(logout());
+   
   }
 
   return (

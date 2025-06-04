@@ -37,6 +37,13 @@ const Watch = ({ params }: { params: { id: string } }) => {
         queryFn: () => myQuery.getVideoById(token, params.id)
     })
 
+    const {data:comments,isLoading:commentsLoading} = useQuery({
+        queryKey:['comments',params.id],
+        queryFn:()=>myQuery.getComments(token,params.id)
+    })
+
+    
+
     if (isLoading) {
         return <Center h="80vh"><Text fontSize="xl">Loading...</Text></Center>
     }
@@ -62,7 +69,7 @@ const Watch = ({ params }: { params: { id: string } }) => {
         <Box className='mt-4 w-full '>
             <Box className='lg:w-2/3 px-3 lg:px-2 '>
                 <VideoPlayer data={data} />
-                <Comments />
+                <Comments comments={comments.comments} />
             </Box>
         </Box>
     )

@@ -127,14 +127,21 @@ const loginUser = asyncHandler(async (req, res) => {
   console.log("User found:", user);
 
   if (!user) {
-    throw new ApiError(404, "User does not exist");
+    return res.status(404).json({
+      success: false,
+      message: "User does not exist",
+    });
   }
-
+  
   const isPasswordValid = await user.isPasswordCorrect(password);
   console.log("Is password valid:", isPasswordValid);
 
   if (!isPasswordValid) {
-    throw new ApiError(401, "Password incorrect");
+    return res.status(401).json({
+      success: false,
+      status: 401,
+      message: "Password is incorrect",
+    });
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(

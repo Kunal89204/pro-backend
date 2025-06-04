@@ -71,6 +71,7 @@ const Video: React.FC<VideoProps> = ({
             width={1000}
             height={1000}
             className="w-full rounded-xl aspect-video"
+            priority
           />
         </Link>
         <Badge

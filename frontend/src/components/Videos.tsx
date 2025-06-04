@@ -15,13 +15,20 @@ const Videos: React.FC = () => {
   const dispatch = useDispatch();
   const { bgColor } = useThemeColors();
 
-  const { data, isLoading, isError, error }:{data:any, isLoading:boolean, isError:boolean, error:any} = useQuery({
-    queryKey: ["videos"],
-    queryFn: () => myQuery.getAllVideos(token),
-    staleTime: 1000 * 60 * 5,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-  });
+  const {
+    data,
+    isLoading,
+    isError,
+   
+  } = useQuery(
+    {
+      queryKey: ["videos"],
+      queryFn: () => myQuery.getAllVideos(token),
+      staleTime: 1000 * 60 * 5,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    }
+  );
 
   if (isLoading) {
     return (
@@ -50,9 +57,8 @@ const Videos: React.FC = () => {
   }
 
   if (isError) {
-    console.log("error", error.message, error?.response?.data?.message);
+    // console.log("error", error.message, error?.response?.data?.message);
     dispatch(logout());
-   
   }
 
   return (

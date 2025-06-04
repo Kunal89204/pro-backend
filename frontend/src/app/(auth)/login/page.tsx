@@ -20,52 +20,74 @@ import loginImage from "../../../../public/assets/login_image.jpg"
 import Link from 'next/link'
 import { useThemeColors } from '@/hooks/useThemeColors'
 
-
-
 interface LoginCredentials {
   username: string
   email: string
   password: string
 }
 
-interface   UserData {
- accessToken: string
- user:{ _id: string;
-  fullName: string;
-  username: string;
-  email: string;
-  avatar: string;
-  coverImage: string;
-  createdAt: string;
-  updatedAt: string;
-  wathcedVideos: string[];
-  __v: number;
- }
+interface User {
+  _id: string
+  fullName: string
+  username: string
+  email: string
+  avatar: string
+  coverImage: string
+  createdAt: string
+  updatedAt: string
+  wathcedVideos: string[]
+  __v: number
+}
+
+interface UserData {
+  accessToken: string
+  user: User
 }
 
 interface LoginResponse {
   statusCode: number
   data: UserData
   message: string
-  success: boolean,
+  success: boolean
   accessToken: string
 }
 
-const Login: React.FC = () => {
+// Custom type for Axios error shape
+interface AxiosErrorData {
+  message?: string
+}
 
+interface AxiosErrorResponse {
+  data?: AxiosErrorData
+}
+
+interface TypedError {
+  response?: AxiosErrorResponse
+}
+
+const Login: React.FC = () => {
   const toast = useToast()
   const dispatch = useDispatch()
   const [username, setUsername] = React.useState('')
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
-  const {textColor, secondaryTextColor, inputBg, inputTextColor, borderColor} = useThemeColors()
-
+  const { textColor, secondaryTextColor, inputBg, inputTextColor, borderColor } = useThemeColors()
 
   const loginMutation = useMutation<LoginResponse, Error, LoginCredentials>({
     mutationFn: (credentials: LoginCredentials) => myQuery.login(credentials),
     onSuccess: (data) => {
       const user = data?.data?.user
-      dispatch(setAuth({ user: { username: user?.username, email: user?.email, fullName: user?.fullName, avatarImage: user?.avatar }, token: data?.data?.accessToken }))
+      dispatch(
+        setAuth({
+          user: {
+            username: user?.username,
+            email: user?.email,
+            fullName: user?.fullName,
+            avatarImage: user?.avatar,
+          },
+          token: data?.data?.accessToken,
+        })
+      )
       console.log("i am received data", data)
       window.location.href = '/'
       toast({
@@ -76,25 +98,30 @@ const Login: React.FC = () => {
         isClosable: true,
       })
     },
-
     onError: (error: unknown) => {
-      // Try to extract error message from possible AxiosError shape
-      let errorMessage = 'An unknown error occurred';
+      let errorMessage = 'An unknown error occurred'
+      // Type guard for TypedError
       if (
         typeof error === 'object' &&
         error !== null &&
-        'response' in error &&
-        typeof (error as any).response === 'object' &&
-        (error as any).response !== null &&
-        'data' in (error as any).response &&
-        typeof (error as any).response.data === 'object' &&
-        (error as any).response.data !== null &&
-        'message' in (error as any).response.data
+        'response' in error
       ) {
-        errorMessage = (error as any).response.data.message;
-        console.log('There is an error with login', (error as any).response.data);
+        const err = error as TypedError
+        if (
+          err.response &&
+          typeof err.response === 'object' &&
+          err.response.data &&
+          typeof err.response.data === 'object' &&
+          'message' in err.response.data &&
+          typeof err.response.data.message === 'string'
+        ) {
+          errorMessage = err.response.data.message as string
+          console.log('There is an error with login', err.response.data)
+        } else {
+          console.log('There is an error with login', error)
+        }
       } else {
-        console.log('There is an error with login', error);
+        console.log('There is an error with login', error)
       }
       toast({
         title: 'Login Failed',
@@ -102,16 +129,14 @@ const Login: React.FC = () => {
         status: 'error',
         duration: 3000,
         isClosable: true,
-      });
+      })
     },
   })
-
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     loginMutation.mutate({ username, email, password })
   }
-
 
   return (
     <Flex>
@@ -119,9 +144,11 @@ const Login: React.FC = () => {
         <Image src={loginImage} alt='' width={1000} className='w-full' />
       </Box>
       <Box w="50%" mx="auto" mt={8} className='flex flex-col justify-center'>
-        <Text textAlign={'center'} fontSize={'3xl'} color={textColor}>Login</Text>
-        <form onSubmit={handleSubmit} className='px-20'  >
-          <VStack spacing={4} alignContent={'center'} >
+        <Text textAlign={'center'} fontSize={'3xl'} color={textColor}>
+          Login
+        </Text>
+        <form onSubmit={handleSubmit} className='px-20'>
+          <VStack spacing={4} alignContent={'center'}>
             <FormControl isRequired>
               <FormLabel color={secondaryTextColor}>Username</FormLabel>
               <Input
@@ -130,9 +157,7 @@ const Login: React.FC = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 bg={inputBg}
                 py={"22px"}
-                                color={inputTextColor}
-
-
+                color={inputTextColor}
               />
             </FormControl>
             <FormControl isRequired>
@@ -154,7 +179,7 @@ const Login: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 bg={inputBg}
                 py={"22px"}
-                                color={inputTextColor}
+                color={inputTextColor}
               />
             </FormControl>
             <Button
@@ -170,7 +195,12 @@ const Login: React.FC = () => {
             >
               Login
             </Button>
-            <Text color={textColor}>Dont&apos;have an account? <Link className='underline font-semibold' href={'/register'}>Register</Link></Text>
+            <Text color={textColor}>
+              Dont&apos;have an account?{' '}
+              <Link className='underline font-semibold' href={'/register'}>
+                Register
+              </Link>
+            </Text>
           </VStack>
         </form>
       </Box>

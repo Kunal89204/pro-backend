@@ -20,6 +20,7 @@ interface VideoData {
   owner: Owner;
   createdAt: string;
   views: number;
+  _id: string;
 }
 
 interface ApiResponse {
@@ -102,6 +103,18 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
     };
   }, []);
 
+  const handleVideoLike = async (id: string) => {
+    console.log("video liked", id);
+  };
+
+  const handleVideoSave = async (id: string) => {
+    console.log("video saved", id);
+  };
+
+  const handleSubscribe = async (id: string) => {
+    console.log("subscribed", id);
+  };
+
   return (
     <Box className="w-full">
       <Box className="aspect-video w-full rounded-xl overflow-hidden">
@@ -134,18 +147,22 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
             </Text>
           </Box>
           <Box mx={4} alignSelf={"end"}>
-            <Button>Subscribe</Button>
+            <Button onClick={() => handleSubscribe(vdo?._id)}>Subscribe</Button>
           </Box>
         </Flex>
 
         <Flex gap={2}>
-          <Button className="flex gap-2">
+          <Button
+            className="flex gap-2"
+            colorScheme="gray"
+            onClick={() => handleVideoLike(vdo?._id)}
+          >
             <IconThumbUp /> Like
           </Button>
           <Button className="flex gap-2">
             <IconShare /> Share
           </Button>
-          <Button>
+          <Button onClick={() => handleVideoSave(vdo?._id)}>
             <IconBookmark /> Save
           </Button>
         </Flex>
@@ -166,23 +183,25 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
           Description
         </Text>
         <Text color={secondaryTextColor} position="relative">
-  {showFullDesc
-    ? parseTextWithLinks(vdo?.description || "")
-    : parseTextWithLinks((vdo?.description || "").slice(0, descriptionLimit))}
-  {vdo?.description?.length > descriptionLimit && (
-    <Button
-      variant="link"
-      position="absolute"
-      right={10}
-      bottom={2}
-      color={textColor}
-      fontWeight="semibold"
-      onClick={() => setShowFullDesc(!showFullDesc)}
-    >
-      {showFullDesc ? " See Less" : " See More"}
-    </Button>
-  )}
-</Text>
+          {showFullDesc
+            ? parseTextWithLinks(vdo?.description || "")
+            : parseTextWithLinks(
+                (vdo?.description || "").slice(0, descriptionLimit)
+              )}
+          {vdo?.description?.length > descriptionLimit && (
+            <Button
+              variant="link"
+              position="absolute"
+              right={10}
+              bottom={2}
+              color={textColor}
+              fontWeight="semibold"
+              onClick={() => setShowFullDesc(!showFullDesc)}
+            >
+              {showFullDesc ? " See Less" : " See More"}
+            </Button>
+          )}
+        </Text>
       </Box>
     </Box>
   );

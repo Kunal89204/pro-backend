@@ -12,6 +12,7 @@ import vdonotfound from '../../../../public/assets/videonotfound.jpg'
 import test3 from '../../../../public/assets/test3.jpg'
 import Image from 'next/image'
 import { useThemeColors } from '@/hooks/useThemeColors'
+import SideSuggestions from '@/components/watch/SideSuggestions'
 
 
 
@@ -66,10 +67,13 @@ const Watch = ({ params }: { params: { id: string } }) => {
 
 
     return (
-        <Box className='mt-4 w-full '>
-            <Box className='lg:w-2/3 px-3 lg:px-2 '>
+        <Box className='mt-4 w-full flex flex-col lg:flex-row '>
+            <Box className='lg:w-2/3 px-3 lg:px-0 '>
                 <VideoPlayer data={data} />
                 <Comments comments={comments.comments} />
+            </Box>
+            <Box className='lg:w-1/3 px-3 lg:px-0'>
+               <SideSuggestions />
             </Box>
         </Box>
     )

@@ -63,7 +63,7 @@ const Videos: React.FC = () => {
 
   return (
     <Box
-      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 3xl:grid-cols-5"
+      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-4 3xl:grid-cols-5"
       bg={bgColor}
     >
       {data?.data?.videos?.map(

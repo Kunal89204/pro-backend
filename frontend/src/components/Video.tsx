@@ -62,7 +62,12 @@ const Video: React.FC<VideoProps> = ({
   const { colorMode } = useColorMode();
 
   return (
-    <Box borderRadius="xl" overflow="hidden">
+    <Box
+      borderRadius="2xl"
+      overflow="hidden"
+      p={2}
+      className="hover:bg-gray-700/50 dark:hover:bg-gray-300/50 transition-all duration-500"
+    >
       <Box position={"relative"}>
         <Link href={`/watch/${videoId}`}>
           <Image

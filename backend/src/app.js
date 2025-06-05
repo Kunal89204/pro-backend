@@ -24,6 +24,7 @@ import userRouter from './routes/user.routes.js';
 import videoRouter from './routes/video.routes.js';
 import playlistRouter from './routes/playlist.routes.js'
 import commentsRouter from './routes/comment.routes.js'
+import subscriptionRouter from './routes/subscription.routes.js'
 
 
 // routes
@@ -31,6 +32,7 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/video", videoRouter);
 app.use("/api/v1/playlist", playlistRouter);
 app.use('/api/v1/comment', commentsRouter)
+app.use('/api/v1/subscription', subscriptionRouter)
 
 
 export { app };

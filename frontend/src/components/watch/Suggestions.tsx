@@ -1,12 +1,12 @@
 import { useThemeColors } from "@/hooks/useThemeColors";
-import { Box, Heading, IconButton, Text, useColorMode } from "@chakra-ui/react";
+import { Box,  Text, useColorMode } from "@chakra-ui/react";
 import { IconDotsVertical } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
 const Suggestions = () => {
-  const { secondaryBgColor, textColor, secondaryTextColor } = useThemeColors();
+  const {  textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
   return (
     <Box className=" p-2 rounded-lg flex gap-2 justify-between relative hover:bg-[#202020] transition-all duration-300">

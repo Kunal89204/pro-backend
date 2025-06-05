@@ -4,7 +4,7 @@ import Suggestions from "./Suggestions";
 import { useThemeColors } from "@/hooks/useThemeColors";
 
 const SideSuggestions = () => {
-  const { secondaryBgColor, textColor } = useThemeColors();
+  const {  textColor } = useThemeColors();
 
   const fakeArray = Array.from({ length: 10 });
   return (

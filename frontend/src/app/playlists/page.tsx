@@ -8,7 +8,6 @@ import usePlaylists from "@/hooks/usePlaylists";
 const Playlists: React.FC = () => {
   // Color schemes
 
-
   const { data, isLoading, error, isError } = usePlaylists();
 
   if (isLoading) {
@@ -19,12 +18,12 @@ const Playlists: React.FC = () => {
     return <div>Error: {String(error)}</div>;
   }
 
-  console.log("i am playlists", data);
+ 
 
   return (
     <Box>
       <Hero />
-      <div className="grid grid-cols-4 ">
+      <div className="grid grid-cols-4 gap-1 px-1 ">
         {data?.data?.map(
           (playlist: {
             _id: string;

@@ -316,10 +316,48 @@ export const myQuery = {
       playlistName,
       isPublic,
       videoId,
-    })
+    });
     const response = await axiosInstance.post(
       "/playlist/create-playlist",
-      { name: playlistName, isPublic, videoId},
+      { name: playlistName, isPublic, videoId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  },
+
+  deletePlaylist: async (token: string, playlistId: string) => {
+    const response = await axiosInstance.delete(
+      `/playlist/delete-playlist/${playlistId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  },
+
+  editPlaylist: async (
+    token: string,
+    playlistId: string,
+    playlistName: string,
+    isPublic: boolean
+  ) => {
+    const response = await axiosInstance.put(
+      `/playlist/edit-playlist/${playlistId}`,
+      { name: playlistName, isPublic },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
+  },
+
+  getPlaylistById: async (token: string, playlistId: string) => {
+    const response = await axiosInstance.get(
+      `/playlist/get-playlist/${playlistId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -12,10 +12,13 @@ import {
   MenuList,
   Text,
   useColorMode,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { useRouter } from "next/navigation";
 import { IconDotsVertical } from "@tabler/icons-react";
+import EditPlaylist from "../Modals/EditPlaylist";
+import DeletePlaylistModal from "../Modals/DeletePlaylistModal";
 
 const Playlist = ({
   data,
@@ -41,6 +44,16 @@ const Playlist = ({
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
   const { colorMode } = useColorMode();
+  const {
+    isOpen: isEditPlaylistOpen,
+    onOpen: onOpenEditPlaylist,
+    onClose: onCloseEditPlaylist,
+  } = useDisclosure();
+  const {
+    isOpen: isDeletePlaylistOpen,
+    onOpen: onOpenDeletePlaylist,
+    onClose: onCloseDeletePlaylist,
+  } = useDisclosure();
   useEffect(() => {
     const fetchColors = async () => {
       if (!imgRef.current) return;
@@ -95,7 +108,7 @@ const Playlist = ({
           borderRadius={"12px"}
           position={"relative"}
           onClick={() =>
-            router.push(`/watch/${data.videos[data.videos.length - 1]._id}`)
+            router.push(`/playlists/${data._id}`)
           }
         >
           {/* First Box (Lighter Shade) */}
@@ -198,6 +211,7 @@ const Playlist = ({
                     .replace(")", ", 0.8)")}`,
                 }}
                 color={"gray.100"}
+                onClick={onOpenEditPlaylist}
               >
                 Edit
               </MenuItem>
@@ -217,6 +231,7 @@ const Playlist = ({
                     .replace(")", ", 0.8)")}`,
                 }}
                 color={"gray.100"}
+                onClick={onOpenDeletePlaylist}
               >
                 Delete
               </MenuItem>
@@ -224,6 +239,19 @@ const Playlist = ({
           </Menu>
         </Flex>
       </Box>
+      <EditPlaylist
+        isOpen={isEditPlaylistOpen}
+        onClose={onCloseEditPlaylist}
+        playlistId={data._id}
+        title={data.name}
+        isPublic={data.isPublic}
+        // colors={colors}
+      />
+      <DeletePlaylistModal
+        isOpen={isDeletePlaylistOpen}
+        onClose={onCloseDeletePlaylist}
+        playlistId={data._id}
+      />
     </div>
   );
 };

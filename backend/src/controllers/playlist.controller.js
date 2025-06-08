@@ -270,6 +270,58 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
   }
 });
 
+const editPlaylist = asyncHandler(async (req, res) => {
+  try {
+    const { playlistId } = req.params;
+    const { name, isPublic } = req.body;
+    const userId = req.user._id;
+
+    console.log(playlistId, name, isPublic, userId);
+
+    if (!playlistId || name === undefined || isPublic === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: "Playlist ID, name, and isPublic are required.",
+        data: {
+          playlistId,
+          name,
+          isPublic,
+        },
+      });
+    }
+
+    const playlist = await Playlist.findById(playlistId);
+
+    if (String(playlist.owner) !== String(userId)) {
+      return res.status(403).json({
+        success: false,
+        message: "You do not have permission to edit this playlist.",
+      });
+    }
+
+    if (!playlist) {
+      return res.status(404).json({
+        success: false,
+        message: "Playlist not found.",
+      });
+    }
+
+    playlist.name = name;
+    playlist.isPublic = isPublic;
+    await playlist.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Playlist updated successfully.",
+      data: playlist,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+    });
+  }
+});
+
 export {
   createPlaylist,
   addVideoToPlaylist,
@@ -277,4 +329,5 @@ export {
   deletePlaylist,
   removeVideoFromPlaylist,
   getPlaylistById,
+  editPlaylist,
 };

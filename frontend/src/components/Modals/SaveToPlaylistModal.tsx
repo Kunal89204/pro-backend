@@ -59,7 +59,11 @@ const SaveToPlaylistModal = ({
   const [selectedPlaylistIds, setSelectedPlaylistIds] = useState<string[]>([]);
   const toast = useToast();
 
-  const { isOpen: isCreatePlaylistOpen, onOpen: onOpenCreatePlaylist, onClose: onCloseCreatePlaylist } = useDisclosure();
+  const {
+    isOpen: isCreatePlaylistOpen,
+    onOpen: onOpenCreatePlaylist,
+    onClose: onCloseCreatePlaylist,
+  } = useDisclosure();
 
   const { token } = useSelector((state: RootState) => state);
 
@@ -88,7 +92,13 @@ const SaveToPlaylistModal = ({
       myQuery.removeVideoFromPlaylist(token, playlistId, videoId),
     onSuccess: () => {
       //   queryClient.invalidateQueries({ queryKey: ["playlists"] });
-      console.log("Removed from playlist");
+      toast({
+        title: "Video removed from playlist",
+        description: "Video removed from playlist",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     },
     onError: (error) => {
       console.log(error);
@@ -170,7 +180,12 @@ const SaveToPlaylistModal = ({
         </ModalBody>
 
         <ModalFooter display="flex" justifyContent="center">
-          <Button colorScheme="gray" mr={3} onClick={onOpenCreatePlaylist} width="100%">
+          <Button
+            colorScheme="gray"
+            mr={3}
+            onClick={onOpenCreatePlaylist}
+            width="100%"
+          >
             Create New Playlist
           </Button>
         </ModalFooter>

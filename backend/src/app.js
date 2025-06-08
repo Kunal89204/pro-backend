@@ -3,12 +3,25 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 
 const app = express();
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://insanity-tube.vercel.app",
+  "https://youtube.kunalkhandelwal.dev"
+];
+
 app.use(
   cors({
-    origin: [process.env.CORS_CLIENT_URL, "http://localhost:3000", "https://insanity-tube.vercel.app", "https://youtube.kunalkhandelwal.dev"],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
 
 app.use(
   express.json({

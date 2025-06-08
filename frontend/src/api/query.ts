@@ -265,4 +265,67 @@ export const myQuery = {
     });
     return response.data;
   },
+
+  addVideoToPlaylist: async (
+    token: string,
+    playlistId: string,
+    videoId: string
+  ) => {
+    const response = await axiosInstance.put(
+      `/playlist/add-to-playlist`,
+      {
+        videoId,
+        playlistId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  },
+
+  removeVideoFromPlaylist: async (
+    token: string,
+    playlistId: string,
+    videoId: string
+  ) => {
+    const response = await axiosInstance.put(
+      "playlist/remove-video",
+      {
+        videoId,
+        playlistId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  },
+
+  createPlaylist: async (
+    token: string,
+    playlistName: string,
+    isPublic: boolean,
+    videoId: string
+  ) => {
+    console.log({
+      playlistName,
+      isPublic,
+      videoId,
+    })
+    const response = await axiosInstance.post(
+      "/playlist/create-playlist",
+      { name: playlistName, isPublic, videoId},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  },
 };

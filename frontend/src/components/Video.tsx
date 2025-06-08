@@ -10,6 +10,7 @@ import {
   Avatar,
   Badge,
   useColorMode,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { IconDotsVertical } from "@tabler/icons-react";
 import Image, { StaticImageData } from "next/image";
@@ -17,6 +18,7 @@ import React from "react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import SaveToPlaylistModal from "./Modals/SaveToPlaylistModal";
 
 const formatDuration = (input: number | string | bigint): string => {
   const seconds = typeof input === "bigint" ? Number(input) : Number(input); // Convert to number
@@ -60,6 +62,7 @@ const Video: React.FC<VideoProps> = ({
 }) => {
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Box
@@ -125,13 +128,14 @@ const Video: React.FC<VideoProps> = ({
                     }
                   />
                 }
+
                 variant="unstyled"
                 aria-label="Options"
               />
-              <MenuList textColor={textColor}>
-                <MenuItem>Save to Playlist</MenuItem>
-                <MenuItem>Share</MenuItem>
-                <MenuItem>Report</MenuItem>
+              <MenuList textColor={textColor} bg="#121212">
+                <MenuItem  bg="#121212" className="hover:bg-gray-700/50" onClick={onOpen}>Save to Playlist</MenuItem>
+                <MenuItem bg="#121212" className="hover:bg-gray-700/50" >Share</MenuItem>
+                <MenuItem bg="#121212" className="hover:bg-gray-700/50" >Report</MenuItem>
               </MenuList>
             </Menu>
           </Flex>
@@ -152,6 +156,9 @@ const Video: React.FC<VideoProps> = ({
           </Flex>
         </Box>
       </Flex>
+
+      {/* Modal for save to playlist*/}
+      <SaveToPlaylistModal isOpen={isOpen} onClose={onClose} videoId={videoId} />
     </Box>
   );
 };

@@ -76,9 +76,11 @@ const Playlist = ({
 
   const { textColor, secondaryTextColor } = useThemeColors();
 
+  if (data.videos.length === 0) return null;
+
   return (
     <div
-      className="flex p-4 m-4 rounded-3xl transition-all duration-300"
+      className="flex p-4 m-0 rounded-3xl transition-all duration-300"
       style={{
         backgroundColor: isHovered
           ? `${colors[0].replace("rgb", "rgba").replace(")", ", 0.3)")}`
@@ -164,7 +166,11 @@ const Playlist = ({
               height="28px"
               width="28px"
               bg="transparent"
-              _hover={{ bg: `${colors[0].replace("rgb", "rgba").replace(")", ", 0.3)")}` }}
+              _hover={{
+                bg: `${colors[0]
+                  .replace("rgb", "rgba")
+                  .replace(")", ", 0.3)")}`,
+              }}
               _active={{ bg: "transparent" }}
             />
             <MenuList
@@ -181,9 +187,17 @@ const Playlist = ({
                 px={3}
                 py={2}
                 bg="transparent"
-                _hover={{ bg: `${colors[0].replace("rgb", "rgba").replace(")", ", 0.3)")}` }}
-                _focus={{ bg:`${colors[0].replace("rgb", "rgba").replace(")", ", 0.8)")}` }}
-                color={colorMode === "light" ? "gray.800" : "gray.100"}
+                _hover={{
+                  bg: `${colors[0]
+                    .replace("rgb", "rgba")
+                    .replace(")", ", 0.3)")}`,
+                }}
+                _focus={{
+                  bg: `${colors[0]
+                    .replace("rgb", "rgba")
+                    .replace(")", ", 0.8)")}`,
+                }}
+                color={"gray.100"}
               >
                 Edit
               </MenuItem>
@@ -192,9 +206,17 @@ const Playlist = ({
                 px={3}
                 py={2}
                 bg="transparent"
-                _hover={{ bg: `${colors[0].replace("rgb", "rgba").replace(")", ", 0.3)")}` }}
-                _focus={{ bg:`${colors[0].replace("rgb", "rgba").replace(")", ", 0.8)")}`}}
-                color={colorMode === "light" ? "gray.800" : "gray.100"}
+                _hover={{
+                  bg: `${colors[0]
+                    .replace("rgb", "rgba")
+                    .replace(")", ", 0.3)")}`,
+                }}
+                _focus={{
+                  bg: `${colors[0]
+                    .replace("rgb", "rgba")
+                    .replace(")", ", 0.8)")}`,
+                }}
+                color={"gray.100"}
               >
                 Delete
               </MenuItem>

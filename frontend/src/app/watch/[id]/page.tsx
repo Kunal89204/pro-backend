@@ -70,7 +70,7 @@ const Watch = ({ params }: { params: { id: string } }) => {
         <Box className='mt-4 w-full flex flex-col lg:flex-row '>
             <Box className='lg:w-2/3 px-3 lg:px-0 '>
                 <VideoPlayer data={data} />
-                <Comments comments={comments.comments} />
+                <Comments comments={comments?.comments} />
             </Box>
             <Box className='lg:w-1/3 px-3 lg:px-0'>
                <SideSuggestions />

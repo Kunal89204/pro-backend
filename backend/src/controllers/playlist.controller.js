@@ -3,15 +3,15 @@ import { Video } from "../models/video.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const createPlaylist = asyncHandler(async (req, res) => {
-  const { name, isPublic } = req.body;
+  const { name, isPublic, videoId } = req.body;
   const user = req.user;
 
   // Validate input
-  if (!name) {
+  if (!name || !videoId) {
     return res.status(400).json({
       success: false,
       status: 400,
-      message: "Playlist name is required.",
+      message: "Playlist name and videoId is required.",
       data: null,
     });
   }
@@ -21,6 +21,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
     name,
     isPublic,
     owner: user._id,
+    videos: [videoId],
   });
 
   res.status(201).json({

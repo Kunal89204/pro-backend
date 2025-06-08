@@ -3,19 +3,13 @@ import Hero from "@/components/playlists/Hero";
 import Playlist from "@/components/playlists/Playlist";
 import { Box } from "@chakra-ui/react";
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { myQuery } from "@/api/query";
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/store";
+import usePlaylists from "@/hooks/usePlaylists";
 
 const Playlists: React.FC = () => {
   // Color schemes
-  const { token } = useSelector((state: RootState) => state);
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["playlists"],
-    queryFn: () => myQuery.getPlaylists(token),
-  });
+
+  const { data, isLoading, error, isError } = usePlaylists();
 
   if (isLoading) {
     return <div>Loading...</div>;

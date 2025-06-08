@@ -110,7 +110,7 @@ const CreatePlaylistModal = ({
         <ModalBody>
           <Text py={2}>Playlist Name</Text>
           <Input
-            placeholder={videoId}
+            placeholder={"Enter playlist name"}
             required
             value={playlistName}
             onChange={(e) => setPlaylistName(e.target.value)}

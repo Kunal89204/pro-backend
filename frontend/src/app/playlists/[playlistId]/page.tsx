@@ -34,6 +34,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import PlaylistVideo from "@/components/playlists/PlaylistVideo";
 import Image from "next/image";
+import ExpandableCardDemo from "@/components/expandable-card-demo-standard";
 
 const PlaylistPage = () => {
   const { playlistId } = useParams();
@@ -342,6 +343,8 @@ const PlaylistPage = () => {
               </Text>
             </Flex>
           )}
+
+          {/* <ExpandableCardDemo /> */}
         </Box>
 
         {/* Modals */}

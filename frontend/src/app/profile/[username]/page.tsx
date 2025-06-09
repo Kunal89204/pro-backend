@@ -155,7 +155,7 @@ const Profile = () => {
             </Box>
 
             {selectedBanner && (
-              <Button onClick={handleCoverImageUpdate} mt={2}>
+              <Button onClick={handleCoverImageUpdate} mt={2} isLoading={coverImageMutation.isPending}>
                 Upload Cover
               </Button>
             )}
@@ -213,7 +213,7 @@ const Profile = () => {
             </Flex>
 
             {selectedAvatar && (
-              <Button onClick={handleAvatarImageUpdate} mt={2}>
+              <Button onClick={handleAvatarImageUpdate} mt={2} isLoading={avatarImageMutation.isPending}>
                 Upload Avatar
               </Button>
             )}

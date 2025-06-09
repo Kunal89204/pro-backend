@@ -1,10 +1,10 @@
 "use client";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Flex,
   Text,
-  Image,
+
   VStack,
   HStack,
   Button,
@@ -19,6 +19,7 @@ import { useParams, useRouter } from "next/navigation";
 import { myQuery } from "@/api/query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
+
 import {
   IconEdit,
   IconTrash,
@@ -32,11 +33,12 @@ import { useDisclosure } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 
 import PlaylistVideo from "@/components/playlists/PlaylistVideo";
+import Image from "next/image";
 
 const PlaylistPage = () => {
   const { playlistId } = useParams();
-  const token = useSelector((state: RootState) => state?.token);
- 
+  const token = useSelector((state: RootState) => state.token);
+
 
   const {
     isOpen: isEditOpen,
@@ -62,12 +64,64 @@ const PlaylistPage = () => {
     enabled: !!playlistId && !!token,
   });
 
-  const bgColor = useColorModeValue("#fafafa", "#0a0a0a");
+  const bgColor = useColorModeValue("#fafafa", "#121212");
   const cardBg = useColorModeValue("white", "#111111");
   const borderColor = useColorModeValue("gray.100", "#1a1a1a");
   const textColor = useColorModeValue("gray.900", "#ffffff");
   const subtleTextColor = useColorModeValue("gray.500", "#888888");
   const hoverBg = useColorModeValue("gray.50", "#161616");
+
+
+
+
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  const [colors, setColors] = useState<string[]>(["#cccccc", "#999999"]); // Default colors
+
+  useEffect(() => {
+    const fetchColors = async () => {
+      if (!imgRef.current || !playlist?.data?.videos?.length) return;
+
+      try {
+        // Dynamically import ColorThief
+        const ColorThief = (await import("colorthief")).default;
+        const colorThief = new ColorThief();
+
+        const image = imgRef.current;
+
+        const extractColors = () => {
+          try {
+            const palette = colorThief.getPalette(image, 2);
+            if (palette && palette.length >= 2) {
+              const [r1, g1, b1] = palette[0];
+              const [r2, g2, b2] = palette[1];
+
+              setColors([`rgb(${r1}, ${g1}, ${b1})`, `rgb(${r2}, ${g2}, ${b2})`]);
+            }
+          } catch (error) {
+            console.log("ColorThief extraction failed:", error);
+            // Keep default colors
+          }
+        };
+
+        if (image.complete && image.naturalHeight !== 0) {
+          // Image is already loaded
+          extractColors();
+        } else {
+          // Image is not loaded yet, wait for it
+          image.onload = extractColors;
+          image.onerror = () => {
+            console.log("Image failed to load");
+            // Keep default colors
+          };
+        }
+      } catch (error) {
+        console.log("ColorThief import failed:", error);
+        // Keep default colors
+      }
+    };
+
+    fetchColors();
+  }, [playlist]); // Add playlist as dependency so it runs when playlist data is available
 
   if (isLoading) {
     return (
@@ -117,20 +171,25 @@ const PlaylistPage = () => {
                 borderRadius="xl"
                 overflow="hidden"
                 bg={cardBg}
-                border="1px solid"
-                borderColor={borderColor}
-                shadow="sm"
+                // border="0px solid"
+                // borderColor={borderColor}
+                style={{
+                  boxShadow: `20px 0px 150px 0px ${colors[0]}`,
+                 
+
+                }}
               >
                 <Image
+                  ref={imgRef} // Add this ref
                   src={
                     playlist.data.videos?.[playlist.data.videos.length - 1]
                       ?.thumbnail || "https://media.istockphoto.com/id/2167960646/vector/illustration-of-a-botanical-background-featuring-tropical-animals-and-various-tropical.jpg?s=612x612&w=0&k=20&c=KeAaK6shnN5qzapejJRcAIxU5ftUtnBbcYZxJecG1_w="
                   }
                   alt={playlist.data.name}
-                  w="100%"
-                  h="100%"
-                  objectFit="cover"
-                  fallbackSrc="https://media.istockphoto.com/id/2167960646/vector/illustration-of-a-botanical-background-featuring-tropical-animals-and-various-tropical.jpg?s=612x612&w=0&k=20&c=KeAaK6shnN5qzapejJRcAIxU5ftUtnBbcYZxJecG1_w="
+                  width={1000}
+                  height={1000}
+                  className="w-full aspect-video h-[280px]"
+                  crossOrigin="anonymous" // Add this for ColorThief to work with external images
                 />
               </Box>
 

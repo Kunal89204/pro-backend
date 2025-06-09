@@ -1,9 +1,10 @@
 "use client";
 import Hero from "@/components/playlists/Hero";
 import Playlist from "@/components/playlists/Playlist";
-import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Text, useColorMode } from "@chakra-ui/react";
 import React from "react";
 import usePlaylists from "@/hooks/usePlaylists";
+import { useThemeColors } from "@/hooks/useThemeColors";
 
 
 const Playlists: React.FC = () => {
@@ -11,11 +12,12 @@ const Playlists: React.FC = () => {
 
   const { data, isLoading, error, isError } = usePlaylists();
 
-
+const {colorMode}  = useColorMode()
+const {textColor} = useThemeColors()
 
   if (isLoading) {
     return  <Flex
-      className="w-full h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900"
+      className={`w-full h-screen bg-gradient-to-br ${colorMode == "dark"?" via-black to-gray-900":""} `}
       alignItems="center"
       justifyContent="center"
       position="relative"
@@ -23,7 +25,7 @@ const Playlists: React.FC = () => {
     >
       {/* Glowing Blurred Circle Background */}
       <Box
-        className="absolute w-[300px] h-[300px] bg-purple-500/20 rounded-full blur-3xl animate-pulse" 
+        className="absolute w-[300px] h-[300px] bg-purple-500/30 rounded-full blur-3xl animate-pulse" 
         style={{ top: "20%", left: "40%" }}
       />
       <Flex
@@ -42,7 +44,7 @@ const Playlists: React.FC = () => {
         <Text
           mt={4}
           fontSize="lg"
-          color="gray.200"
+          color={textColor}
           letterSpacing="wide"
           fontWeight="semibold"
         >

@@ -2,17 +2,18 @@ import React from 'react'
 import { VideoProps } from '@/types/types'
 import { useThemeColors } from '@/hooks/useThemeColors'
 import { formatDistanceToNow } from "date-fns"
-import { Box, Flex, Menu, MenuButton, MenuItem, MenuList, Text, IconButton, Badge, useColorMode } from "@chakra-ui/react";
+import { Box, Flex, Menu, MenuButton, MenuItem, MenuList, Text, IconButton, Badge, useColorMode, useDisclosure } from "@chakra-ui/react";
 import { IconDotsVertical } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from 'next/link';
 import DeleteButton from './DeleteButton';
+import SaveToPlaylistModal from '../Modals/SaveToPlaylistModal';
 
 
 const formatDuration = (input: number | string | bigint): string => {
-    const seconds = typeof input === "bigint" ? Number(input) : Number(input); // Convert to number
+    const seconds = typeof input === "bigint" ? Number(input) : Number(input); 
 
-    if (isNaN(seconds) || seconds < 0) return "0:00"; // Handle invalid cases
+    if (isNaN(seconds) || seconds < 0) return "0:00"; 
 
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -28,6 +29,7 @@ const Video: React.FC<VideoProps> = ({ duration, thumbnail, _id, createdAt, titl
 
     const { textColor, secondaryTextColor } = useThemeColors()
     const { colorMode } = useColorMode()
+    const {isOpen:isSaveToPlaylistOpen, onClose:onSaveToPlaylistClose, onOpen} = useDisclosure()
 
 
  
@@ -53,14 +55,14 @@ const Video: React.FC<VideoProps> = ({ duration, thumbnail, _id, createdAt, titl
 
                 <Box flex={1}>
                     <Flex justify="space-between" >
-                        <Link href={`/watch/${_id}`}>
+                        <Link href={`/watch/${_id}`} className='w-full'>
                             <Text fontWeight="bold" noOfLines={2} fontSize="md" textColor={textColor}>
                                 {title}
                             </Text></Link>
                         <Menu >
                             <MenuButton height={0} width={6} minW={0} as={IconButton} icon={<IconDotsVertical width={20} className={colorMode == "light" ? "text-black" : "text-white"} />} variant="unstyled" aria-label="Options" />
                             <MenuList textColor={textColor}>
-                                <MenuItem >Save to Playlist</MenuItem>
+                                <MenuItem onClick={onOpen}>Save to Playlist</MenuItem>
                                 <MenuItem >Share</MenuItem>
                                 <DeleteButton id={_id}>Delete</DeleteButton>
                             </MenuList>
@@ -74,6 +76,7 @@ const Video: React.FC<VideoProps> = ({ duration, thumbnail, _id, createdAt, titl
                     </Flex>
                 </Box>
             </Flex>
+            <SaveToPlaylistModal isOpen={isSaveToPlaylistOpen} onClose={onSaveToPlaylistClose} videoId={_id}   />
         </Box>
     )
 }

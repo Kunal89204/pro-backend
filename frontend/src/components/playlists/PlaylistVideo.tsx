@@ -76,7 +76,7 @@ const PlaylistVideo = ({ video, idx, playlistId }: {
                         w="100%"
                         h="100%"
                         objectFit="cover"
-                        fallbackSrc="/assets/video_placeholder.png"
+                      
                     />
 
                     {/* Duration Badge */}

@@ -2,7 +2,7 @@
 import Hero from "@/components/playlists/Hero";
 import Playlist from "@/components/playlists/Playlist";
 import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React from "react";
 import usePlaylists from "@/hooks/usePlaylists";
 
 

@@ -111,7 +111,7 @@ export const Logo = () => {
     
     return (
         <Link href="#" className="font-normal flex space-x-2 items-center text-sm text-black relative z-20">
-            <Image src={logo} alt="" width={1000} className="w-6 " />
+            <Image src={logo} alt="" width={1000} className="w-12 " />
             <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`font-medium  whitespace-pre`}>
                 <Text color={textColor}>YouTube</Text>
             </motion.span>
@@ -122,7 +122,7 @@ export const Logo = () => {
 export const LogoIcon = () => {
     return (
         <Link href="#" className="font-normal flex space-x-2 items-center text-sm text-black relative z-20">
-            <Image src={logo} alt="" width={1000} className="w-6 " />
+            <Image src={logo} alt="" width={1000} className="w-12 " />
         </Link>
     );
 };

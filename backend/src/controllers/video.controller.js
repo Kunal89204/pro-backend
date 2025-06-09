@@ -112,9 +112,12 @@ const publishAVideo = asyncHandler(async (req, res) => {
         resource_type: 'video'
     });
 
+    
     if (!uploadedVideo) {
         throw new ApiError(500, "Error while uploading video");
     }
+
+    
 
     let thumbnailUrl = "";
 

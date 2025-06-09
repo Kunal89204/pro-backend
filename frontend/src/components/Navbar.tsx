@@ -20,7 +20,7 @@ import { useThemeColors } from "@/hooks/useThemeColors";
 const Navbar: React.FC = () => {
   const { colorMode, toggleColorMode } = useColorMode();
 
-  const { bgColor, borderColor, buttonBg, hoverBg, inputBg, inputTextColor } =
+  const { borderColor, buttonBg, hoverBg, inputBg, inputTextColor } =
     useThemeColors();
 
   if (
@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
       position="sticky"
       top={0}
       zIndex={10}
-      bg={bgColor}
+      bg={'transparent'}
       px={4}
       py={2}
       boxShadow="sm"

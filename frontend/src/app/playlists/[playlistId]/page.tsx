@@ -4,7 +4,6 @@ import {
   Box,
   Flex,
   Text,
-
   VStack,
   HStack,
   Button,
@@ -20,12 +19,7 @@ import { myQuery } from "@/api/query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 
-import {
-  IconEdit,
-  IconTrash,
-  IconPlayerPlayFilled,
-
-} from "@tabler/icons-react";
+import { IconEdit, IconTrash, IconPlayerPlayFilled } from "@tabler/icons-react";
 
 import EditPlaylist from "@/components/Modals/EditPlaylist";
 import DeletePlaylistModal from "@/components/Modals/DeletePlaylistModal";
@@ -34,12 +28,11 @@ import { useQuery } from "@tanstack/react-query";
 
 import PlaylistVideo from "@/components/playlists/PlaylistVideo";
 import Image from "next/image";
-import ExpandableCardDemo from "@/components/expandable-card-demo-standard";
+
 
 const PlaylistPage = () => {
   const { playlistId } = useParams();
   const token = useSelector((state: RootState) => state.token);
-
 
   const {
     isOpen: isEditOpen,
@@ -72,9 +65,6 @@ const PlaylistPage = () => {
   const subtleTextColor = useColorModeValue("gray.500", "#888888");
   const hoverBg = useColorModeValue("gray.50", "#161616");
 
-
-
-
   const imgRef = useRef<HTMLImageElement | null>(null);
   const [colors, setColors] = useState<string[]>(["#cccccc", "#999999"]); // Default colors
 
@@ -96,7 +86,10 @@ const PlaylistPage = () => {
               const [r1, g1, b1] = palette[0];
               const [r2, g2, b2] = palette[1];
 
-              setColors([`rgb(${r1}, ${g1}, ${b1})`, `rgb(${r2}, ${g2}, ${b2})`]);
+              setColors([
+                `rgb(${r1}, ${g1}, ${b1})`,
+                `rgb(${r2}, ${g2}, ${b2})`,
+              ]);
             }
           } catch (error) {
             console.log("ColorThief extraction failed:", error);
@@ -152,8 +145,6 @@ const PlaylistPage = () => {
     );
   }
 
-
-
   return (
     <Box minH="100vh" bg={bgColor}>
       <Container maxW="7xl" py={8}>
@@ -176,15 +167,14 @@ const PlaylistPage = () => {
                 // borderColor={borderColor}
                 style={{
                   boxShadow: `20px 0px 150px 0px ${colors[0]}`,
-                 
-
                 }}
               >
                 <Image
                   ref={imgRef} // Add this ref
                   src={
                     playlist.data.videos?.[playlist.data.videos.length - 1]
-                      ?.thumbnail || "https://media.istockphoto.com/id/2167960646/vector/illustration-of-a-botanical-background-featuring-tropical-animals-and-various-tropical.jpg?s=612x612&w=0&k=20&c=KeAaK6shnN5qzapejJRcAIxU5ftUtnBbcYZxJecG1_w="
+                      ?.thumbnail ||
+                    "https://media.istockphoto.com/id/2167960646/vector/illustration-of-a-botanical-background-featuring-tropical-animals-and-various-tropical.jpg?s=612x612&w=0&k=20&c=KeAaK6shnN5qzapejJRcAIxU5ftUtnBbcYZxJecG1_w="
                   }
                   alt={playlist.data.name}
                   width={1000}
@@ -211,14 +201,14 @@ const PlaylistPage = () => {
                 cursor="pointer"
               >
                 <IconButton
-                  icon={<IconPlayerPlayFilled size={32} />}
+                  icon={<IconPlayerPlayFilled size={30} color="white" />}
                   aria-label="Play playlist"
                   size="xl"
                   borderRadius="full"
-                  bg="whiteAlpha.900"
+                  bg="whiteAlpha.400"
                   color="black"
-                  _hover={{ bg: "white", transform: "scale(1.05)" }}
-                  transition="all 0.2s"
+                  _hover={{ bg: "black", transform: "scale(1.05)" }}
+                  transition="all 0.2s" padding={2}
                 />
               </Flex>
             </Box>
@@ -304,16 +294,26 @@ const PlaylistPage = () => {
         <Box pt={8}>
           {playlist.data.videos && playlist.data.videos.length > 0 ? (
             <VStack align="stretch" spacing={1}>
-              {playlist.data.videos.map((video: {
-                _id: string;
-                thumbnail: string;
-                title: string;
-                description: string;
-                duration: number;
-                views: number;
-              }, idx: number) => (
-                <PlaylistVideo key={idx} video={video} idx={idx} playlistId={playlist.data._id} />
-              ))}
+              {playlist.data.videos.map(
+                (
+                  video: {
+                    _id: string;
+                    thumbnail: string;
+                    title: string;
+                    description: string;
+                    duration: number;
+                    views: number;
+                  },
+                  idx: number
+                ) => (
+                  <PlaylistVideo
+                    key={idx}
+                    video={video}
+                    idx={idx}
+                    playlistId={playlist.data._id}
+                  />
+                )
+              )}
             </VStack>
           ) : (
             <Flex
@@ -344,7 +344,7 @@ const PlaylistPage = () => {
             </Flex>
           )}
 
-          {/* <ExpandableCardDemo /> */}
+         
         </Box>
 
         {/* Modals */}
@@ -360,7 +360,6 @@ const PlaylistPage = () => {
           onClose={onCloseDelete}
           playlistId={playlist.data._id}
         />
-
       </Container>
     </Box>
   );

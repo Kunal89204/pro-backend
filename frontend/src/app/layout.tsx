@@ -5,6 +5,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import AuthWrapper from "@/components/AuthWrapper";
 import SidebarDemo from "@/components/SideBarWrapper";
+import { Analytics } from "@vercel/analytics/next"
 
 
 
@@ -41,7 +42,7 @@ export default function RootLayout({
             </SidebarDemo>
           </AuthWrapper>
         </Providers>
-
+ <Analytics />
       </body>
     </html>
   );

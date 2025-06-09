@@ -65,7 +65,7 @@ const SaveToPlaylistModal = ({
     onClose: onCloseCreatePlaylist,
   } = useDisclosure();
 
-  const { token } = useSelector((state: RootState) => state);
+  const token  = useSelector((state: RootState) => state?.token);
 
   // Separate mutations for add and remove
   const addVideoToPlaylistMutation = useMutation({
@@ -137,8 +137,8 @@ const SaveToPlaylistModal = ({
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
+    <Modal isOpen={isOpen} onClose={onClose} isCentered>
+      <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(2px)" />
       <ModalContent
         bg="#121212"
         color="white"
@@ -171,7 +171,7 @@ const SaveToPlaylistModal = ({
                   alignItems="center"
                   className="w-full "
                 >
-                  <Text fontSize="20px">{playlist.name}</Text>
+                  <Text fontSize="18px">{playlist.name}</Text>
                 </Flex>
               </Checkbox>
               {playlist.isPublic ? <IconLock /> : <IconLockOpen />}

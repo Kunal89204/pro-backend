@@ -37,7 +37,7 @@ const EditPlaylist = ({
 }) => {
   const [playlistName, setPlaylistName] = useState(title);
   const [isPublicState, setIsPublicState] = useState(isPublic);
-  const { token } = useSelector((state: RootState) => state);
+  const token  = useSelector((state: RootState) => state?.token);
   const { refetch } = usePlaylists();
   const toast = useToast();
   const { mutate: editPlaylist, isPending } = useMutation({

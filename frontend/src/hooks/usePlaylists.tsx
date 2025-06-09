@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 
 const usePlaylists = () => {
-  const { token } = useSelector((state: RootState) => state);
+  const token = useSelector((state: RootState) => state.token);
   return useQuery({
     queryKey: ["playlists"],
     queryFn: () => myQuery.getPlaylists(token),

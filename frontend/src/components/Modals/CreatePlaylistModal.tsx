@@ -35,7 +35,7 @@ const CreatePlaylistModal = ({
   const [playlistName, setPlaylistName] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const toast = useToast();
-  const { token } = useSelector((state: RootState) => state);
+  const token  = useSelector((state: RootState) => state?.token);
 
   const createPlaylistMutation = useMutation({
     mutationFn: ({
@@ -97,7 +97,7 @@ const CreatePlaylistModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent
         bg="#121212"
@@ -105,10 +105,10 @@ const CreatePlaylistModal = ({
         borderRadius="10px"
         // width="300px"
       >
-        <ModalHeader>Modal Title</ModalHeader>
+        <ModalHeader>Create Playlist</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text py={2}>Playlist Name</Text>
+          <Text py={2} >Playlist Name</Text>
           <Input
             placeholder={"Enter playlist name"}
             required

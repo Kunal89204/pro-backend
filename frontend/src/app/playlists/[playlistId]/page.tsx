@@ -20,21 +20,23 @@ import { myQuery } from "@/api/query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import {
-  IconDotsVertical,
   IconEdit,
   IconTrash,
   IconPlayerPlayFilled,
-  IconEye,
+
 } from "@tabler/icons-react";
+
 import EditPlaylist from "@/components/Modals/EditPlaylist";
 import DeletePlaylistModal from "@/components/Modals/DeletePlaylistModal";
 import { useDisclosure } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { formatDuration } from "@/utils/formatDuration";
+
+import PlaylistVideo from "@/components/playlists/PlaylistVideo";
 
 const PlaylistPage = () => {
   const { playlistId } = useParams();
-  const { token } = useSelector((state: RootState) => state);
+  const token = useSelector((state: RootState) => state?.token);
+ 
 
   const {
     isOpen: isEditOpen,
@@ -95,11 +97,7 @@ const PlaylistPage = () => {
     );
   }
 
-  const formatViews = (views: number) => {
-    if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
-    if (views >= 1000) return `${(views / 1000).toFixed(1)}K`;
-    return views.toString();
-  };
+
 
   return (
     <Box minH="100vh" bg={bgColor}>
@@ -126,13 +124,13 @@ const PlaylistPage = () => {
                 <Image
                   src={
                     playlist.data.videos?.[playlist.data.videos.length - 1]
-                      ?.thumbnail || "/assets/playlist_placeholder.png"
+                      ?.thumbnail || "https://media.istockphoto.com/id/2167960646/vector/illustration-of-a-botanical-background-featuring-tropical-animals-and-various-tropical.jpg?s=612x612&w=0&k=20&c=KeAaK6shnN5qzapejJRcAIxU5ftUtnBbcYZxJecG1_w="
                   }
                   alt={playlist.data.name}
                   w="100%"
                   h="100%"
                   objectFit="cover"
-                  fallbackSrc="/assets/playlist_placeholder.png"
+                  fallbackSrc="https://media.istockphoto.com/id/2167960646/vector/illustration-of-a-botanical-background-featuring-tropical-animals-and-various-tropical.jpg?s=612x612&w=0&k=20&c=KeAaK6shnN5qzapejJRcAIxU5ftUtnBbcYZxJecG1_w="
                 />
               </Box>
 
@@ -254,113 +252,7 @@ const PlaylistPage = () => {
                 duration: number;
                 views: number;
               }, idx: number) => (
-                <Box
-                  key={video._id}
-                  p={4}
-                  borderRadius="lg"
-                  cursor="pointer"
-                  onClick={() => router.push(`/watch/${video._id}`)}
-                  _hover={{ bg: hoverBg }}
-                  transition="all 0.2s"
-                  border="1px solid"
-                  borderColor="transparent"
-                  //   _hover={{ borderColor: borderColor }}
-                >
-                  <Flex align="center" gap={4}>
-                    {/* Video Index */}
-                    <Text
-                      fontSize="sm"
-                      color={subtleTextColor}
-                      fontWeight="medium"
-                      minW="24px"
-                      textAlign="center"
-                    >
-                      {idx + 1}
-                    </Text>
-
-                    {/* Video Thumbnail */}
-                    <Box
-                      w="120px"
-                      h="68px"
-                      borderRadius="md"
-                      overflow="hidden"
-                      bg={cardBg}
-                      flexShrink={0}
-                      position="relative"
-                    >
-                      <Image
-                        src={video.thumbnail}
-                        alt={video.title}
-                        w="100%"
-                        h="100%"
-                        objectFit="cover"
-                        fallbackSrc="/assets/video_placeholder.png"
-                      />
-
-                      {/* Duration Badge */}
-                      <Box
-                        position="absolute"
-                        bottom={1}
-                        right={1}
-                        bg="blackAlpha.800"
-                        color="white"
-                        px={2}
-                        py={0.5}
-                        borderRadius="sm"
-                        fontSize="xs"
-                        fontWeight="medium"
-                      >
-                        {formatDuration(video.duration)}
-                      </Box>
-                    </Box>
-
-                    {/* Video Info */}
-                    <VStack align="flex-start" spacing={2} flex={1} minW={0}>
-                      <Text
-                        fontWeight="medium"
-                        color={textColor}
-                        fontSize="md"
-                        noOfLines={2}
-                        lineHeight="shorter"
-                      >
-                        {video.title}
-                      </Text>
-
-                      {video.description && (
-                        <Text
-                          fontSize="sm"
-                          color={subtleTextColor}
-                          noOfLines={1}
-                          lineHeight="shorter"
-                        >
-                          {video.description}
-                        </Text>
-                      )}
-
-                      <HStack spacing={3} fontSize="xs" color={subtleTextColor}>
-                        <HStack spacing={1}>
-                          <IconEye size={12} />
-                          <Text>{formatViews(video.views)} views</Text>
-                        </HStack>
-                      </HStack>
-                    </VStack>
-
-                    {/* More Options */}
-                    <IconButton
-                      icon={<IconDotsVertical size={16} />}
-                      aria-label="More options"
-                      size="sm"
-                      variant="ghost"
-                      color={subtleTextColor}
-                      _hover={{ bg: hoverBg, color: textColor }}
-                      borderRadius="full"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Handle more options
-                      }}
-                    />
-                  </Flex>
-                </Box>
+                <PlaylistVideo key={idx} video={video} idx={idx} playlistId={playlist.data._id} />
               ))}
             </VStack>
           ) : (
@@ -406,6 +298,7 @@ const PlaylistPage = () => {
           onClose={onCloseDelete}
           playlistId={playlist.data._id}
         />
+
       </Container>
     </Box>
   );

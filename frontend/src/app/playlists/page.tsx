@@ -23,7 +23,7 @@ const Playlists: React.FC = () => {
     >
       {/* Glowing Blurred Circle Background */}
       <Box
-        className="absolute w-[300px] h-[300px] bg-purple-500/20 rounded-full blur-3xl animate-pulse"
+        className="absolute w-[300px] h-[300px] bg-purple-500/20 rounded-full blur-3xl animate-pulse" 
         style={{ top: "20%", left: "40%" }}
       />
       <Flex

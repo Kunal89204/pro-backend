@@ -1,6 +1,7 @@
 "use client";
 import { IconSearch } from "@tabler/icons-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React from "react";
 import {
   Box,
@@ -19,14 +20,14 @@ import { useThemeColors } from "@/hooks/useThemeColors";
 
 const Navbar: React.FC = () => {
   const { colorMode, toggleColorMode } = useColorMode();
+  const pathname = usePathname();
 
-  const { borderColor, buttonBg, hoverBg, inputBg, inputTextColor } =
+  const { buttonBg, hoverBg, inputTextColor } =
     useThemeColors();
 
   if (
-    typeof window !== "undefined" &&
-    (window.location.pathname === "/login" ||
-      window.location.pathname === "/register")
+    pathname === "/login" ||
+    pathname === "/register"
   ) {
     return null;
   }
@@ -37,7 +38,9 @@ const Navbar: React.FC = () => {
       position="sticky"
       top={0}
       zIndex={10}
+      // bg={pathname.startsWith("/playlists/") ? "transparent" : "#121212"}
       bg={'transparent'}
+      backdropFilter="blur(10px)"
       px={4}
       py={2}
       boxShadow="sm"
@@ -50,12 +53,12 @@ const Navbar: React.FC = () => {
           maxW={{ base: "full", lg: "40%" }}
           borderRadius="full"
           border="0px solid"
-          borderColor={borderColor}
+          borderColor={'rgba(255, 255, 255, 0.1)'}
           className="relative"
         >
           <Input
             placeholder="Search..."
-            bg={inputBg}
+            bg={"rgba(10, 10, 10, 0.8)"}
             color={inputTextColor}
             borderRadius="full"
             py={2}

@@ -157,7 +157,8 @@ const getPaginatedCommentsForVideo = async (req, res) => {
 
 const addComment = async (req, res) => {
   try {
-    const { content, videoId, userId, parentComment } = req.body;
+    const { content, videoId,  parentComment } = req.body;
+    const userId = req.user._id;
 
     if (!content || !videoId || !userId) {
       return res.status(400).json({ message: "Missing required fields" });

@@ -10,13 +10,14 @@ import {
   Text,
   Button,
 
-  useColorModeValue,
+
   useToast
 } from '@chakra-ui/react';
 import { useMutation } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/lib/store';
 import { myQuery } from '@/api/query';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 const RemoveVideoFromPlaylist = ({
   isOpen,
@@ -31,6 +32,8 @@ const RemoveVideoFromPlaylist = ({
 }) => {
   const toast = useToast()
   const token = useSelector((state: RootState) => state.token)
+  const {textColor} =
+    useThemeColors();
   const removeVideoFromPlaylistMutation = useMutation({
     mutationFn: (playlistId: string) =>
       myQuery.removeVideoFromPlaylist(token, playlistId, videoId),
@@ -55,9 +58,10 @@ const RemoveVideoFromPlaylist = ({
   }
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="sm">
-      <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(2px)" />
+      <ModalOverlay bg="blackAlpha.600"  />
       <ModalContent
-        bg={useColorModeValue('#f9f9f9', '#1a1a1a')}
+        bg={'transparent'}
+        backdropFilter="blur(20px)"
         borderRadius="lg"
         boxShadow="lg"
         px={4}
@@ -69,7 +73,7 @@ const RemoveVideoFromPlaylist = ({
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text fontSize="sm" color="gray.400">
+          <Text fontSize="sm" color={'secondary.base.light'}>
             Are you sure you want to remove this video from the playlist?
           </Text>
         </ModalBody>
@@ -78,8 +82,8 @@ const RemoveVideoFromPlaylist = ({
           <Button
             onClick={onClose}
             variant="ghost"
-            color="gray.500"
-            _hover={{ bg: useColorModeValue('gray.100', 'gray.700') }}
+            color={textColor}
+            // _hover={{ bg: useColorModeValue('gray.100', 'gray.700') }}
             mr={2}
           >
             Cancel

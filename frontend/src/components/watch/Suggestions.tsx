@@ -12,7 +12,7 @@ const Suggestions = () => {
     <Box className=" p-2 rounded-lg flex gap-2 justify-between relative hover:bg-[#202020] transition-all duration-300">
      
       <Box className="flex gap-2 w-full ">
-        <Link href={"/watch/6840426746f14d9fac997954npx "} className="w-2/5">
+        <Link href={"/watch/6840426746f14d9fac997954 "} className="w-2/5">
           <Image
             src={
               "https://res.cloudinary.com/dqvqvvwc8/video/upload/v1749041765/v8qfcsf55nq7pjmfyrcu.jpg?so=1"

@@ -366,4 +366,22 @@ export const myQuery = {
     );
     return response.data;
   },
+
+  addComment: async (token: string, videoId: string, comment: string) => {
+    const response = await axiosInstance.post(`/comment/add`, { videoId, content:comment }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+  addReply: async (token: string, videoId: string, commentId: string, content: string) => {
+    const response = await axiosInstance.post(`/comment/add`, { videoId, parentComment:commentId, content }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
 };

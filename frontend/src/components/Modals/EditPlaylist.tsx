@@ -67,15 +67,16 @@ const EditPlaylist = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
-      <ModalContent bg={"#121212"} color="white" borderRadius="10px">
-        <ModalHeader>Edit Playlist</ModalHeader>
+      <ModalContent bg={"transparent"} backdropFilter="blur(50px)" borderRadius="10px">
+        <ModalHeader color={'white'}>Edit Playlist</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text py={2} fontSize={"lg"}>
+          <Text py={2} fontSize={"lg"} color={'white'}>
             Playlist Name
           </Text>
           <Input
             value={playlistName}
+            color={'white'}
             onChange={(e) => setPlaylistName(e.target.value)}
           />
           <Flex alignItems={"center"} gap={2} py={4} mt={4}>
@@ -84,12 +85,12 @@ const EditPlaylist = ({
               isChecked={isPublicState}
               onChange={() => setIsPublicState(!isPublicState)}
             />{" "}
-            <Text>Public</Text>
+            <Text color={'white'}>Public</Text>
           </Flex>
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="gray" mr={3} onClick={onClose}>
+          <Button colorScheme="gray" variant={'ghost'} mr={3} onClick={onClose}>
             Close
           </Button>
           <Button
@@ -97,6 +98,8 @@ const EditPlaylist = ({
             onClick={handleSave}
             colorScheme="gray"
             isLoading={isPending}
+            color={'white'}
+            _hover={{ color: 'black', bg: 'white' }}
           >
             Save
           </Button>

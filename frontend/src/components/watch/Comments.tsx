@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Text,
@@ -21,10 +21,12 @@ import {
 } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
+import { myQuery } from "@/api/query";
+import { useMutation } from "@tanstack/react-query";
 
 // Define comment type
 interface Comment {
-  id: number;
+  id: string;
   user: string;
   avatar: string;
   text: string;
@@ -32,73 +34,45 @@ interface Comment {
   replies: Comment[];
 }
 
-// const commentsData: Comment[] = [
-//   {
-//     id: 1,
-//     user: "John Doe",
-//     avatar: "https://i.pravatar.cc/46",
-//     text: "This is an amazing video! Thanks for sharing.",
-//     time: "2 hours ago",
-//     replies: [],
-//   },
-//   {
-//     id: 2,
-//     user: "Alice Brown",
-//     avatar: "https://i.pravatar.cc/42",
-//     text: "Can someone explain this part?",
-//     time: "3 hours ago",
-//     replies: [
-//       {
-//         id: 5,
-//         user: "John Doe",
-//         avatar: "https://i.pravatar.cc/46",
-//         text: "Sure! What part do you need help with?",
-//         time: "2 hours ago",
-//         replies: [
-//           {
-//             id: 7,
-//             user: "Alice Brown",
-//             avatar: "https://i.pravatar.cc/42",
-//             text: "Can someone explain this part?",
-//             time: "3 hours ago",
-//             replies: [
-//               {
-//                 id: 9,
-//                 user: "John Doe",
-//                 avatar: "https://i.pravatar.cc/46",
-//                 text: "Sure! What part do you need help with?",
-//                 time: "2 hours ago",
-//                 replies: [],
-//               },
-//             ],
-//           },
-//         ],
-//       },
-//     ],
-//   },
-// ];
-
 const CommentItem = ({
   comment,
   depth = 0,
+  videoId,
+  refetch,
 }: {
   comment: Comment;
   depth?: number;
+  videoId: string;
+  refetch: () => void;
 }) => {
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyText, setReplyText] = useState("");
+ 
+  const token = useSelector((state: RootState) => state?.token);
+  useEffect(() => {
+    console.log("I am here inside comment item", comment);
+  }, []);
 
-  console.log("I am here inside comment item",comment)
+  const { mutate: addReply, isPending } = useMutation({
+    mutationFn: () => myQuery.addReply(token, videoId, comment.id, replyText),
+    onSuccess: () => {
+      console.log("Reply added successfully");
+      refetch();
+    },
+    onError: () => {
+      console.log("Error adding reply");
+    },
+  });
 
   const handleReplySubmit = () => {
-    console.log("Replying to Comment ID:", comment.id);
-    console.log("Reply Text:", replyText);
-    setReplyText(""); // Clear input after submission
+    addReply();
     setShowReplyInput(false); // Hide input after submitting
   };
+
+ 
 
   return (
     <Box w="full" pl={depth * 6}>
@@ -155,8 +129,9 @@ const CommentItem = ({
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 size="sm"
+                color={textColor}
               />
-              <Button size="sm" colorScheme="blue" onClick={handleReplySubmit}>
+              <Button size="sm" colorScheme="blue" onClick={handleReplySubmit} isLoading={isPending}>
                 Post
               </Button>
             </HStack>
@@ -165,8 +140,8 @@ const CommentItem = ({
           {/* Nested Replies */}
           <Collapse in={showReplies} animateOpacity>
             <VStack mt={3} pl={6} align="start" spacing={3} w="full">
-              {comment?.replies?.map((reply) => (
-                <CommentItem key={reply.id} comment={reply} depth={depth + 1} />
+              {comment?.replies?.reverse()?.map((reply) => (
+                <CommentItem key={reply.id} comment={reply} depth={depth + 1} videoId={videoId} refetch={refetch} />
               ))}
             </VStack>
           </Collapse>
@@ -176,12 +151,29 @@ const CommentItem = ({
   );
 };
 
-const Comments = ({comments}:{comments:Comment[]}) => {
+const Comments = ({ comments, videoId, refetch }: { comments: Comment[], videoId: string, refetch: () => void }) => {
   const { textColor } = useThemeColors();
   const { user } = useSelector((state: RootState) => state);
   const { avatarImage } = user;
-
-  console.log("I am here",comments)
+  const [commentText, setCommentText] = useState("");
+  const token = useSelector((state: RootState) => state?.token);
+  const { mutate: addComment, isPending } = useMutation({
+    mutationFn: () => myQuery.addComment(token, videoId, commentText),
+    onSuccess: () => {
+      console.log("Comment added successfully");
+      refetch();
+    },
+    onError: () => {
+      console.log("Error adding comment");
+      refetch();
+    },
+  });
+  const handleCommentSubmit = () => {
+    addComment();
+    // console.log("I am here", commentText);
+    // setCommentText(""); // Clear input after submission
+  };
+  console.log("I am here", comments);
   return (
     <Box py={4}>
       <Text fontSize="2xl" fontWeight="semibold" color={textColor}>
@@ -194,16 +186,24 @@ const Comments = ({comments}:{comments:Comment[]}) => {
           placeholder="Add a comment..."
           variant="filled"
           borderRadius={"full"}
+          value={commentText}
+          color={textColor}
+          onChange={(e) => setCommentText(e.target.value)}
         />
-        <Button colorScheme="blue" borderRadius={"full"}>
+        <Button
+          colorScheme="blue"
+          borderRadius={"full"}
+          onClick={handleCommentSubmit}
+          isLoading={isPending}
+        >
           <IconMessageCircle size={18} />
         </Button>
       </HStack>
 
       <Divider pt={4} />
       <VStack align="start" mt={5} spacing={4} w="full">
-        {comments?.map((comment:Comment,i:number) => (
-          <CommentItem key={i} comment={comment} />
+        {comments?.reverse()?.map((comment: Comment, i: number) => (
+          <CommentItem key={i} comment={comment} videoId={videoId} refetch={refetch} />
         ))}
       </VStack>
     </Box>

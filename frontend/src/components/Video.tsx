@@ -63,13 +63,18 @@ const Video: React.FC<VideoProps> = ({
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {bgColor, buttonBg, hoverBg} = useThemeColors()
 
   return (
     <Box
       borderRadius="2xl"
       overflow="hidden"
       p={2}
-      className="hover:bg-gray-700/50 dark:hover:bg-gray-300/50 transition-all duration-500"
+      className="transition-all duration-500"
+    
+      _hover={{
+        bg: hoverBg,
+      }}
     >
       <Box position={"relative"}>
         <Link href={`/watch/${videoId}`}>
@@ -132,10 +137,10 @@ const Video: React.FC<VideoProps> = ({
                 variant="unstyled"
                 aria-label="Options"
               />
-              <MenuList textColor={textColor} bg="#121212">
-                <MenuItem  bg="#121212" className="hover:bg-gray-700/50" onClick={onOpen}>Save to Playlist</MenuItem>
-                <MenuItem bg="#121212" className="hover:bg-gray-700/50" >Share</MenuItem>
-                <MenuItem bg="#121212" className="hover:bg-gray-700/50" >Report</MenuItem>
+              <MenuList textColor={textColor} bg={bgColor}>
+                <MenuItem  bg={bgColor} className="hover:bg-gray-700/50" onClick={onOpen}>Save to Playlist</MenuItem>
+                <MenuItem bg={bgColor} className="hover:bg-gray-700/50" >Share</MenuItem>
+                <MenuItem bg={bgColor} className="hover:bg-gray-700/50" onClick={onOpen}>Report</MenuItem>
               </MenuList>
             </Menu>
           </Flex>

@@ -1,11 +1,12 @@
 import { useThemeColors } from "@/hooks/useThemeColors";
 import parseTextWithLinks from "@/utils/parseTextWithLinks";
-import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
-import { IconBookmark, IconShare, IconThumbUp } from "@tabler/icons-react";
+import { Box, Button, Flex, Heading, Text, useDisclosure } from "@chakra-ui/react";
+import { IconBookmark, IconShare, IconThumbUp, IconThumbUpFilled } from "@tabler/icons-react";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
+import SaveToPlaylistModal from "../Modals/SaveToPlaylistModal";
 
 // Define types
 interface Owner {
@@ -36,7 +37,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
   const [showFullDesc, setShowFullDesc] = useState(false);
   const descriptionLimit = 235; // Character limit before showing "See More"
   const { textColor, secondaryTextColor, secondaryBgColor } = useThemeColors();
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isLiked, setIsLiked] = useState(false);
   // Video.js refs
   const videoRef = useRef<HTMLDivElement>(null);
   // Video.js player ref - using ReturnType to get the correct type
@@ -105,6 +107,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
 
   const handleVideoLike = async (id: string) => {
     console.log("video liked", id);
+    setIsLiked(!isLiked);
   };
 
   const handleVideoSave = async (id: string) => {
@@ -157,7 +160,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
             colorScheme="gray"
             onClick={() => handleVideoLike(vdo?._id)}
           >
-            <IconThumbUp /> Like
+            {isLiked ? <IconThumbUpFilled /> : <IconThumbUp />} Like
           </Button>
           <Button className="flex gap-2">
             <IconShare /> Share
@@ -203,6 +206,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
           )}
         </Text>
       </Box>
+      <SaveToPlaylistModal isOpen={isOpen} onClose={onClose} videoId={vdo?._id} />
     </Box>
   );
 };

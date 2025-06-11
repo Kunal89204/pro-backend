@@ -5,7 +5,11 @@ import {
   Button,
   Flex,
   Heading,
+  Skeleton,
+  SkeletonText,
+  Spinner,
   Text,
+  useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
 import { IoMdThumbsUp } from "react-icons/io";
@@ -55,6 +59,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
   const [isLiked, setIsLiked] = useState(false);
   const descriptionLimit = 235; // Character limit before showing "See More"
   const { textColor, secondaryTextColor } = useThemeColors();
+  const { colorMode } = useColorMode();
   const { isOpen, onClose, onOpen } = useDisclosure();
 
   // Video js refs
@@ -205,49 +210,70 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
             <Text color={textColor} fontWeight={"semibold"} noOfLines={1}>
               {vdo?.owner?.fullName}
             </Text>
-            <Text color={secondaryTextColor} fontSize={"xs"} fontWeight={"600"}>
-              {subscribeData?.data?.subscriberCount} subscribers
-            </Text>
+            {subscribeLoading ? (
+              <SkeletonText
+                height={"20px"}
+                width={"150px"}
+                borderRadius={"full"}
+                noOfLines={1}
+              />
+            ) : (
+              <Text
+                color={secondaryTextColor}
+                fontSize={"xs"}
+                fontWeight={"600"}
+              >
+                {subscribeData?.data?.subscriberCount} subscribers
+              </Text>
+            )}
           </Box>
           <Box mx={4} alignSelf={"end"}>
-            <Button
-              onClick={() => handleSubscribe(vdo?.owner?._id)}
-              borderRadius={"full"}
-              position="relative"
-              transition="background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s"
-              colorScheme={subscribeData?.data?.subscribed ? "green" : "red"}
-              bg={subscribeData?.data?.subscribed ? "green.400" : undefined}
-              color={subscribeData?.data?.subscribed ? "white" : undefined}
-              _hover={{
-                transform: "scale(1.05)",
-                boxShadow: subscribeData?.data?.subscribed
-                  ? "0 0 0 4px rgba(72,187,120,0.2)"
-                  : "0 0 0 4px rgba(66,153,225,0.2)",
-              }}
-              _active={{
-                transform: "scale(0.98)",
-              }}
-            >
-              {subscribeData?.data?.subscribed ? "Subscribed" : "Subscribe"}
-            </Button>
+            {subscribeLoading ? (
+              <Skeleton height={"40px"} width={"150px"} borderRadius={"full"} />
+            ) : (
+              <Button
+                onClick={() => handleSubscribe(vdo?.owner?._id)}
+                borderRadius={"full"}
+                position="relative"
+                transition="background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s"
+                colorScheme={subscribeData?.data?.subscribed ? "green" : "red"}
+                bg={subscribeData?.data?.subscribed ? "green.400" : undefined}
+                color={subscribeData?.data?.subscribed ? "white" : undefined}
+                _hover={{
+                  transform: "scale(1.05)",
+                  boxShadow: subscribeData?.data?.subscribed
+                    ? "0 0 0 4px rgba(72,187,120,0.2)"
+                    : "0 0 0 4px rgba(66,153,225,0.2)",
+                }}
+                _active={{
+                  transform: "scale(0.98)",
+                }}
+              >
+                {subscribeData?.data?.subscribed ? "Subscribed" : "Subscribe"}
+              </Button>
+            )}
           </Box>
         </Flex>
 
         <Flex gap={2} alignItems={"center"}>
-          <Button
-            className="flex gap-2 "
-            colorScheme="gray"
-            borderRadius={"full"}
-            onClick={() => handleVideoLike(vdo?._id)}
-            fontWeight={"normal"}
-          >
-            {isLiked ? (
-              <IoMdThumbsUp size={20} />
-            ) : (
-              <MdOutlineThumbUp size={20} />
-            )}{" "}
-            {likeData?.likeCount}
-          </Button>
+          {isLoading ? (
+            <Skeleton height={"40px"} width={"100px"} borderRadius={"full"} />
+          ) : (
+            <Button
+              className="flex gap-2 items-center"
+              colorScheme="gray"
+              borderRadius={"full"}
+              onClick={() => handleVideoLike(vdo?._id)}
+              fontWeight={"normal"}
+            >
+              {isLiked ? (
+                <IoMdThumbsUp size={20} />
+              ) : (
+                <MdOutlineThumbUp size={20} />
+              )}{" "}
+              {likeData?.likeCount}
+            </Button>
+          )}
           <Button
             borderRadius={"full"}
             className="flex gap-2 rounded-full"
@@ -267,10 +293,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
       </Flex>
 
       <Box
-        bg={"#202020"}
+        bg={colorMode === "dark" ? "#202020" : "#f1f1f1"}
         borderRadius={"10px"}
         my={2}
-        p={2}
+        p={4}
         position={"relative"}
       >
         <Flex color={textColor} gap={2} fontSize={"sm"} fontWeight={"semibold"}>

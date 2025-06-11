@@ -177,7 +177,7 @@ const Comments = ({ comments, videoId, refetch }: { comments: Comment[], videoId
   return (
     <Box py={4}>
       <Text fontSize="2xl" fontWeight="semibold" color={textColor}>
-        Comments
+      {comments?.length}  Comments 
       </Text>
       {/* User's Comment Input */}
       <HStack mt={4} spacing={3}>

@@ -25,7 +25,7 @@ const Register: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const { bgColor, borderColor, textColor, hoverBg, inputBg, secondaryTextColor } = useThemeColors();
+  const { borderColor, textColor,  inputBg, secondaryTextColor } = useThemeColors();
   const toast = useToast();
 
   // Responsive values
@@ -47,10 +47,10 @@ const Register: React.FC = () => {
       });
       window.location.href = "/login";
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast({
         title: 'Registration Failed',
-        description: error?.response?.data?.message || 'Something went wrong',
+        description:  'Something went wrong',
         status: 'error',
         duration: 3000,
         isClosable: true,

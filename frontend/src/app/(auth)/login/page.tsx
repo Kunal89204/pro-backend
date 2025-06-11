@@ -78,7 +78,7 @@ const Login: React.FC = () => {
   // Responsive values
   const showImage = useBreakpointValue({ base: false, md: true })
   const formWidth = useBreakpointValue({ base: '100%', md: '50%' })
-  const formPadding = useBreakpointValue({ base: '4', md: '20' })
+  
   const containerMaxW = useBreakpointValue({ base: '100%', md: 'container.xl' })
 
   const loginMutation = useMutation<LoginResponse, Error, LoginCredentials>({

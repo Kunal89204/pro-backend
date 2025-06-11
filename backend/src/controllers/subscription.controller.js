@@ -51,8 +51,6 @@ const subscriberStats = asyncHandler(async (req, res) => {
     channel: channelId,
   });
 
-
-  
   const subscriberCount = await Subscription.countDocuments({
     channel: channelId,
   });
@@ -61,7 +59,7 @@ const subscriberStats = asyncHandler(async (req, res) => {
     success: true,
     message: "Subscriber stats fetched successfully",
     data: {
-      subscribed:!!subscribed,
+      subscribed: !!subscribed,
       subscriberCount,
     },
   });
@@ -74,7 +72,36 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
-  const { subscriberId } = req.params;
+  const userId = req.user._id;
+
+  if (!isValidObjectId(userId)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid channel ID or subscriber ID",
+    });
+  }
+
+  const subscribedChannels = await Subscription.find({
+    subscriber: userId,
+  }).populate("channel", "_id username fullName avatar");
+
+  if (!subscribedChannels) {
+    return res.status(404).json({
+      success: false,
+      message: "No subscribed channels found",
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "Subscribed channels fetched successfully",
+    data: subscribedChannels,
+  });
 });
 
-export { toggleSubscription, getUserChannelSubscribers, getSubscribedChannels, subscriberStats };
+export {
+  toggleSubscription,
+  getUserChannelSubscribers,
+  getSubscribedChannels,
+  subscriberStats,
+};

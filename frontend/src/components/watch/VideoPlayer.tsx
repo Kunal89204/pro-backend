@@ -7,7 +7,7 @@ import {
   Heading,
   Skeleton,
   SkeletonText,
-  Spinner,
+  
   Text,
   useColorMode,
   useDisclosure,
@@ -189,7 +189,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
         <div ref={videoRef} />
       </Box>
 
-      <Heading as={"h2"} fontSize={"2xl"} py={1} color={textColor}>
+      <Heading as={"h2"} fontSize={"24px"} py={2} color={textColor}>
         {vdo?.title}
       </Heading>
 
@@ -198,7 +198,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
         flexDir={{ base: "column", lg: "row" }}
         alignItems={{ base: "stretch", lg: "center" }}
       >
-        <Flex gap={2} py={3} alignItems={"center"}>
+        <Flex gap={2} py={3}>
           <Image
             src={vdo?.owner?.avatar}
             alt="Owner Avatar"

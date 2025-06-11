@@ -233,6 +233,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
             ) : (
               <Button
                 onClick={() => handleSubscribe(vdo?.owner?._id)}
+                isLoading={subscribeChannelMutation.isPending}
                 borderRadius={"full"}
                 position="relative"
                 transition="background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s"

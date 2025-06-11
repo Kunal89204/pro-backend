@@ -47,7 +47,7 @@ const Register: React.FC = () => {
       });
       window.location.href = "/login";
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: 'Registration Failed',
         description:  'Something went wrong',

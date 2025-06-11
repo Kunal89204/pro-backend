@@ -138,9 +138,10 @@ const SaveToPlaylistModal = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
-      <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(2px)" />
+      <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(1px)" />
       <ModalContent
-        bg="#121212"
+        bg="transparent"
+        backdropFilter="blur(20px)"
         color="white"
         borderRadius="10px"
         width="300px"

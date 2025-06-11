@@ -63,7 +63,8 @@ const Video: React.FC<VideoProps> = ({
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const {bgColor, buttonBg, hoverBg} = useThemeColors()
+
+ 
 
   return (
     <Box
@@ -73,7 +74,7 @@ const Video: React.FC<VideoProps> = ({
       className="transition-all duration-500"
     
       _hover={{
-        bg: hoverBg,
+        bg: colorMode == "light" ? "gray.200" : "#222222",
       }}
     >
       <Box position={"relative"}>
@@ -137,10 +138,10 @@ const Video: React.FC<VideoProps> = ({
                 variant="unstyled"
                 aria-label="Options"
               />
-              <MenuList textColor={textColor} bg={bgColor}>
-                <MenuItem  bg={bgColor} className="hover:bg-gray-700/50" onClick={onOpen}>Save to Playlist</MenuItem>
-                <MenuItem bg={bgColor} className="hover:bg-gray-700/50" >Share</MenuItem>
-                <MenuItem bg={bgColor} className="hover:bg-gray-700/50" onClick={onOpen}>Report</MenuItem>
+              <MenuList textColor={textColor} bg={'transparent'}border={'0px solid #202020'} backdropFilter="blur(20px)">
+                <MenuItem  bg={'transparent'} _hover={{backdropFilter:'blur(40px)'}} onClick={onOpen}>Save to Playlist</MenuItem>
+                <MenuItem bg={'transparent'} _hover={{backdropFilter:'blur(40px)'}} >Share</MenuItem>
+                <MenuItem bg={'transparent'} _hover={{backdropFilter:'blur(40px)'}} onClick={onOpen}>Report</MenuItem>
               </MenuList>
             </Menu>
           </Flex>

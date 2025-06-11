@@ -58,7 +58,7 @@ const Navbar: React.FC = () => {
         >
           <Input
             placeholder="Search..."
-            bg={"rgba(10, 10, 10, 0.8)"}
+            bg={colorMode == "light" ? "gray.200" : "rgba(10, 10, 10, 0.8)"}
             color={inputTextColor}
             borderRadius="full"
             py={2}

@@ -368,7 +368,38 @@ export const myQuery = {
   },
 
   addComment: async (token: string, videoId: string, comment: string) => {
-    const response = await axiosInstance.post(`/comment/add`, { videoId, content:comment }, {
+    const response = await axiosInstance.post(
+      `/comment/add`,
+      { videoId, content: comment },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  },
+
+  addReply: async (
+    token: string,
+    videoId: string,
+    commentId: string,
+    content: string
+  ) => {
+    const response = await axiosInstance.post(
+      `/comment/add`,
+      { videoId, parentComment: commentId, content },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  },
+
+  likeVideo: async (token: string, videoId: string) => {
+    const response = await axiosInstance.post(`/like/${videoId}`, {}, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -376,8 +407,8 @@ export const myQuery = {
     return response.data;
   },
 
-  addReply: async (token: string, videoId: string, commentId: string, content: string) => {
-    const response = await axiosInstance.post(`/comment/add`, { videoId, parentComment:commentId, content }, {
+  likeVideoStatus: async (token: string, videoId: string) => {
+    const response = await axiosInstance.get(`/like/${videoId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

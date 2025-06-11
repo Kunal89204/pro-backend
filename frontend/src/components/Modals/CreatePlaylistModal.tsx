@@ -100,7 +100,8 @@ const CreatePlaylistModal = ({
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent
-        bg="#121212"
+        bg="transparent"
+        backdropFilter="blur(20px)"
         color="white"
         borderRadius="10px"
         // width="300px"

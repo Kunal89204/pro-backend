@@ -1,12 +1,28 @@
 import { useThemeColors } from "@/hooks/useThemeColors";
 import parseTextWithLinks from "@/utils/parseTextWithLinks";
-import { Box, Button, Flex, Heading, Text, useDisclosure } from "@chakra-ui/react";
-import { IconBookmark, IconShare, IconThumbUp, IconThumbUpFilled } from "@tabler/icons-react";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Text,
+  useDisclosure,
+  } from "@chakra-ui/react";
+import {
+  IconBookmark,
+  IconShare,
+  IconThumbUp,
+  IconThumbUpFilled,
+} from "@tabler/icons-react";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import SaveToPlaylistModal from "../Modals/SaveToPlaylistModal";
+import { myQuery } from "@/api/query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
 
 // Define types
 interface Owner {
@@ -36,8 +52,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
   const vdo = data?.data;
   const [showFullDesc, setShowFullDesc] = useState(false);
   const descriptionLimit = 235; // Character limit before showing "See More"
+
   const { textColor, secondaryTextColor, secondaryBgColor } = useThemeColors();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const token = useSelector((state: RootState) => state.token);
+  const { isOpen, onClose } = useDisclosure();
   const [isLiked, setIsLiked] = useState(false);
   // Video.js refs
   const videoRef = useRef<HTMLDivElement>(null);
@@ -105,9 +123,31 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
     };
   }, []);
 
+  const likeVideoMutation = useMutation({
+    mutationFn: (id: string) => myQuery.likeVideo(token, id),
+    onSuccess: () => {
+      refetch();
+    },
+  });
+
+  const {
+    data: likeData,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["like", vdo?._id],
+    queryFn: () => myQuery.likeVideoStatus(token, vdo?._id),
+  });
+
+  useEffect(() => {
+    if (likeData) {
+      setIsLiked(likeData.liked);
+    }
+  }, [likeData, isLoading]);
+
   const handleVideoLike = async (id: string) => {
-    console.log("video liked", id);
     setIsLiked(!isLiked);
+    likeVideoMutation.mutate(id);
   };
 
   const handleVideoSave = async (id: string) => {
@@ -160,7 +200,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
             colorScheme="gray"
             onClick={() => handleVideoLike(vdo?._id)}
           >
-            {isLiked ? <IconThumbUpFilled /> : <IconThumbUp />} Like
+            {isLiked ? <IconThumbUpFilled /> : <IconThumbUp />}{" "}
+            {likeData?.likeCount}
           </Button>
           <Button className="flex gap-2">
             <IconShare /> Share
@@ -206,7 +247,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
           )}
         </Text>
       </Box>
-      <SaveToPlaylistModal isOpen={isOpen} onClose={onClose} videoId={vdo?._id} />
+      <SaveToPlaylistModal
+        isOpen={isOpen}
+        onClose={onClose}
+        videoId={vdo?._id}
+      />
     </Box>
   );
 };

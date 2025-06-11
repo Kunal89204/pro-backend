@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import {
   Box,
   Text,
@@ -52,9 +52,7 @@ const CommentItem = ({
   const [replyText, setReplyText] = useState("");
  
   const token = useSelector((state: RootState) => state?.token);
-  useEffect(() => {
-    console.log("I am here inside comment item", comment);
-  }, []);
+
 
   const { mutate: addReply, isPending } = useMutation({
     mutationFn: () => myQuery.addReply(token, videoId, comment.id, replyText),
@@ -173,7 +171,7 @@ const Comments = ({ comments, videoId, refetch }: { comments: Comment[], videoId
     // console.log("I am here", commentText);
     // setCommentText(""); // Clear input after submission
   };
-  console.log("I am here", comments);
+
   return (
     <Box py={4}>
       <Text fontSize="2xl" fontWeight="semibold" color={textColor}>

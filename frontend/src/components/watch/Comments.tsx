@@ -202,7 +202,7 @@ const Comments = ({ comments, videoId, refetch }: { comments: Comment[], videoId
 
       <Divider pt={4} />
       <VStack align="start" mt={5} spacing={4} w="full">
-        {comments?.reverse()?.map((comment: Comment, i: number) => (
+        {comments?.map((comment: Comment, i: number) => (
           <CommentItem key={i} comment={comment} videoId={videoId} refetch={refetch} />
         ))}
       </VStack>

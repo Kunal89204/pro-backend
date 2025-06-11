@@ -294,7 +294,7 @@ const PlaylistPage = () => {
         <Box pt={8}>
           {playlist.data.videos && playlist.data.videos.length > 0 ? (
             <VStack align="stretch" spacing={1}>
-              {playlist?.data?.videos?.reverse()?.map(
+              {playlist?.data?.videos?.map(
                 (
                   video: {
                     _id: string;

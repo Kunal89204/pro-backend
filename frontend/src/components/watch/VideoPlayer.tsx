@@ -7,13 +7,11 @@ import {
   Heading,
   Text,
   useDisclosure,
-  } from "@chakra-ui/react";
-import {
-  IconBookmark,
-  IconShare,
-  IconThumbUp,
-  IconThumbUpFilled,
-} from "@tabler/icons-react";
+} from "@chakra-ui/react";
+import { IoMdThumbsUp } from "react-icons/io";
+import { MdOutlineThumbUp } from "react-icons/md";
+
+import { CiShare2 } from "react-icons/ci";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import videojs from "video.js";
@@ -23,11 +21,13 @@ import { myQuery } from "@/api/query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
+import { CiBookmark } from "react-icons/ci";
 
 // Define types
 interface Owner {
   avatar: string;
   fullName: string;
+  _id: string;
 }
 
 interface VideoData {
@@ -50,16 +50,15 @@ interface VideoPlayerProps {
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
   const vdo = data?.data;
-  const [showFullDesc, setShowFullDesc] = useState(false);
-  const descriptionLimit = 235; // Character limit before showing "See More"
-
-  const { textColor, secondaryTextColor, secondaryBgColor } = useThemeColors();
   const token = useSelector((state: RootState) => state.token);
-  const { isOpen, onClose } = useDisclosure();
+  const [showFullDesc, setShowFullDesc] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-  // Video.js refs
+  const descriptionLimit = 235; // Character limit before showing "See More"
+  const { textColor, secondaryTextColor } = useThemeColors();
+  const { isOpen, onClose, onOpen } = useDisclosure();
+
+  // Video js refs
   const videoRef = useRef<HTMLDivElement>(null);
-  // Video.js player ref - using ReturnType to get the correct type
   const playerRef = useRef<ReturnType<typeof videojs> | null>(null);
 
   // Format the date (e.g., "4 Feb 2025")
@@ -74,9 +73,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
     : "";
 
   useEffect(() => {
-    // Make sure Video.js player is only initialized once
     if (!playerRef.current && vdo?.videoFile) {
-      // The Video.js player needs to be attached to an element
       const videoElement = document.createElement("video-js");
 
       videoElement.classList.add("vjs-default-skin");
@@ -114,7 +111,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
   // Dispose of the Video.js player when the component unmounts
   useEffect(() => {
     const player = playerRef.current;
-
     return () => {
       if (player && !player.isDisposed()) {
         player.dispose();
@@ -130,6 +126,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
     },
   });
 
+  const subscribeChannelMutation = useMutation({
+    mutationFn: (id: string) => myQuery.subscribeChannel(token, id),
+    onSuccess: () => {
+      subscribeRefetch();
+    },
+  });
+
   const {
     data: likeData,
     isLoading,
@@ -138,6 +141,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
     queryKey: ["like", vdo?._id],
     queryFn: () => myQuery.likeVideoStatus(token, vdo?._id),
   });
+
+  const {
+    data: subscribeData,
+    isLoading: subscribeLoading,
+    refetch: subscribeRefetch,
+  } = useQuery({
+    queryKey: ["subscribe", vdo?._id],
+    queryFn: () => myQuery.subscribeStatus(token, vdo?.owner?._id),
+  });
+
+  useEffect(() => {
+    if (subscribeData && !subscribeLoading) {
+      console.log("I am here", subscribeData);
+    }
+  }, [subscribeData, subscribeLoading]);
 
   useEffect(() => {
     if (likeData) {
@@ -152,10 +170,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
 
   const handleVideoSave = async (id: string) => {
     console.log("video saved", id);
+    onOpen();
   };
 
   const handleSubscribe = async (id: string) => {
     console.log("subscribed", id);
+    subscribeChannelMutation.mutate(id);
   };
 
   return (
@@ -186,34 +206,68 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
               {vdo?.owner?.fullName}
             </Text>
             <Text color={secondaryTextColor} fontSize={"xs"} fontWeight={"600"}>
-              100 subscribers
+              {subscribeData?.data?.subscriberCount} subscribers
             </Text>
           </Box>
           <Box mx={4} alignSelf={"end"}>
-            <Button onClick={() => handleSubscribe(vdo?._id)}>Subscribe</Button>
+            <Button
+              onClick={() => handleSubscribe(vdo?.owner?._id)}
+              borderRadius={"full"}
+              position="relative"
+              transition="background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s"
+              colorScheme={subscribeData?.data?.subscribed ? "green" : "red"}
+              bg={subscribeData?.data?.subscribed ? "green.400" : undefined}
+              color={subscribeData?.data?.subscribed ? "white" : undefined}
+              _hover={{
+                transform: "scale(1.05)",
+                boxShadow: subscribeData?.data?.subscribed
+                  ? "0 0 0 4px rgba(72,187,120,0.2)"
+                  : "0 0 0 4px rgba(66,153,225,0.2)",
+              }}
+              _active={{
+                transform: "scale(0.98)",
+              }}
+            >
+              {subscribeData?.data?.subscribed ? "Subscribed" : "Subscribe"}
+            </Button>
           </Box>
         </Flex>
 
-        <Flex gap={2}>
+        <Flex gap={2} alignItems={"center"}>
           <Button
-            className="flex gap-2"
+            className="flex gap-2 "
             colorScheme="gray"
+            borderRadius={"full"}
             onClick={() => handleVideoLike(vdo?._id)}
+            fontWeight={"normal"}
           >
-            {isLiked ? <IconThumbUpFilled /> : <IconThumbUp />}{" "}
+            {isLiked ? (
+              <IoMdThumbsUp size={20} />
+            ) : (
+              <MdOutlineThumbUp size={20} />
+            )}{" "}
             {likeData?.likeCount}
           </Button>
-          <Button className="flex gap-2">
-            <IconShare /> Share
+          <Button
+            borderRadius={"full"}
+            className="flex gap-2 rounded-full"
+            fontWeight={"normal"}
+          >
+            <CiShare2 size={20} /> Share
           </Button>
-          <Button onClick={() => handleVideoSave(vdo?._id)}>
-            <IconBookmark /> Save
+          <Button
+            borderRadius={"full"}
+            className="flex gap-2 rounded-full"
+            onClick={() => handleVideoSave(vdo?._id)}
+            fontWeight={"normal"}
+          >
+            <CiBookmark size={20} /> Save
           </Button>
         </Flex>
       </Flex>
 
       <Box
-        bg={secondaryBgColor}
+        bg={"#202020"}
         borderRadius={"10px"}
         my={2}
         p={2}

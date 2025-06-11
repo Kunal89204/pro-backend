@@ -415,4 +415,22 @@ export const myQuery = {
     });
     return response.data;
   },
+
+  subscribeChannel: async (token:string, channelId:string) => {
+    const response = await axiosInstance.post(`/subscription/toggle-subscription/${channelId}`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+  subscribeStatus: async (token: string, videoId: string) => {
+    const response = await axiosInstance.get(`/subscription/subscriber-stats/${videoId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
 };

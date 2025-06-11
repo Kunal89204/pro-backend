@@ -42,6 +42,31 @@ const toggleSubscription = asyncHandler(async (req, res) => {
   });
 });
 
+const subscriberStats = asyncHandler(async (req, res) => {
+  const { channelId } = req.params;
+  const subscriberId = req.user._id;
+
+  const subscribed = await Subscription.exists({
+    subscriber: subscriberId,
+    channel: channelId,
+  });
+
+
+  
+  const subscriberCount = await Subscription.countDocuments({
+    channel: channelId,
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Subscriber stats fetched successfully",
+    data: {
+      subscribed:!!subscribed,
+      subscriberCount,
+    },
+  });
+});
+
 // controller to return subscriber list of a channel
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
   const { channelId } = req.params;
@@ -52,4 +77,4 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
   const { subscriberId } = req.params;
 });
 
-export { toggleSubscription, getUserChannelSubscribers, getSubscribedChannels };
+export { toggleSubscription, getUserChannelSubscribers, getSubscribedChannels, subscriberStats };

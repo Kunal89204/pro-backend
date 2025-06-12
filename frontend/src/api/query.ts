@@ -433,4 +433,13 @@ export const myQuery = {
     });
     return response.data;
   },
+
+  onPageVideoRecommendations: async (token: string, videoId: string) => {
+    const response = await axiosInstance.get(`/video/recommendations/${videoId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
 };

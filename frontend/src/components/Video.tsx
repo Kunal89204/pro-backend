@@ -64,15 +64,12 @@ const Video: React.FC<VideoProps> = ({
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
- 
-
   return (
     <Box
       borderRadius="2xl"
       overflow="hidden"
       p={2}
       className="transition-all duration-500"
-    
       _hover={{
         bg: colorMode == "light" ? "gray.200" : "#222222",
       }}
@@ -134,14 +131,34 @@ const Video: React.FC<VideoProps> = ({
                     }
                   />
                 }
-
                 variant="unstyled"
                 aria-label="Options"
               />
-              <MenuList textColor={textColor} bg={'transparent'}border={'0px solid #202020'} backdropFilter="blur(20px)">
-                <MenuItem  bg={'transparent'} _hover={{backdropFilter:'blur(40px)'}} onClick={onOpen}>Save to Playlist</MenuItem>
-                <MenuItem bg={'transparent'} _hover={{backdropFilter:'blur(40px)'}} >Share</MenuItem>
-                <MenuItem bg={'transparent'} _hover={{backdropFilter:'blur(40px)'}} onClick={onOpen}>Report</MenuItem>
+              <MenuList
+                textColor={textColor}
+                bg={"transparent"}
+                border={"0px solid #202020"}
+                backdropFilter="blur(20px)"
+              >
+                <MenuItem
+                  bg={"transparent"}
+                  _hover={{ backdropFilter: "blur(40px)" }}
+                  onClick={onOpen}
+                >
+                  Save to Playlist
+                </MenuItem>
+                <MenuItem
+                  bg={"transparent"}
+                  _hover={{ backdropFilter: "blur(40px)" }}
+                >
+                  Share
+                </MenuItem>
+                <MenuItem
+                  bg={"transparent"}
+                  _hover={{ backdropFilter: "blur(40px)" }}
+                >
+                  Report
+                </MenuItem>
               </MenuList>
             </Menu>
           </Flex>
@@ -164,7 +181,11 @@ const Video: React.FC<VideoProps> = ({
       </Flex>
 
       {/* Modal for save to playlist*/}
-      <SaveToPlaylistModal isOpen={isOpen} onClose={onClose} videoId={videoId} />
+      <SaveToPlaylistModal
+        isOpen={isOpen}
+        onClose={onClose}
+        videoId={videoId}
+      />
     </Box>
   );
 };

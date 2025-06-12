@@ -6,7 +6,8 @@ import {
     publishAVideo,
     togglePublishStatus,
     updateVideo,
-     userVideos
+     userVideos,
+     onPageVideoRecommendation
 
 } from "../controllers/video.controller.js"
 import {verifyJWT} from "../middlewares/auth.middleware.js"
@@ -43,6 +44,8 @@ router.route("/:videoId([0-9a-fA-F]{24})") // ✅ Only match valid ObjectIds
 router.route("/toggle/publish/:videoId").patch(togglePublishStatus);
 
 router.route('/delete-video/:videoId').delete(deleteVideo)
+
+router.route("/recommendations/:videoId").get(onPageVideoRecommendation)
 
 
 

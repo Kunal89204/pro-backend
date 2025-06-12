@@ -73,7 +73,7 @@ const Watch = ({ params }: { params: { id: string } }) => {
                 <Comments comments={comments?.comments} videoId={params.id} refetch={commentsRefetch} />
             </Box>
             <Box className='lg:w-1/3 px-3 lg:px-0'>
-               <SideSuggestions />
+               <SideSuggestions videoId={params.id} />
             </Box>
         </Box>
     )

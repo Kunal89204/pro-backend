@@ -7,7 +7,6 @@ import {
   Heading,
   Skeleton,
   SkeletonText,
-  
   Text,
   useColorMode,
   useDisclosure,
@@ -158,7 +157,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
 
   useEffect(() => {
     if (subscribeData && !subscribeLoading) {
-      console.log("I am here", subscribeData);
     }
   }, [subscribeData, subscribeLoading]);
 
@@ -174,12 +172,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
   };
 
   const handleVideoSave = async (id: string) => {
-    console.log("video saved", id);
+    console.log(id)
     onOpen();
   };
 
   const handleSubscribe = async (id: string) => {
-    console.log("subscribed", id);
     subscribeChannelMutation.mutate(id);
   };
 

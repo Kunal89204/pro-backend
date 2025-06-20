@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Avatar,
@@ -33,7 +33,7 @@ const Subscriptions = () => {
   const [loading, setLoading] = useState(true);
   const token = useSelector((state: RootState) => state.token);
 
-  const fetchSubscriptions = async () => {
+  const fetchSubscriptions = useCallback(async () => {
     try {
       const response = await axios.get("https://youtube-backend.kunalkhandelwal.dev/api/v1/subscription/subscribed-channels", {
         headers: {
@@ -46,11 +46,11 @@ const Subscriptions = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchSubscriptions();
-  }, []);
+  }, [fetchSubscriptions]);
 
   const cardBg = useColorModeValue("gray.50", "gray.800");
 

@@ -430,7 +430,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
   const user = await User.findById(req?.user?._id).populate({
     path: "watchHistory",
     model: "Video",
-    select: "thumbnail views title description _id duration",
+    select: "thumbnail views title description _id duration createdAt",
     populate: {
       path: "owner",
       model: "User",
@@ -438,12 +438,17 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     },
   });
 
+  // Sort the watchHistory array by createdAt (latest to oldest)
+  const sortedHistory = (user?.watchHistory || []).sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+
   return res
     .status(200)
     .json(
       new ApiResponse(
         200,
-        user?.watchHistory?.reverse() || [],
+        sortedHistory,
         "Watch History Fetched Successfully"
       )
     );

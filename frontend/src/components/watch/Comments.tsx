@@ -41,11 +41,13 @@ const CommentItem = ({
   depth = 0,
   videoId,
   refetch,
+  isLoading
 }: {
   comment: Comment;
   depth?: number;
   videoId: string;
   refetch: () => void;
+  isLoading: boolean;
 }) => {
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
@@ -141,7 +143,7 @@ const CommentItem = ({
           <Collapse in={showReplies} animateOpacity>
             <VStack mt={3} pl={6} align="start" spacing={3} w="full">
               {comment?.replies?.reverse()?.map((reply) => (
-                <CommentItem key={reply.id} comment={reply} depth={depth + 1} videoId={videoId} refetch={refetch} />
+                <CommentItem key={reply.id} comment={reply} depth={depth + 1} videoId={videoId} refetch={refetch} isLoading={isLoading} />
               ))}
             </VStack>
           </Collapse>
@@ -151,7 +153,7 @@ const CommentItem = ({
   );
 };
 
-const Comments = ({ comments, videoId, refetch }: { comments: Comment[], videoId: string, refetch: () => void }) => {
+const Comments = ({ comments, videoId, refetch, isLoading }: { comments: Comment[], videoId: string, refetch: () => void, isLoading: boolean }) => {
   const { textColor } = useThemeColors();
   const { user } = useSelector((state: RootState) => state);
   const { avatarImage } = user;
@@ -203,7 +205,7 @@ const Comments = ({ comments, videoId, refetch }: { comments: Comment[], videoId
       <Divider pt={4} />
       <VStack align="start" mt={5} spacing={4} w="full">
         {comments?.map((comment: Comment, i: number) => (
-          <CommentItem key={i} comment={comment} videoId={videoId} refetch={refetch} />
+          <CommentItem key={i} comment={comment} videoId={videoId} refetch={refetch} isLoading={isLoading} />
         ))}
       </VStack>
     </Box>

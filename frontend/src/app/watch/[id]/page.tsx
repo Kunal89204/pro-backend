@@ -25,7 +25,13 @@ const Watch = ({ params }: { params: { id: string } }) => {
 
 
     const addVideoToWatchHistoryMutation = useMutation({
-        mutationFn: () => myQuery.addVideoToWatchHistory(token, params.id)
+        mutationFn: () => myQuery.addVideoToWatchHistory(token, params.id),
+        onError: (error) => {
+            console.log(error)
+        },
+        onSuccess: () => {
+            console.log('Video added to watch history')
+        }
     })
 
     useEffect(() => {
@@ -33,17 +39,23 @@ const Watch = ({ params }: { params: { id: string } }) => {
     }, [params.id, addVideoToWatchHistoryMutation])
 
 
-    const { data, isLoading } = useQuery({
+    const { data, isLoading, isError, error } = useQuery({
         queryKey: ['video', params.id],
         queryFn: () => myQuery.getVideoById(token, params.id)
     })
 
-    const {data:comments,isLoading:commentsLoading, refetch:commentsRefetch} = useQuery({
+    const {data:comments,isLoading:commentsLoading, refetch:commentsRefetch,isError:isCommentsError,error:commentsError} = useQuery({
         queryKey:['comments',params.id],
         queryFn:()=>myQuery.getComments(token,params.id)
     })
 
-    console.log(commentsLoading)
+    if (isError) {
+        console.log("error in video",error)
+    }
+
+    if (isCommentsError) {
+        console.log("error in comments",commentsError)
+    }
 
     if (isLoading) {
         return <Center h="80vh"><Text fontSize="xl">Loading...</Text></Center>

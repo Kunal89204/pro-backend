@@ -462,39 +462,43 @@ const addToWatchHistory = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Video ID is required" });
   }
 
-  const user = await User.findById(userId);
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
-
+  // Check if the video exists
   const video = await Video.findById(videoId);
   if (!video) {
     return res.status(404).json({ message: "Video not found" });
   }
 
-  let { watchHistory } = user;
+  // Step 1: Update watch history (remove if exists, then push to end)
+  await User.findByIdAndUpdate(
+    userId,
+    {
+      $pull: { watchHistory: videoId },
+    }
+  );
 
-  // Remove the videoId if it already exists
-  watchHistory = watchHistory.filter((id) => id.toString() !== videoId);
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      $push: { watchHistory: videoId },
+    },
+    { new: true, select: "watchHistory" }
+  );
 
-  // Push videoId to the end
-  watchHistory.push(videoId);
+  // Step 2: Update video views and unique viewers
+  const hasViewed = video.viewers.includes(userId.toString());
 
-  // Update the user's watch history
-  user.watchHistory = watchHistory;
-  await user.save();
-
-  // Check if the user has already viewed the video
-  if (!video.viewers.includes(userId)) {
-    video.viewers.push(userId);
-    video.views += 1;
-    await video.save();
+  if (!hasViewed) {
+    await Video.findByIdAndUpdate(videoId, {
+      $addToSet: { viewers: userId },
+      $inc: { views: 1 },
+    });
   }
 
+  // Step 3: Send response
   res.status(200).json({
     message: "Watch history updated",
-    watchHistory,
-    views: video.views, // Return updated view count
+    watchHistory: updatedUser.watchHistory,
+    views: hasViewed ? video.views : video.views + 1,
   });
 });
 

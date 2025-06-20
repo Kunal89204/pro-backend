@@ -60,7 +60,7 @@ const SideSuggestions = ({ videoId }: { videoId: string }) => {
               <circle cx="12" cy="16" r="1" />
             </svg>
             <Text color="red.600" fontWeight="bold" fontSize="lg" mb={2}>
-              Oops! Something went wrong.
+              Oops! Something went wrong.   
             </Text>
             <Text color="red.500" fontSize="sm" mb={2}>
               We couldn&apos;t load related videos right now.

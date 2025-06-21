@@ -24,9 +24,7 @@ interface VideoData {
   _id: string;
 }
 
-interface ApiResponse {
-  data: VideoData;
-}
+
 
 const EmbedVideoPlayer = () => {
   const { videoId } = useParams();

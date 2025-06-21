@@ -42,7 +42,7 @@ const RemoveVideoFromHistory = ({
       onClose();
       refetch();
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: "Error removing video from history",
         description: "Error removing video from history",

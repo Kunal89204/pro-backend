@@ -43,7 +43,13 @@ const RemoveVideoFromHistory = ({
       refetch();
     },
     onError: (error) => {
-      console.log(error);
+      toast({
+        title: "Error removing video from history",
+        description: "Error removing video from history",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     },
   });
   return (
@@ -64,7 +70,6 @@ const RemoveVideoFromHistory = ({
         <ModalBody>
           <Text fontSize={"14px"} fontWeight={"normal"} color={"gray.300"}>
             Are you sure you want to remove this video from your history?{" "}
-            {videoId}
           </Text>
         </ModalBody>
 
@@ -72,7 +77,12 @@ const RemoveVideoFromHistory = ({
           <Button color={"gray.400"} variant="ghost" mr={3} onClick={onClose}>
             Close
           </Button>
-          <Button color={"black"} variant="solid" colorScheme="red" onClick={() => removeVideoFromHistoryMutation.mutate()}>
+          <Button
+            color={"black"}
+            variant="solid"
+            colorScheme="red"
+            onClick={() => removeVideoFromHistoryMutation.mutate()}
+          >
             Remove
           </Button>
         </ModalFooter>

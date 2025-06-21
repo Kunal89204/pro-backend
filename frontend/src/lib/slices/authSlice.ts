@@ -7,7 +7,8 @@ export interface AuthState {
         username?: string,
         fullName?: string,
         email?: string,
-        avatarImage?:string
+        avatarImage?:string,
+        _id?:string
 
     },
     token: string,

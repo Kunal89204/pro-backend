@@ -92,6 +92,7 @@ const Login: React.FC = () => {
             email: user?.email,
             fullName: user?.fullName,
             avatarImage: user?.avatar,
+            _id: user?._id,
           },
           token: data?.data?.accessToken,
         })

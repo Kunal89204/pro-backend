@@ -54,6 +54,7 @@ interface VideoPlayerProps {
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
   const vdo = data?.data;
   const token = useSelector((state: RootState) => state.token);
+  const userId = useSelector((state: RootState) => state.user?._id);
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const descriptionLimit = 235; // Character limit before showing "See More"
@@ -231,6 +232,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
               <Button
                 onClick={() => handleSubscribe(vdo?.owner?._id)}
                 isLoading={subscribeChannelMutation.isPending}
+                isDisabled={vdo?.owner?._id === userId}
                 borderRadius={"full"}
                 position="relative"
                 transition="background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s"

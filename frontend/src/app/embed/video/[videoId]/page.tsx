@@ -9,8 +9,6 @@ import "video.js/dist/video-js.css";
 
 // Define types
 
-
-
 const EmbedVideoPlayer = () => {
   const { videoId } = useParams();
   const videoRef = useRef<HTMLDivElement>(null);
@@ -116,9 +114,7 @@ const EmbedVideoPlayer = () => {
           p={{ base: 3, md: 5 }}
           borderTopRadius="md"
           className="video-title-overlay"
-          style={{
-            pointerEvents: "none", // allow clicks to pass through to video controls
-          }}
+          // Remove pointerEvents: "none" so that the title link is clickable
         >
           <Heading
             as="h1"
@@ -128,11 +124,21 @@ const EmbedVideoPlayer = () => {
             noOfLines={2}
             style={{ textShadow: "0 2px 8px rgba(0,0,0,0.7)" }}
           >
-            <a href={`https://youtube.kunalkhandelwal.dev/watch/${videoId}`}>{vdo?.title}</a>
+            <a
+              href={`https://youtube.kunalkhandelwal.dev/watch/${videoId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                pointerEvents: "auto",
+                color: "inherit",
+                textDecoration: "none",
+                cursor: "pointer",
+              }}
+            >
+              {vdo?.title}
+            </a>
           </Heading>
           <Flex gap={4} color="gray.300" fontSize={{ base: "sm", md: "md" }}>
-          
-            
             <Text>{vdo?.owner?.fullName}</Text>
             <Text>•</Text>
             <Text>{formattedDate}</Text>

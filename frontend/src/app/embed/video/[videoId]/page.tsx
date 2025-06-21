@@ -128,7 +128,7 @@ const EmbedVideoPlayer = () => {
             noOfLines={2}
             style={{ textShadow: "0 2px 8px rgba(0,0,0,0.7)" }}
           >
-            {vdo?.title}
+            <a href={`https://youtube.kunalkhandelwal.dev/watch/${videoId}`}>{vdo?.title}</a>
           </Heading>
           <Flex gap={4} color="gray.300" fontSize={{ base: "sm", md: "md" }}>
           

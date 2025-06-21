@@ -19,6 +19,7 @@ import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import SaveToPlaylistModal from "./Modals/SaveToPlaylistModal";
+import ShareVideo from "./Modals/ShareVideo";
 
 const formatDuration = (input: number | string | bigint): string => {
   const seconds = typeof input === "bigint" ? Number(input) : Number(input); // Convert to number
@@ -63,7 +64,7 @@ const Video: React.FC<VideoProps> = ({
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
-
+  const { isOpen: isOpenShare, onOpen: onOpenShare, onClose: onCloseShare } = useDisclosure();
   return (
     <Box
       borderRadius="2xl"
@@ -150,6 +151,7 @@ const Video: React.FC<VideoProps> = ({
                 <MenuItem
                   bg={"transparent"}
                   _hover={{ backdropFilter: "blur(40px)" }}
+                  onClick={onOpenShare}
                 >
                   Share
                 </MenuItem>
@@ -186,6 +188,8 @@ const Video: React.FC<VideoProps> = ({
         onClose={onClose}
         videoId={videoId}
       />
+
+      <ShareVideo isOpen={isOpenShare} onClose={onCloseShare} videoId={videoId} />
     </Box>
   );
 };

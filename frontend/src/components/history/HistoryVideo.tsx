@@ -14,6 +14,7 @@ import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
 import { IconDotsVertical } from "@tabler/icons-react";
 import SaveToPlaylistModal from "../Modals/SaveToPlaylistModal";
 import RemoveVideoFromHistory from "../Modals/RemoveVideoFromHistory";
+import ShareVideo from "../Modals/ShareVideo";
 
 const formatDuration = (input: number | string | bigint): string => {
   const seconds = typeof input === "string" ? Number(input) : Number(input);
@@ -54,9 +55,16 @@ const HistoryVideo = ({
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const { isOpen: isOpenRemoveVideoFromHistory, onOpen: onOpenRemoveVideoFromHistory, onClose: onCloseRemoveVideoFromHistory } = useDisclosure();
-
+  const {
+    isOpen: isOpenShare,
+    onOpen: onOpenShare,
+    onClose: onCloseShare,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenRemoveVideoFromHistory,
+    onOpen: onOpenRemoveVideoFromHistory,
+    onClose: onCloseRemoveVideoFromHistory,
+  } = useDisclosure();
 
   return (
     <div className="flex my-3 justify-between items-start max-w-[1000px] mx-auto px-4 lg:px-0">
@@ -132,7 +140,14 @@ const HistoryVideo = ({
           <MenuItem onClick={onOpen} bg="transparent" color={textColor}>
             Save To Playlist
           </MenuItem>
-          <MenuItem bg="transparent" color={textColor} onClick={onOpenRemoveVideoFromHistory}>
+          <MenuItem bg="transparent" color={textColor} onClick={onOpenShare}>
+            Share
+          </MenuItem>
+          <MenuItem
+            bg="transparent"
+            color={textColor}
+            onClick={onOpenRemoveVideoFromHistory}
+          >
             Remove
           </MenuItem>
         </MenuList>
@@ -148,6 +163,11 @@ const HistoryVideo = ({
         onClose={onCloseRemoveVideoFromHistory}
         videoId={videoId}
         refetch={refetch}
+      />
+      <ShareVideo
+        isOpen={isOpenShare}
+        onClose={onCloseShare}
+        videoId={videoId}
       />
     </div>
   );

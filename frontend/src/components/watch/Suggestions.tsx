@@ -12,6 +12,7 @@ import Link from "next/link";
 import React from "react";
 import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
 import SaveToPlaylistModal from "@/components/Modals/SaveToPlaylistModal";
+import ShareVideo from "../Modals/ShareVideo";
 
 const Suggestions = ({
   videoData,
@@ -29,6 +30,11 @@ const Suggestions = ({
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isOpenShare,
+    onOpen: onOpenShare,
+    onClose: onCloseShare,
+  } = useDisclosure();
   return (
     <Box
       className=" p-2 rounded-lg flex gap-2 justify-between relative  transition-all duration-300"
@@ -105,6 +111,7 @@ const Suggestions = ({
             <MenuItem
               bg={"transparent"}
               _hover={{ backdropFilter: "blur(40px)" }}
+              onClick={onOpenShare}
             >
               Share
             </MenuItem>
@@ -120,6 +127,12 @@ const Suggestions = ({
       <SaveToPlaylistModal
         isOpen={isOpen}
         onClose={onClose}
+        videoId={videoData._id}
+      />
+
+      <ShareVideo
+        isOpen={isOpenShare}
+        onClose={onCloseShare}
         videoId={videoData._id}
       />
     </Box>

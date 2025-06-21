@@ -25,6 +25,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { CiBookmark } from "react-icons/ci";
+import ShareVideo from "../Modals/ShareVideo";
 
 // Define types
 interface Owner {
@@ -61,7 +62,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
   const { isOpen, onClose, onOpen } = useDisclosure();
-
+  const { isOpen: isOpenShare, onOpen: onOpenShare, onClose: onCloseShare } = useDisclosure();
   // Video js refs
   const videoRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<ReturnType<typeof videojs> | null>(null);
@@ -278,6 +279,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
             borderRadius={"full"}
             className="flex gap-2 rounded-full"
             fontWeight={"normal"}
+            onClick={onOpenShare}
           >
             <CiShare2 size={20} /> Share
           </Button>
@@ -332,6 +334,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
         onClose={onClose}
         videoId={vdo?._id}
       />
+      <ShareVideo isOpen={isOpenShare} onClose={onCloseShare} videoId={vdo?._id} />
     </Box>
   );
 };

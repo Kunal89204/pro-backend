@@ -8,21 +8,6 @@ import videojs from "video.js";
 import "video.js/dist/video-js.css";
 
 // Define types
-interface Owner {
-  avatar: string;
-  fullName: string;
-  _id: string;
-}
-
-interface VideoData {
-  videoFile: string;
-  title: string;
-  description: string;
-  owner: Owner;
-  createdAt: string;
-  views: number;
-  _id: string;
-}
 
 
 

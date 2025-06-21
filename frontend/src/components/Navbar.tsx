@@ -27,7 +27,8 @@ const Navbar: React.FC = () => {
 
   if (
     pathname === "/login" ||
-    pathname === "/register"
+    pathname === "/register" ||
+    pathname.startsWith("/embed/video/")
   ) {
     return null;
   }

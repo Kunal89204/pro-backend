@@ -90,7 +90,7 @@ export const DesktopSidebar = ({
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
 
-  if (window.location.pathname == "/login" || window.location.pathname == "/register") {
+  if (window.location.pathname == "/login" || window.location.pathname == "/register" || window.location.pathname.startsWith("/embed/video/")) {
     return null
   }
   return (

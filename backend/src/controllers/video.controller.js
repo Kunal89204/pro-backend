@@ -180,6 +180,17 @@ const getVideoById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, video, "Video fetched successfully"));
 });
 
+const getVideoByIdForEmbed = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+  const video = await Video.findById(videoId).populate("owner", "fullName _id");
+  if (!video) {
+    throw new ApiError(404, "Video not found");
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, video, "Video fetched successfully"));
+});
+
 const updateVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   const { title, description } = req.body;
@@ -462,6 +473,7 @@ const onPageVideoRecommendation = asyncHandler(async (req, res) => {
 export {
   getAllVideos,
   getVideoById,
+  getVideoByIdForEmbed,
   publishAVideo,
   togglePublishStatus,
   updateVideo,

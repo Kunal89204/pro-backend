@@ -134,6 +134,11 @@ export const myQuery = {
     }
   },
 
+  getVideoByIdForEmbed: async (videoId: string) => {
+    const response = await axiosInstance.get(`/video/embed/${videoId}`);
+    return response.data;
+  },
+
   addVideoToWatchHistory: async (token: string, videoId: string) => {
     try {
       const response = await axiosInstance.post(

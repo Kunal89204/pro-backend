@@ -6,15 +6,20 @@ import {
     publishAVideo,
     togglePublishStatus,
     updateVideo,
-     userVideos,
-     onPageVideoRecommendation
-
+    userVideos,
+    onPageVideoRecommendation,
+    getVideoByIdForEmbed
 } from "../controllers/video.controller.js"
-import {verifyJWT} from "../middlewares/auth.middleware.js"
-import {upload} from "../middlewares/multer.middleware.js"
+import { verifyJWT } from "../middlewares/auth.middleware.js"
+import { upload } from "../middlewares/multer.middleware.js"
 
 const router = Router();
-router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
+
+// Exempt embed API from requiring token
+router.route("/embed/:videoId").get(getVideoByIdForEmbed);
+
+// Apply verifyJWT middleware to all subsequent routes
+router.use(verifyJWT);
 
 router
     .route("/")
@@ -29,24 +34,20 @@ router
                 name: "thumbnail",
                 maxCount: 1,
             },
-            
         ]),
         publishAVideo
     );
 
-router.route('/uservideos').get(userVideos)
+router.route('/uservideos').get(userVideos);
 
 router.route("/:videoId([0-9a-fA-F]{24})") // ✅ Only match valid ObjectIds
     .get(getVideoById)
     .patch(upload.single("thumbnail"), updateVideo);
 
-
 router.route("/toggle/publish/:videoId").patch(togglePublishStatus);
 
-router.route('/delete-video/:videoId').delete(deleteVideo)
+router.route('/delete-video/:videoId').delete(deleteVideo);
 
-router.route("/recommendations/:videoId").get(onPageVideoRecommendation)
-
-
+router.route("/recommendations/:videoId").get(onPageVideoRecommendation);
 
 export default router

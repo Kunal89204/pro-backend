@@ -33,7 +33,7 @@ const AuthWrapper = ({ children }: { children: ReactNode }) => {
   }, [isAuthenticated, pathname, router]);
 
   // Allow rendering of /login and /register pages even if not authenticated
-  if (!isAuthenticated && (pathname === "/login" || pathname === "/register")) {
+  if (!isAuthenticated && (pathname === "/login" || pathname === "/register" || pathname.startsWith("/embed/video/"))) {
     return children;
   }
 

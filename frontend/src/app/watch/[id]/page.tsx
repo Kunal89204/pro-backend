@@ -36,7 +36,7 @@ const Watch = ({ params }: { params: { id: string } }) => {
 
     useEffect(() => {
         addVideoToWatchHistoryMutation.mutate()
-    }, [params.id, addVideoToWatchHistoryMutation])
+    }, [params.id])
 
 
     const { data, isLoading, isError, error } = useQuery({

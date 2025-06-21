@@ -13,6 +13,7 @@ import React from "react";
 import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
 import { IconDotsVertical } from "@tabler/icons-react";
 import SaveToPlaylistModal from "../Modals/SaveToPlaylistModal";
+import RemoveVideoFromHistory from "../Modals/RemoveVideoFromHistory";
 
 const formatDuration = (input: number | string | bigint): string => {
   const seconds = typeof input === "string" ? Number(input) : Number(input);
@@ -39,6 +40,7 @@ const HistoryVideo = ({
   views,
   fullName,
   description,
+  refetch,
 }: {
   videoId: string;
   thumbnail: string;
@@ -47,10 +49,15 @@ const HistoryVideo = ({
   views: number;
   fullName: string;
   description: string;
+  refetch: () => void;
 }) => {
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const { isOpen: isOpenRemoveVideoFromHistory, onOpen: onOpenRemoveVideoFromHistory, onClose: onCloseRemoveVideoFromHistory } = useDisclosure();
+
+
   return (
     <div className="flex my-3 justify-between items-start max-w-[1000px] mx-auto px-4 lg:px-0">
       <Flex gap={4} w={"full"} alignItems={"start"}>
@@ -125,7 +132,7 @@ const HistoryVideo = ({
           <MenuItem onClick={onOpen} bg="transparent" color={textColor}>
             Save To Playlist
           </MenuItem>
-          <MenuItem bg="transparent" color={textColor}>
+          <MenuItem bg="transparent" color={textColor} onClick={onOpenRemoveVideoFromHistory}>
             Remove
           </MenuItem>
         </MenuList>
@@ -135,6 +142,12 @@ const HistoryVideo = ({
         isOpen={isOpen}
         onClose={onClose}
         videoId={videoId}
+      />
+      <RemoveVideoFromHistory
+        isOpen={isOpenRemoveVideoFromHistory}
+        onClose={onCloseRemoveVideoFromHistory}
+        videoId={videoId}
+        refetch={refetch}
       />
     </div>
   );

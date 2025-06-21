@@ -15,6 +15,7 @@ import { GoogleGenAI } from "@google/genai";
 
 import os from "os";
 import fs from "fs";
+import WatchHistory from "../models/watchHistory.model.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -132,7 +133,7 @@ const loginUser = asyncHandler(async (req, res) => {
       message: "User does not exist",
     });
   }
-  
+
   const isPasswordValid = await user.isPasswordCorrect(password);
   console.log("Is password valid:", isPasswordValid);
 
@@ -427,32 +428,34 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 });
 
 const getWatchHistory = asyncHandler(async (req, res) => {
-  const user = await User.findById(req?.user?._id).populate({
-    path: "watchHistory",
-    model: "Video",
-    select: "thumbnail views title description _id duration createdAt",
-    populate: {
-      path: "owner",
-      model: "User",
-      select: "fullName _id",
-    },
-  });
+  const userId = req.user._id;
 
-  // Sort the watchHistory array by createdAt (latest to oldest)
-  const sortedHistory = (user?.watchHistory || []).sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  const history = await WatchHistory.find({ userId })
+    .sort({ updatedAt: -1 }) // Most recent first
+    .populate({
+      path: "videoId",
+      model: "Video",
+      select: "thumbnail views title description _id duration createdAt",
+      populate: {
+        path: "owner",
+        model: "User",
+        select: "fullName _id",
+      },
+    });
+
+  // Format result: include watchedAt and video details
+  const formattedHistory = history
+    .filter(entry => entry.videoId) // filter out deleted videos
+    .map(entry => ({
+      watchedAt: entry.updatedAt,
+      video: entry.videoId,
+    }));
+
+  return res.status(200).json(
+    new ApiResponse(200, formattedHistory, "Watch History Fetched Successfully")
   );
-
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        sortedHistory,
-        "Watch History Fetched Successfully"
-      )
-    );
 });
+
 
 const addToWatchHistory = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
@@ -462,44 +465,57 @@ const addToWatchHistory = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Video ID is required" });
   }
 
-  // Check if the video exists
+  // Step 1: Ensure the video exists
   const video = await Video.findById(videoId);
   if (!video) {
     return res.status(404).json({ message: "Video not found" });
   }
 
-  // Step 1: Update watch history (remove if exists, then push to end)
-  await User.findByIdAndUpdate(
-    userId,
+  // Step 2: Upsert watch history entry
+  await WatchHistory.findOneAndUpdate(
+    { userId, videoId },
+    {},
     {
-      $pull: { watchHistory: videoId },
+      upsert: true,
+      new: true,
+      setDefaultsOnInsert: true,
     }
   );
 
-  const updatedUser = await User.findByIdAndUpdate(
-    userId,
-    {
-      $push: { watchHistory: videoId },
-    },
-    { new: true, select: "watchHistory" }
-  );
+  // Step 3: Update video views if user is a new viewer
+  const isNewViewer = !video.viewers.includes(userId.toString());
 
-  // Step 2: Update video views and unique viewers
-  const hasViewed = video.viewers.includes(userId.toString());
-
-  if (!hasViewed) {
+  if (isNewViewer) {
     await Video.findByIdAndUpdate(videoId, {
       $addToSet: { viewers: userId },
       $inc: { views: 1 },
     });
   }
 
-  // Step 3: Send response
+  // Step 4: Respond
   res.status(200).json({
-    message: "Watch history updated",
-    watchHistory: updatedUser.watchHistory,
-    views: hasViewed ? video.views : video.views + 1,
+    message: "Watch history updated successfully",
+    videoId,
+    viewCount: isNewViewer ? video.views + 1 : video.views,
   });
+});
+
+const removeFromWatchHistory = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+  const userId = req.user._id;
+
+  if (!videoId) {
+    return res.status(400).json({ message: "Video ID is required" });
+  }
+
+  const video = await Video.findById(videoId);
+  if (!video) {
+    return res.status(404).json({ message: "Video not found" });
+  }
+
+  await WatchHistory.findOneAndDelete({ userId, videoId });
+
+  return res.status(200).json(new ApiResponse(200, {}, "Video removed from watch history"));
 });
 
 const healthCheck = asyncHandler(async (req, res) => {
@@ -592,4 +608,5 @@ export {
   getWatchHistory,
   addToWatchHistory,
   healthCheck,
+  removeFromWatchHistory,
 };

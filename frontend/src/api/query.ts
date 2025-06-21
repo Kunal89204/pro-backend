@@ -166,6 +166,15 @@ export const myQuery = {
     }
   },
 
+  removeVideoFromHistory: async (token: string, videoId: string) => {
+    const response = await axiosInstance.delete(`/users/history/${videoId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
   updateCoverImage: async (
     token: string,
     coverImage: File | undefined,
@@ -399,11 +408,15 @@ export const myQuery = {
   },
 
   likeVideo: async (token: string, videoId: string) => {
-    const response = await axiosInstance.post(`/like/${videoId}`, {}, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axiosInstance.post(
+      `/like/${videoId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   },
 
@@ -416,30 +429,40 @@ export const myQuery = {
     return response.data;
   },
 
-  subscribeChannel: async (token:string, channelId:string) => {
-    const response = await axiosInstance.post(`/subscription/toggle-subscription/${channelId}`, {}, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  subscribeChannel: async (token: string, channelId: string) => {
+    const response = await axiosInstance.post(
+      `/subscription/toggle-subscription/${channelId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   },
 
   subscribeStatus: async (token: string, videoId: string) => {
-    const response = await axiosInstance.get(`/subscription/subscriber-stats/${videoId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axiosInstance.get(
+      `/subscription/subscriber-stats/${videoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   },
 
   onPageVideoRecommendations: async (token: string, videoId: string) => {
-    const response = await axiosInstance.get(`/video/recommendations/${videoId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axiosInstance.get(
+      `/video/recommendations/${videoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   },
 };

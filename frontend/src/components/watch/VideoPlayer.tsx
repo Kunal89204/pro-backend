@@ -112,7 +112,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
     }
   }, [vdo?.videoFile]);
 
-  // Dispose of the Video.js player when the component unmounts
+  
   useEffect(() => {
     const player = playerRef.current;
     return () => {

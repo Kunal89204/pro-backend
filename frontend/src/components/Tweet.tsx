@@ -114,7 +114,7 @@ const Tweet: React.FC<TweetProps> = ({
             size="sm"
             _hover={{ color: "red.500" }}
           />
-          <Text fontSize="xs" mr={1}>
+          <Text fontSize="xs" mr={1} color={colorMode == "light" ? "black" : "white"}>
             {likes}
           </Text>
         </Flex>
@@ -127,7 +127,7 @@ const Tweet: React.FC<TweetProps> = ({
             size="sm"
             _hover={{ color: "blue.500" }}
           />
-          <Text fontSize="xs" mr={1}>
+          <Text fontSize="xs" mr={1} color={colorMode == "light" ? "black" : "white"}>
             {views}
           </Text>
         </Flex>
@@ -140,7 +140,7 @@ const Tweet: React.FC<TweetProps> = ({
             size="sm"
             _hover={{ color: "blue.500" }}
           />
-          <Text fontSize="xs" mr={1}>
+          <Text fontSize="xs" mr={1} color={colorMode == "light" ? "black" : "white"}   >
             {comments}
           </Text>
         </Flex>

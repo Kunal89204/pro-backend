@@ -1,9 +1,46 @@
-import Tweets from "@/components/Tweets";
-import Videos from "@/components/Videos";
+"use client";
 import { Button, Flex } from "@chakra-ui/react";
+import { useQuery } from "@tanstack/react-query";
+import { myQuery } from "@/api/query";
 import React from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
+import Video from "@/components/Video";
+import Tweet from "@/components/Tweet";
+
+type Video = {
+  createdAt: string | number;
+  views: number;
+  _id: string;
+  title: string;
+  thumbnail: string;
+  duration: number;
+  owner: {
+    fullName: string | undefined;
+    _id: string;
+    username: string;
+    avatar: string;
+  };
+};
+
+type Tweet = {
+  createdAt: string | undefined;
+  views: number | undefined;
+  _id: string;
+  content: string;
+  image?: string;
+  owner: {
+    fullName: string;
+    _id: string;
+    username: string;
+    avatar: string;
+  };
+};
+
+
 
 const Home: React.FC = () => {
+  const token = useSelector((state: RootState) => state.token);
   const arr = [
     "All",
     "Music",
@@ -148,8 +185,21 @@ const Home: React.FC = () => {
     "Hamsters",
     "Rabbits",
     "Guinea Pigs",
-    "Other"
+    "Other",
   ];
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["home-feed"],
+    queryFn: () => myQuery.getHomeFeed(token),
+  });
+
+  console.log("data", data);
+  if(isError){
+    return <div>Error</div>
+  }
+  if(isLoading){
+    return <div>Loading...</div>
+  }
   return (
     <div>
       <Flex
@@ -179,8 +229,41 @@ const Home: React.FC = () => {
           </Button>
         ))}
       </Flex>
-      <Videos />
-      <Tweets />
+  
+
+      {data?.feed?.map((item: {videos: Video[], tweets: Tweet[]}, i: number) => {
+        if (item.hasOwnProperty("videos")) {
+          return (
+            <div  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-4 3xl:grid-cols-5 mx-auto" key={i}>
+              {item.videos.map((video: Video, i: number) => (
+                <Video
+                key={i}
+                title={video.title}
+                thumbnail={video.thumbnail}
+                logo={video.owner.avatar}
+                channelName={video.owner.fullName}
+                uploadTime={video.createdAt}
+                views={video.views}
+                duration={video.duration}
+                videoId={video._id}
+                isProfile={false}
+              />
+              ))}
+              ))
+            </div>
+          );
+        } else if (item.hasOwnProperty("tweets")) {
+          return <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2 p-4 3xl:grid-cols-5 mx-auto" key={i}>
+            {item.tweets.map((tweet: Tweet, i: number) => (
+              <Tweet key={i} author={{
+                name: tweet.owner.fullName,
+                username: tweet.owner.username,
+                avatar: tweet.owner.avatar,
+              }} content={tweet.content} timestamp={tweet.createdAt} views={tweet.views} image={tweet.image} />
+            ))}
+          </div>;
+        }
+      })}
     </div>
   );
 };

@@ -22,10 +22,12 @@ interface TweetProps {
  
   comments?: number;
   views?: number;
+  image?: string;
 }
 
 const Tweet: React.FC<TweetProps> = ({
   id,
+ 
   author = {
     name: "John Doe",
     username: "johndoe",
@@ -36,6 +38,7 @@ const Tweet: React.FC<TweetProps> = ({
   likes = 0,
   comments = 0,
   views = 0,
+  image,
 }) => {
   return (
     <Box
@@ -45,9 +48,13 @@ const Tweet: React.FC<TweetProps> = ({
       p={4}
       key={id}
       mb={2}
+      w="100%"
+      h="100%"
+      maxH="500px"
+      display="flex"
+      flexDirection="column"
       transition="all 0.2s"
       _hover={{ boxShadow: "md" }}
-      //   maxH="500px"
     >
       <Flex mb={3} justifyContent="space-between">
         <Flex>
@@ -76,18 +83,28 @@ const Tweet: React.FC<TweetProps> = ({
       </Flex>
 
       <Text mb={3}>{content}</Text>
-      <Box>
-        <Image
-          src="https://img.freepik.com/free-vector/follow-me-social-business-theme-design_24877-50426.jpg?uid=R102693816&ga=GA1.1.1255758767.1750578121&semt=ais_hybrid&w=740"
-          alt="Tweet Image"
-          width={1000}
-          height={1000}
-        />
-      </Box>
+      {image && (
+        <Box 
+          position="relative" 
+          width="100%" 
+          height="200px" 
+          overflow="hidden" 
+          borderRadius="md"
+          mb={2}
+        >
+          <Image
+            src={image}
+            alt="Tweet Image"
+            fill
+            style={{ objectFit: "cover" }}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </Box>
+      )}
 
       <Divider my={2} />
 
-      <Flex justifyContent="space-between" mt={2}>
+      <Flex justifyContent="space-between" mt="auto">
         <Flex alignItems="center">
           <IconButton
             aria-label="Like"

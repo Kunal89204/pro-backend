@@ -1,5 +1,4 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Tweet } from "../models/tweet.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
@@ -51,4 +50,10 @@ const getTweetsOfUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, tweets, "Tweets fetched successfully"));
 });
 
-export { createTweet, getTweetsOfUser };
+const getTweets = asyncHandler(async (req, res) => {
+  const {page, limit} = req?.query;
+  const tweets = await Tweet.find().sort({createdAt: -1}).skip((page - 1) * limit).limit(limit);
+  res.status(200).json(new ApiResponse(200, tweets, "Tweets fetched successfully"));
+})
+
+export { createTweet, getTweetsOfUser, getTweets };

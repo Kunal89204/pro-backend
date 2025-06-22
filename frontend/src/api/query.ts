@@ -480,4 +480,13 @@ export const myQuery = {
     });
     return response.data;
   },
+
+  getHomeFeed: async (token: string) => {
+    const response = await axiosInstance.get("/users/home-feed", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
 };

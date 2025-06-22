@@ -16,6 +16,7 @@ import { GoogleGenAI } from "@google/genai";
 import os from "os";
 import fs from "fs";
 import WatchHistory from "../models/watchHistory.model.js";
+import { Tweet } from "../models/tweet.model.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -518,6 +519,62 @@ const removeFromWatchHistory = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, {}, "Video removed from watch history"));
 });
 
+
+
+
+
+const getHomeFeed = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page ) || 1;
+  const limit = parseInt(req.query.limit ) || 20;
+
+  const videoChunk = 8;
+  const tweetChunk = 3;
+
+  const rawVideos = await Video.find({ isPublished: true })
+    .select('-viewers')
+    .populate('owner', '_id username avatar')
+    .sort({ createdAt: -1 })
+    .limit(limit * 4); // more videos to allow mixing
+
+  const rawTweets = await Tweet.find()
+    .select('-viewers')
+    .populate('owner', '_id username avatar fullName')
+    .sort({ createdAt: -1 })
+    .limit(limit * 2); // more tweets to allow mixing
+
+  let vi = 0;
+  let ti = 0;
+  const structuredFeed = [];
+
+  while (vi < rawVideos.length || ti < rawTweets.length) {
+    const videoBlock = rawVideos.slice(vi, vi + videoChunk);
+    if (videoBlock.length) {
+      structuredFeed.push({ videos: videoBlock });
+    }
+    vi += videoChunk;
+
+    const tweetBlock = rawTweets.slice(ti, ti + tweetChunk);
+    if (tweetBlock.length) {
+      structuredFeed.push({ tweets: tweetBlock });
+    }
+    ti += tweetChunk;
+
+    if (structuredFeed.length >= limit) break;
+  }
+
+  const start = (page - 1) * limit;
+  const paginatedFeed = structuredFeed.slice(start, start + limit);
+
+  res.status(200).json({
+    success: true,
+    page,
+    limit,
+    feed: paginatedFeed,
+    hasMore: start + limit < structuredFeed.length,
+  });
+});
+
+
 const healthCheck = asyncHandler(async (req, res) => {
   try {
     const ai = new GoogleGenAI({
@@ -609,4 +666,5 @@ export {
   addToWatchHistory,
   healthCheck,
   removeFromWatchHistory,
+  getHomeFeed,
 };

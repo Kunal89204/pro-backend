@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react'
 import RemoveVideoFromPlaylist from '../Modals/RemoveVideoFromPlaylist';
 
-const PlaylistVideo = ({ video, idx, playlistId }: {
+const PlaylistVideo = ({ video, idx, playlistId, playlistData }: {
     video:{
         _id:string,
         thumbnail:string,
@@ -15,7 +15,7 @@ const PlaylistVideo = ({ video, idx, playlistId }: {
         views:number
 
     },
-    idx:number, playlistId:string
+    idx:number, playlistId:string, playlistData:{data: {videos: {_id: string}[]}}
 }) => {
     const router = useRouter()
   
@@ -143,7 +143,7 @@ const PlaylistVideo = ({ video, idx, playlistId }: {
                 />
             </Flex>
 
-            <RemoveVideoFromPlaylist playlistId={playlistId} isOpen={removeVideoIsOpen} onClose={removeVideoOnClose} videoId={video._id} />
+            <RemoveVideoFromPlaylist playlistId={playlistId} isOpen={removeVideoIsOpen} onClose={removeVideoOnClose} videoId={video._id} playlistData={playlistData} />
         </Box>
     )
 }

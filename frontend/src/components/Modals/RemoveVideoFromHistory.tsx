@@ -15,23 +15,33 @@ import { useMutation } from "@tanstack/react-query";
 import { myQuery } from "@/api/query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
+import { useQueryClient } from "@tanstack/react-query";
 
 const RemoveVideoFromHistory = ({
   isOpen,
   onClose,
   videoId,
-  refetch,
+ 
 }: {
   isOpen: boolean;
   onClose: () => void;
   videoId: string;
-  refetch: () => void;
+ 
 }) => {
   const token = useSelector((state: RootState) => state.token);
   const toast = useToast();
+  const queryClient = useQueryClient();
   const removeVideoFromHistoryMutation = useMutation({
     mutationFn: () => myQuery.removeVideoFromHistory(token, videoId),
     onSuccess: () => {
+      queryClient.setQueryData(['history'], (old:{data: {video: {_id: string}}[]}) => {
+        if (!old || !old.data) return old;
+
+        return {
+          ...old,
+          data: old.data.filter((video: {video: {_id: string}}) => video?.video?._id !== videoId)
+        }
+      })
       toast({
         title: "Video removed from history",
         description: "Video removed from history",
@@ -40,7 +50,7 @@ const RemoveVideoFromHistory = ({
         isClosable: true,
       });
       onClose();
-      refetch();
+      
     },
     onError: () => {
       toast({

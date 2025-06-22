@@ -470,4 +470,14 @@ export const myQuery = {
     );
     return response.data;
   },
+
+  createTweet: async (token: string, formData: FormData) => {
+    const response = await axiosInstance.post("/tweet/create", formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  },
 };

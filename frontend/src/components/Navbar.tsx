@@ -1,8 +1,11 @@
 "use client";
-import { IconSearch } from "@tabler/icons-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React from "react";
+import {
+  IconMessage2Plus,
+  IconSearch,
+  IconVideo,
+} from "@tabler/icons-react";
+import { usePathname, useRouter } from "next/navigation";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -11,7 +14,6 @@ import {
   Input,
   InputGroup,
   InputRightAddon,
- 
   useColorMode,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
@@ -21,9 +23,10 @@ import { useThemeColors } from "@/hooks/useThemeColors";
 const Navbar: React.FC = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const pathname = usePathname();
+  const [showCreate, setShowCreate] = useState(false);
+  const router = useRouter();
 
-  const { buttonBg, hoverBg, inputTextColor } =
-    useThemeColors();
+  const { buttonBg, hoverBg, inputTextColor } = useThemeColors();
 
   if (
     pathname === "/login" ||
@@ -40,7 +43,7 @@ const Navbar: React.FC = () => {
       top={0}
       zIndex={10}
       // bg={pathname.startsWith("/playlists/") ? "transparent" : "#121212"}
-      bg={'transparent'}
+      bg={"transparent"}
       backdropFilter="blur(10px)"
       px={4}
       py={2}
@@ -54,7 +57,7 @@ const Navbar: React.FC = () => {
           maxW={{ base: "full", lg: "40%" }}
           borderRadius="full"
           border="0px solid"
-          borderColor={'rgba(255, 255, 255, 0.1)'}
+          borderColor={"rgba(255, 255, 255, 0.1)"}
           className="relative"
         >
           <Input
@@ -98,7 +101,8 @@ const Navbar: React.FC = () => {
             size="md"
             variant="ghost"
           />
-          <Link href="/create">
+          {/* <Link href="/create"> */}
+          <Box className="relative">
             <Button
               display={{ base: "none", lg: "inline-flex" }}
               bg={buttonBg}
@@ -107,11 +111,39 @@ const Navbar: React.FC = () => {
               py={2}
               boxShadow="sm"
               _hover={{ bg: hoverBg, color: "primary.med" }}
-              
+              onClick={() => setShowCreate(!showCreate)}
             >
               Create
             </Button>
-          </Link>
+
+            {showCreate && (
+              <Box className="absolute top-[110%] right-0 flex flex-col gap-2 bg-[#222222] rounded-md p-2">
+                <Button
+                  onClick={() => {
+                    router.push("/create/video");
+                    setShowCreate(false);
+                  }}
+                  background={"transparent"}
+                  className="flex gap-2"
+                >
+                  {" "}
+                  <IconVideo size={18} /> Upload Video
+                </Button>
+                <Button
+                  onClick={() => {
+                    router.push("/create/tweet");
+                    setShowCreate(false);
+                  }}
+                  background={"transparent"}
+                  className="flex gap-2"
+                >
+                  {" "}
+                  <IconMessage2Plus size={18} /> Upload Tweet
+                </Button>
+              </Box>
+            )}
+          </Box>
+          {/* </Link> */}
         </Flex>
       </Flex>
     </Box>

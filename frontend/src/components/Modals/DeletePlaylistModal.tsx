@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 const DeletePlaylistModal = ({
   isOpen,
@@ -28,13 +29,22 @@ const DeletePlaylistModal = ({
   onClose: () => void;
   playlistId: string;
 }) => {
-  const token  = useSelector((state: RootState) => state?.token);
+  const token = useSelector((state: RootState) => state?.token);
   const toast = useToast();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { mutate: deletePlaylist, isPending } = useMutation({
     mutationFn: () => myQuery.deletePlaylist(token, playlistId),
     onSuccess: () => {
+      queryClient.setQueryData(["playlists"], (old: {data: {_id: string}[]}) => {
+        if (!old || !old.data) return old;
+
+        return {
+          ...old,
+          data: old.data.filter((playlist: {_id: string}) => playlist._id !== playlistId),
+        };
+      });
       toast({
         position: "bottom-right",
         duration: 3000,
@@ -73,14 +83,13 @@ const DeletePlaylistModal = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="sm">
-      <ModalOverlay bg="blackAlpha.600"  />
+      <ModalOverlay bg="blackAlpha.600" />
       <ModalContent
         bg="transparent"
         backdropFilter="blur(50px)"
         borderRadius="lg"
         px={6}
         py={4}
-
       >
         <ModalHeader fontSize="lg" fontWeight="semibold">
           Confirm Deletion

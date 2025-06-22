@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Modal,
   ModalOverlay,
@@ -9,36 +9,54 @@ import {
   ModalCloseButton,
   Text,
   Button,
-
-
-  useToast
-} from '@chakra-ui/react';
-import { useMutation } from '@tanstack/react-query';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/lib/store';
-import { myQuery } from '@/api/query';
-import { useThemeColors } from '@/hooks/useThemeColors';
+  useToast,
+} from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
+import { myQuery } from "@/api/query";
+import { useThemeColors } from "@/hooks/useThemeColors";
 
 const RemoveVideoFromPlaylist = ({
   isOpen,
   onClose,
   playlistId,
   videoId,
+  playlistData,
 }: {
   isOpen: boolean;
   onClose: () => void;
   playlistId: string;
   videoId: string;
+  playlistData: {data: {videos: {_id: string}[]}};
 }) => {
-  const toast = useToast()
-  const token = useSelector((state: RootState) => state.token)
-  const {textColor} =
-    useThemeColors();
+  const toast = useToast();
+  const token = useSelector((state: RootState) => state.token);
+  const { textColor } = useThemeColors();
+  const queryClient = useQueryClient();
+  console.log("playlistData", playlistData);
+
   const removeVideoFromPlaylistMutation = useMutation({
-    mutationFn: (playlistId: string) =>
+    mutationFn: () =>
       myQuery.removeVideoFromPlaylist(token, playlistId, videoId),
+
     onSuccess: () => {
-      onClose()
+      // Update the cached playlist
+      queryClient.setQueryData(["playlist", playlistId, token], (old: {data: {videos: {_id: string}[]}}) => {
+        if (!old || !old.data) return old;
+
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            videos: old.data.videos.filter(
+              (video: {_id: string}) => video._id !== videoId
+            ),
+          },
+        };
+      });
+
+      onClose();
       toast({
         title: "Video removed from playlist",
         description: "Video removed from playlist",
@@ -47,20 +65,21 @@ const RemoveVideoFromPlaylist = ({
         isClosable: true,
       });
     },
+
     onError: (error) => {
       console.log(error);
     },
   });
 
+  const handleVideoRemoval = () => {
+    removeVideoFromPlaylistMutation.mutate();
+  };
 
-  const handleVideoRemoval = async () => {
-    removeVideoFromPlaylistMutation.mutate(playlistId)
-  }
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="sm">
-      <ModalOverlay bg="blackAlpha.600"  />
+      <ModalOverlay bg="blackAlpha.600" />
       <ModalContent
-        bg={'transparent'}
+        bg={"transparent"}
         backdropFilter="blur(20px)"
         borderRadius="lg"
         boxShadow="lg"
@@ -73,7 +92,7 @@ const RemoveVideoFromPlaylist = ({
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text fontSize="sm" color={'secondary.base.light'}>
+          <Text fontSize="sm" color={"secondary.base.light"}>
             Are you sure you want to remove this video from the playlist?
           </Text>
         </ModalBody>

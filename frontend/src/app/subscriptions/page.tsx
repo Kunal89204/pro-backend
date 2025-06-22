@@ -4,12 +4,13 @@ import {
   Box,
   Avatar,
   Text,
-  VStack,
-  HStack,
+  Flex,
   Heading,
   Spinner,
-  SimpleGrid,
+  Grid,
   useColorModeValue,
+  Container,
+
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -39,7 +40,7 @@ const Subscriptions = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }); // replace with your endpoint
+      });
       setSubscriptions(response.data.data);
     } catch (error) {
       console.error("Failed to fetch subscriptions", error);
@@ -52,46 +53,80 @@ const Subscriptions = () => {
     fetchSubscriptions();
   }, [fetchSubscriptions]);
 
-  const cardBg = useColorModeValue("gray.50", "gray.800");
+  const cardBg = useColorModeValue("white", "gray.900");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
 
   return (
-    <Box p={6}>
-      <Heading size="lg" mb={6} textAlign="center">
-        Your Subscriptions
+    <Container maxW="container.xl" py={8}>
+      <Heading 
+        size="md" 
+        mb={6} 
+        fontWeight="medium"
+        letterSpacing="tight"
+      >
+        Subscriptions
       </Heading>
 
       {loading ? (
-        <Spinner size="xl" thickness="4px" color="purple.400" />
+        <Flex justify="center" align="center" h="50vh">
+          <Spinner size="md" color="blue.500" />
+        </Flex>
       ) : (
-        <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={6}>
+        <Grid 
+          templateColumns={{ 
+            base: "repeat(1, 1fr)", 
+            sm: "repeat(2, 1fr)", 
+            md: "repeat(3, 1fr)",
+            lg: "repeat(4, 1fr)" 
+          }} 
+          gap={4}
+        >
           {subscriptions.map((sub) => (
             <Box
               key={sub._id}
-              p={5}
+              p={4}
               bg={cardBg}
-              borderRadius="2xl"
-              shadow="lg"
-              transition="all 0.3s"
-              _hover={{ shadow: "xl", transform: "scale(1.02)" }}
+              borderWidth="1px"
+              borderColor={borderColor}
+              borderRadius="md"
+              transition="all 0.2s"
+              _hover={{ 
+                transform: "translateY(-2px)",
+                shadow: "sm" 
+              }}
             >
-              <HStack spacing={4}>
+              <Flex align="center" gap={3}>
                 <Avatar
                   name={sub.channel.fullName}
                   src={sub.channel.avatar}
-                  size="lg"
+                  size="md"
                 />
-                <VStack align="start" spacing={0}>
-                  <Text fontWeight="bold">{sub.channel.fullName}</Text>
-                  <Text fontSize="sm" color="gray.500">
+                <Box>
+                  <Text fontWeight="medium" fontSize="sm" noOfLines={1}>
+                    {sub.channel.fullName}
+                  </Text>
+                  <Text fontSize="xs" color="gray.500" mt={0.5}>
                     @{sub.channel.username}
                   </Text>
-                </VStack>
-              </HStack>
+                </Box>
+              </Flex>
             </Box>
           ))}
-        </SimpleGrid>
+        </Grid>
       )}
-    </Box>
+      
+      {!loading && subscriptions.length === 0 && (
+        <Flex 
+          direction="column" 
+          align="center" 
+          justify="center" 
+          h="50vh"
+          color="gray.500"
+        >
+          <Text>No subscriptions yet</Text>
+        </Flex>
+      )}
+    </Container>
   );
 };
 

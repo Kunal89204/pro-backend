@@ -41,7 +41,7 @@ const HistoryVideo = ({
   views,
   fullName,
   description,
-  refetch,
+ 
 }: {
   videoId: string;
   thumbnail: string;
@@ -50,7 +50,7 @@ const HistoryVideo = ({
   views: number;
   fullName: string;
   description: string;
-  refetch: () => void;
+  
 }) => {
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
@@ -162,7 +162,7 @@ const HistoryVideo = ({
         isOpen={isOpenRemoveVideoFromHistory}
         onClose={onCloseRemoveVideoFromHistory}
         videoId={videoId}
-        refetch={refetch}
+      
       />
       <ShareVideo
         isOpen={isOpenShare}

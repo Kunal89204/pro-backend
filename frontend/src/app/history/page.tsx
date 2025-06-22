@@ -29,7 +29,7 @@ const History = () => {
   const token = useSelector((state: RootState) => state.token);
   const { textColor, secondaryTextColor } = useThemeColors();
 
-  const { data, isLoading, error, isError, refetch } = useQuery({
+  const { data, isLoading, error, isError } = useQuery({
     queryKey: ["history"],
     queryFn: () => myQuery.getHistory(token),
   });
@@ -86,7 +86,7 @@ const History = () => {
               duration={entry.video.duration}
               fullName={entry.video.owner.fullName}
               views={entry.video.views}
-              refetch={refetch}
+             
             />
           ))}
         </Box>

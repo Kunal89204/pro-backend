@@ -56,6 +56,7 @@ const PlaylistPage = () => {
     queryKey: ["playlist", playlistId, token],
     queryFn: () => myQuery.getPlaylistById(token, playlistId as string),
     enabled: !!playlistId && !!token,
+    
   });
 
   const bgColor = useColorModeValue("#fafafa", "#121212");
@@ -145,6 +146,9 @@ const PlaylistPage = () => {
     );
   }
 
+  
+
+
   return (
     <Box minH="100vh" bg={bgColor}>
       <Container maxW="7xl" py={8}>
@@ -172,7 +176,7 @@ const PlaylistPage = () => {
                 <Image
                   ref={imgRef} // Add this ref
                   src={
-                    playlist.data.videos?.[playlist.data.videos.length - 1]
+                    playlist.data.videos?.[0]
                       ?.thumbnail ||
                     "https://media.istockphoto.com/id/2167960646/vector/illustration-of-a-botanical-background-featuring-tropical-animals-and-various-tropical.jpg?s=612x612&w=0&k=20&c=KeAaK6shnN5qzapejJRcAIxU5ftUtnBbcYZxJecG1_w="
                   }
@@ -310,7 +314,7 @@ const PlaylistPage = () => {
                     key={idx}
                     video={video}
                     idx={idx}
-                    playlistId={playlist.data._id}
+                    playlistId={playlist.data._id} playlistData={playlist.data.videos}
                   />
                 )
               )}
@@ -359,6 +363,7 @@ const PlaylistPage = () => {
           isOpen={isDeleteOpen}
           onClose={onCloseDelete}
           playlistId={playlist.data._id}
+         
         />
       </Container>
     </Box>

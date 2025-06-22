@@ -1,3 +1,4 @@
+import Tweets from "@/components/Tweets";
 import Videos from "@/components/Videos";
 import { Button, Flex } from "@chakra-ui/react";
 import React from "react";
@@ -178,8 +179,8 @@ const Home: React.FC = () => {
           </Button>
         ))}
       </Flex>
-      
       <Videos />
+      <Tweets />
     </div>
   );
 };

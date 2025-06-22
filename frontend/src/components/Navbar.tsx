@@ -117,7 +117,7 @@ const Navbar: React.FC = () => {
             </Button>
 
             {showCreate && (
-              <Box className="absolute top-[110%] right-0 flex flex-col gap-2 bg-[#222222] rounded-md p-2">
+              <Box className="absolute top-[110%] right-0 flex flex-col gap-2  rounded-md p-2" bg={colorMode == "light" ? "gray.200" : "#222222"}>
                 <Button
                   onClick={() => {
                     router.push("/create/video");

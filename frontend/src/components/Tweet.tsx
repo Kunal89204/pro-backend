@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Flex, Text, Avatar, IconButton, Divider } from "@chakra-ui/react";
+import { Box, Flex, Text, Avatar, IconButton, Divider, useColorMode } from "@chakra-ui/react";
 import {
   IconHeart,
   IconMessageCircle,
@@ -40,6 +40,7 @@ const Tweet: React.FC<TweetProps> = ({
   views = 0,
   image,
 }) => {
+  const { colorMode } = useColorMode();
   return (
     <Box
       borderWidth="1px"
@@ -61,7 +62,7 @@ const Tweet: React.FC<TweetProps> = ({
           <Avatar src={author.avatar} size="md" mr={3} />
           <Box>
             <Flex alignItems="center">
-              <Text fontWeight="bold" mr={1}>
+              <Text fontWeight="bold" mr={1} color={colorMode == "light" ? "black" : "white"}>
                 {author.name}
               </Text>
               <Text color="gray.500" fontSize="xs" ml={1}>
@@ -82,7 +83,7 @@ const Tweet: React.FC<TweetProps> = ({
         />
       </Flex>
 
-      <Text mb={3}>{content}</Text>
+      <Text mb={3} color={colorMode == "light" ? "black" : "white"}>{content}</Text>
       {image && (
         <Box 
           position="relative" 

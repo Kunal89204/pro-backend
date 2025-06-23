@@ -153,6 +153,38 @@ const CommentItem = ({
   );
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const Comments = ({ comments, videoId, refetch, isLoading }: { comments: Comment[], videoId: string, refetch: () => void, isLoading: boolean }) => {
   const { textColor } = useThemeColors();
   const { user } = useSelector((state: RootState) => state);

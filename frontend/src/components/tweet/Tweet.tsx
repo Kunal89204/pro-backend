@@ -27,7 +27,7 @@ const Tweet = ({
     comments: number;
   };
   isLoading: boolean;
-
+ 
 }) => {
   const { colorMode } = useColorMode();
   const { textColor, secondaryTextColor } = useThemeColors();

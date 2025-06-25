@@ -13,7 +13,7 @@ import UserProfile from "@/components/tweet/UserProfile";
 const TweetPage = () => {
   const { id } = useParams();
   const token = useSelector((state: RootState) => state.token);
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["tweet", id],
     queryFn: () => myQuery.getTweetById(token, id as string),
   });

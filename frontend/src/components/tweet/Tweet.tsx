@@ -17,7 +17,7 @@ import { useThemeColors } from "@/hooks/useThemeColors";
 const Tweet = ({
   data,
   isLoading,
-  error,
+  
 }: {
   data: {
     content: string;

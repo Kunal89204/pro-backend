@@ -24,7 +24,7 @@ const TweetPage = () => {
         <Tweet 
           data={data?.data} 
           isLoading={isLoading} 
-          error={error ? { message: error.message || 'An error occurred' } : { message: '' }} 
+          
         />
         
         <Comments />

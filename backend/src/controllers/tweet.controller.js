@@ -56,4 +56,10 @@ const getTweets = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, tweets, "Tweets fetched successfully"));
 })
 
-export { createTweet, getTweetsOfUser, getTweets };
+const getTweetById = asyncHandler(async (req, res) => {
+  const { id } = req?.params;
+  const tweet = await Tweet.findById(id);
+  res.status(200).json(new ApiResponse(200, tweet, "Tweet fetched successfully"));
+});
+
+export { createTweet, getTweetsOfUser, getTweets, getTweetById };

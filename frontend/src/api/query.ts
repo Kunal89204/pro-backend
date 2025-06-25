@@ -487,6 +487,16 @@ export const myQuery = {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log(response)
+    return response.data;
+  },
+
+  getTweetById: async (token: string, tweetId: string) => {
+    const response = await axiosInstance.get(`/tweet/${tweetId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   },
 };

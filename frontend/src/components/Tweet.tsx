@@ -8,6 +8,8 @@ import {
   IconBookmark,
 } from "@tabler/icons-react";
 import Image from "next/image";
+import { formatPostTime } from "@/utils/relativeTime";
+import { useRouter } from "next/navigation";
 
 interface TweetProps {
   id?: string;
@@ -41,6 +43,7 @@ const Tweet: React.FC<TweetProps> = ({
   image,
 }) => {
   const { colorMode } = useColorMode();
+  const router = useRouter()
   return (
     <Box
       borderWidth="1px"
@@ -66,7 +69,7 @@ const Tweet: React.FC<TweetProps> = ({
                 {author.name}
               </Text>
               <Text color="gray.500" fontSize="xs" ml={1}>
-                • {timestamp}
+                • {formatPostTime(timestamp)}
               </Text>
             </Flex>
             <Text color="gray.500" fontSize="xs">
@@ -83,7 +86,7 @@ const Tweet: React.FC<TweetProps> = ({
         />
       </Flex>
 
-      <Text mb={3} color={colorMode == "light" ? "black" : "white"}>{content}</Text>
+      <Text mb={3} color={colorMode == "light" ? "black" : "white"} className="line-clamp-1">{content}</Text>
       {image && (
         <Box 
           position="relative" 
@@ -92,14 +95,23 @@ const Tweet: React.FC<TweetProps> = ({
           overflow="hidden" 
           borderRadius="md"
           mb={2}
+          cursor="pointer"
+          onClick={()=>{
+            router.push(`/tweet/${id}`)
+          }}
         >
           <Image
             src={image}
             alt="Tweet Image"
             fill
             style={{ objectFit: "cover" }}
+            className="blur-lg"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
+
+          <Box className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+            <IconEye size={50} color="white" />
+          </Box>
         </Box>
       )}
 

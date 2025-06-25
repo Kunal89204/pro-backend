@@ -5,19 +5,22 @@ import { myQuery } from "@/api/query";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import Image from "next/image";
-import { Flex, Box, Text, Button, Avatar, Input, useColorMode } from "@chakra-ui/react";
+import { Flex, Box, Text, Button, Avatar, Input, useColorMode, useDisclosure } from "@chakra-ui/react";
 import { setAuth } from "@/lib/slices/authSlice";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import Myvideos from "@/components/profile/Myvideos";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
+import EditProfile from "@/components/Modals/EditProfile";
 
 
 const Profile = () => {
   const token = useSelector((state: RootState) => state.token);
+  const userId = useSelector((state: RootState) => state.user._id);
   const coverFileInputRef = useRef<HTMLInputElement>(null);
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch()
   const { colorMode } = useColorMode()
+  const {isOpen, onOpen, onClose} = useDisclosure()
 
   // Color modes import
   const { textColor, secondaryTextColor, buttonBg } = useThemeColors()
@@ -120,6 +123,8 @@ const Profile = () => {
     );
   }
 
+ 
+
   return (
     <div className="p-4">
       <div className="mt-4">
@@ -195,6 +200,7 @@ const Profile = () => {
                     px={4}
                     my={4}
                     bg={buttonBg}
+                    onClick={onOpen}
                   >
                     Edit Profile
                   </Button>
@@ -221,20 +227,22 @@ const Profile = () => {
         )}
       </div>
 
-      <Tabs variant={'solid-rounded'} colorScheme="blue">
+      <Tabs variant={'solid-rounded'} >
         <TabList >
-          <Tab mx={1} color={colorMode == 'dark' ? "white" : "black"}>Videos</Tab>
-          <Tab mx={1} color={colorMode == 'dark' ? "white" : "black"}>Tweets</Tab>
-          <Tab mx={1} color={colorMode == 'dark' ? "white" : "black"}>Playlists</Tab>
+          <Tab mx={1}  color={colorMode == 'dark' ? "white" : "black"} _selected={{color: "white", bg: "gray.500"}}>Videos</Tab>
+          <Tab mx={1} color={colorMode == 'dark' ? "white" : "black"} _selected={{color: "white", bg: "gray.500"}}>Tweets</Tab>
+          <Tab mx={1} color={colorMode == 'dark' ? "white" : "black"} _selected={{color: "white", bg: "gray.500"}}>Saved</Tab>
         </TabList>
 
         <TabPanels>
           <TabPanel><Myvideos /></TabPanel>
           <TabPanel><p>Tweets</p></TabPanel>
-          <TabPanel><p>Playlists</p></TabPanel>
+          <TabPanel><p>Saved</p></TabPanel>
         </TabPanels>
       </Tabs>
 
+
+<EditProfile isOpen={isOpen} onClose={onClose} userId={userId}  fullName={user?.data?.fullName}/>
     </div>
   );
 };

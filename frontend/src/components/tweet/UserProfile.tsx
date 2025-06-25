@@ -11,7 +11,7 @@ const UserProfile = () => {
       {/* Cover Image */}
       <Box position="relative" height="100px" mb={12}>
         <Image 
-          src="http://localhost:3000/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fdqvqvvwc8%2Fimage%2Fupload%2Fv1749469542%2Fllcowjyi6w8rfgdg5rps.png&w=2048&q=75"
+          src=""
           alt="Cover photo"
           fill
           className="object-cover"

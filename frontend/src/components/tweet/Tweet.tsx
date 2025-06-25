@@ -35,11 +35,9 @@ const Tweet = ({
   if (isLoading) {
     return <div>Loading...</div>;
   }
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
+  
 
-  console.log(data);
+  console.log("data.image", data.image);
   return (
     <div>
       {/* Header */}

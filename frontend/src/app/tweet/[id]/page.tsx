@@ -26,6 +26,7 @@ const TweetPage = () => {
           isLoading={isLoading} 
           error={error ? { message: error.message || 'An error occurred' } : { message: '' }} 
         />
+        
         <Comments />
       </div>
 

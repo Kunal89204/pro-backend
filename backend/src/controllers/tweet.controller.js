@@ -21,12 +21,12 @@ const createTweet = asyncHandler(async (req, res) => {
 
   if (localImagePath) {
     const uploadedImage = await uploadOnCloudinary(localImagePath);
-    if (!uploadedImage?.url) {
+    if (!uploadedImage?.secure_url) {
       return res
         .status(400)
         .json(new ApiResponse(400, null, "Error while uploading image"));
     }
-    imageUrl = uploadedImage.url;
+    imageUrl = uploadedImage.secure_url;
   }
 
   const tweet = await Tweet.create({

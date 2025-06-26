@@ -11,6 +11,7 @@ import { useThemeColors } from "@/hooks/useThemeColors";
 import Myvideos from "@/components/profile/Myvideos";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 import EditProfile from "@/components/Modals/EditProfile";
+import Tweets from "@/components/profile/tweets/Tweets";
 
 
 const Profile = () => {
@@ -236,7 +237,7 @@ const Profile = () => {
 
         <TabPanels>
           <TabPanel><Myvideos /></TabPanel>
-          <TabPanel><p>Tweets</p></TabPanel>
+          <TabPanel><Tweets /></TabPanel>
           <TabPanel><p>Saved</p></TabPanel>
         </TabPanels>
       </Tabs>

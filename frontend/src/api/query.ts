@@ -487,7 +487,7 @@ export const myQuery = {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response)
+    console.log(response);
     return response.data;
   },
 
@@ -499,4 +499,15 @@ export const myQuery = {
     });
     return response.data;
   },
+
+  getTweetsOfUser: async (token: string) => {
+    const response = await axiosInstance.get("/tweet/get-tweets", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+  
 };

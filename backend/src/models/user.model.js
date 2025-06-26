@@ -27,12 +27,13 @@ const userSchema = new Schema(
     },
     avatar: {
       type: String, // cloudinary url
-     
     },
     coverImage: {
       type: String, // cloudinary url
     },
-   
+    bio: {
+      type: String,
+    },
     password: {
       type: String,
       required: [true, "Password is required"],
@@ -73,7 +74,6 @@ userSchema.methods.generateAccessToken = function () {
   );
 };
 
-
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
@@ -85,6 +85,5 @@ userSchema.methods.generateRefreshToken = function () {
     }
   );
 };
-
 
 export const User = mongoose.model("User", userSchema);

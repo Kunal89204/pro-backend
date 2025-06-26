@@ -58,7 +58,7 @@ const getTweets = asyncHandler(async (req, res) => {
 
 const getTweetById = asyncHandler(async (req, res) => {
   const { id } = req?.params;
-  const tweet = await Tweet.findById(id);
+  const tweet = await Tweet.findById(id).populate("owner", "fullName username email avatar coverImage");
   res.status(200).json(new ApiResponse(200, tweet, "Tweet fetched successfully"));
 });
 

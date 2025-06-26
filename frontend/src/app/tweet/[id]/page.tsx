@@ -31,7 +31,7 @@ const TweetPage = () => {
       </div>
 
       <div className="w-2/5">
-        <UserProfile />
+        <UserProfile data={data?.data?.owner} />
       </div>
     </div>
   );

@@ -1,5 +1,13 @@
 import React from "react";
-import { Box, Flex, Text, Avatar, IconButton, Divider, useColorMode } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Text,
+  Avatar,
+  IconButton,
+  Divider,
+  useColorMode,
+} from "@chakra-ui/react";
 import {
   IconHeart,
   IconMessageCircle,
@@ -21,7 +29,7 @@ interface TweetProps {
   content?: string;
   timestamp?: string;
   likes?: number;
- 
+
   comments?: number;
   views?: number;
   image?: string;
@@ -29,7 +37,7 @@ interface TweetProps {
 
 const Tweet: React.FC<TweetProps> = ({
   id,
- 
+
   author = {
     name: "John Doe",
     username: "johndoe",
@@ -43,7 +51,7 @@ const Tweet: React.FC<TweetProps> = ({
   image,
 }) => {
   const { colorMode } = useColorMode();
-  const router = useRouter()
+  const router = useRouter();
   return (
     <Box
       borderWidth="1px"
@@ -65,7 +73,11 @@ const Tweet: React.FC<TweetProps> = ({
           <Avatar src={author.avatar} size="md" mr={3} />
           <Box>
             <Flex alignItems="center">
-              <Text fontWeight="bold" mr={1} color={colorMode == "light" ? "black" : "white"}>
+              <Text
+                fontWeight="bold"
+                mr={1}
+                color={colorMode == "light" ? "black" : "white"}
+              >
                 {author.name}
               </Text>
               <Text color="gray.500" fontSize="xs" ml={1}>
@@ -86,18 +98,28 @@ const Tweet: React.FC<TweetProps> = ({
         />
       </Flex>
 
-      <Text mb={3} color={colorMode == "light" ? "black" : "white"} className="line-clamp-1">{content}</Text>
+      <Text
+        onClick={() => {
+          router.push(`/tweet/${id}`);
+        }}
+        cursor="pointer"
+        mb={3}
+        color={colorMode == "light" ? "black" : "white"}
+        className="line-clamp-1"
+      >
+        {content}
+      </Text>
       {image && (
-        <Box 
-          position="relative" 
-          width="100%" 
-          height="200px" 
-          overflow="hidden" 
+        <Box
+          position="relative"
+          width="100%"
+          height="200px"
+          overflow="hidden"
           borderRadius="md"
           mb={2}
           cursor="pointer"
-          onClick={()=>{
-            router.push(`/tweet/${id}`)
+          onClick={() => {
+            router.push(`/tweet/${id}`);
           }}
         >
           <Image
@@ -126,7 +148,11 @@ const Tweet: React.FC<TweetProps> = ({
             size="sm"
             _hover={{ color: "red.500" }}
           />
-          <Text fontSize="xs" mr={1} color={colorMode == "light" ? "black" : "white"}>
+          <Text
+            fontSize="xs"
+            mr={1}
+            color={colorMode == "light" ? "black" : "white"}
+          >
             {likes}
           </Text>
         </Flex>
@@ -139,7 +165,11 @@ const Tweet: React.FC<TweetProps> = ({
             size="sm"
             _hover={{ color: "blue.500" }}
           />
-          <Text fontSize="xs" mr={1} color={colorMode == "light" ? "black" : "white"}>
+          <Text
+            fontSize="xs"
+            mr={1}
+            color={colorMode == "light" ? "black" : "white"}
+          >
             {views}
           </Text>
         </Flex>
@@ -152,7 +182,11 @@ const Tweet: React.FC<TweetProps> = ({
             size="sm"
             _hover={{ color: "blue.500" }}
           />
-          <Text fontSize="xs" mr={1} color={colorMode == "light" ? "black" : "white"}   >
+          <Text
+            fontSize="xs"
+            mr={1}
+            color={colorMode == "light" ? "black" : "white"}
+          >
             {comments}
           </Text>
         </Flex>

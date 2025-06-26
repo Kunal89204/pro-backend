@@ -12,6 +12,11 @@ const watchHistorySchema = new Schema(
       ref: "Video",
       required: true,
     },
+    tweetId: {
+      type: Schema.Types.ObjectId,
+      ref: "Tweet",
+      required: true,
+    },
   },
   { timestamps: true }
 );

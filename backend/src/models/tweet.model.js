@@ -14,16 +14,18 @@ const tweetSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    views: {
+    viewsCount: {
       type: Number,
       default: 0,
     },
-    viewers: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    commentsCount: {
+      type: Number,
+      default: 0,
+    },
+    likesCount: {
+      type: Number,
+      default: 0,
+    },
     tags: [{ type: String, trim: true, lowercase: true }],
   },
   { timestamps: true }

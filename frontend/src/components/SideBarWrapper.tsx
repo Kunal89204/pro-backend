@@ -90,7 +90,7 @@ export function SidebarDemo({ children }: { children: ReactNode }) {
                         <SidebarLink
                             link={{
                                 label: fullName,
-                                href: `/profile/${username}`,
+                                href: `/profile/${username}?tab=videos`,
                                 icon: (
                                     <Avatar src={avatar} width={10} height={10} className="!h-8 !w-8 flex-shrink-0 rounded-full" name={fullName} />
                                 ),

@@ -2,6 +2,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Tweet } from "../models/tweet.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { Bookmark } from "../models/bookmark.model.js";
+import mongoose from "mongoose";
 
 const createTweet = asyncHandler(async (req, res) => {
   console.log("requested");
@@ -51,15 +53,102 @@ const getTweetsOfUser = asyncHandler(async (req, res) => {
 });
 
 const getTweets = asyncHandler(async (req, res) => {
-  const {page, limit} = req?.query;
-  const tweets = await Tweet.find().sort({createdAt: -1}).skip((page - 1) * limit).limit(limit);
-  res.status(200).json(new ApiResponse(200, tweets, "Tweets fetched successfully"));
-})
+  const { page, limit } = req?.query;
+  const tweets = await Tweet.find()
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+  res
+    .status(200)
+    .json(new ApiResponse(200, tweets, "Tweets fetched successfully"));
+});
 
 const getTweetById = asyncHandler(async (req, res) => {
   const { id } = req?.params;
-  const tweet = await Tweet.findById(id).populate("owner", "fullName username email avatar coverImage");
-  res.status(200).json(new ApiResponse(200, tweet, "Tweet fetched successfully"));
+  const tweet = await Tweet.findById(id).populate(
+    "owner",
+    "fullName username email avatar coverImage"
+  );
+  res
+    .status(200)
+    .json(new ApiResponse(200, tweet, "Tweet fetched successfully"));
 });
 
-export { createTweet, getTweetsOfUser, getTweets, getTweetById };
+const bookmarkTweet = asyncHandler(async (req, res) => {
+  const { id } = req?.params;
+  const userId = req?.user?._id;
+  const tweet = await Tweet.findById(id);
+  if (!tweet) {
+    return res.status(404).json(new ApiResponse(404, null, "Tweet not found"));
+  }
+
+  const bookmark = await Bookmark.findOne({ tweet: id, bookmarkedBy: userId });
+  if (bookmark) {
+    // If bookmark exists, remove it (toggle off)
+    await Bookmark.findByIdAndDelete(bookmark._id);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "Bookmark removed successfully"));
+  }
+
+  // If bookmark doesn't exist, create it (toggle on)
+  await Bookmark.create({ tweet: id, bookmarkedBy: userId });
+  res
+    .status(200)
+    .json(new ApiResponse(200, null, "Tweet bookmarked successfully"));
+});
+
+const getBookmarkedTweets = asyncHandler(async (req, res) => {
+  const userId = req?.user?._id;
+
+  const bookmarks = await Bookmark.find({ bookmarkedBy: userId })
+    .populate({
+      path: "tweet",
+      select: "content image owner createdAt _id",
+      populate: {
+        path: "owner",
+        select: "fullName username avatar _id",
+      },
+    })
+    .sort({ createdAt: -1 });
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, bookmarks, "Bookmarked tweets fetched successfully")
+    );
+});
+
+const bookmarkStatus = asyncHandler(async (req, res) => {
+const userId = req?.user?._id;
+const tweetId = req?.params?.id;
+const bookmark = await Bookmark.findOne({ tweet: tweetId, bookmarkedBy: userId });
+
+if(bookmark){
+  return res.status(200).json({
+    success: true,
+    message: "Tweet bookmarked",
+    data: {
+      isBookmarked: true,
+    },
+  });
+}
+
+return res.status(200).json({
+  success: true,
+  message: "Tweet not bookmarked",
+  data: {
+    isBookmarked: false,
+  },
+});
+});
+
+export {
+  createTweet,
+  getTweetsOfUser,
+  getTweets,
+  getTweetById,
+  bookmarkTweet,
+  getBookmarkedTweets,
+  bookmarkStatus,
+};

@@ -92,7 +92,7 @@ export function SidebarDemo({ children }: { children: ReactNode }) {
                                 label: fullName,
                                 href: `/profile/${username}`,
                                 icon: (
-                                    <Avatar src={avatar} className="!h-8 !w-8 flex-shrink-0 rounded-full" name={fullName} />
+                                    <Avatar src={avatar} width={10} height={10} className="!h-8 !w-8 flex-shrink-0 rounded-full" name={fullName} />
                                 ),
                             }}
                         />

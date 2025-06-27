@@ -4,7 +4,7 @@ import { Comment } from "../models/comment.model.js";
 const getPaginatedCommentsForVideo = async (req, res) => {
   const { videoId } = req.params;
   const { page = 1, limit = 10 } = req.query;
-  
+
   const aggregateQuery = Comment.aggregate([
     {
       $match: {
@@ -47,8 +47,8 @@ const getPaginatedCommentsForVideo = async (req, res) => {
             input: {
               $filter: {
                 input: "$allReplies",
-                cond: { $eq: ["$$this.parentComment", "$_id"] }
-              }
+                cond: { $eq: ["$$this.parentComment", "$_id"] },
+              },
             },
             as: "directReply",
             in: {
@@ -59,12 +59,12 @@ const getPaginatedCommentsForVideo = async (req, res) => {
                       {
                         $filter: {
                           input: "$replyOwners",
-                          cond: { $eq: ["$$this._id", "$$directReply.owner"] }
-                        }
+                          cond: { $eq: ["$$this._id", "$$directReply.owner"] },
+                        },
                       },
-                      0
-                    ]
-                  }
+                      0,
+                    ],
+                  },
                 },
                 in: {
                   id: "$$directReply._id",
@@ -73,10 +73,10 @@ const getPaginatedCommentsForVideo = async (req, res) => {
                   fullName: "$$replyOwner.fullName",
                   text: "$$directReply.content",
                   time: {
-                    $dateToString: { 
-                      format: "%Y-%m-%d %H:%M", 
-                      date: "$$directReply.createdAt" 
-                    }
+                    $dateToString: {
+                      format: "%Y-%m-%d %H:%M",
+                      date: "$$directReply.createdAt",
+                    },
                   },
                   parentComment: "$$directReply.parentComment",
                   replies: {
@@ -84,8 +84,10 @@ const getPaginatedCommentsForVideo = async (req, res) => {
                       input: {
                         $filter: {
                           input: "$allReplies",
-                          cond: { $eq: ["$$this.parentComment", "$$directReply._id"] }
-                        }
+                          cond: {
+                            $eq: ["$$this.parentComment", "$$directReply._id"],
+                          },
+                        },
                       },
                       as: "nestedReply",
                       in: {
@@ -96,12 +98,17 @@ const getPaginatedCommentsForVideo = async (req, res) => {
                                 {
                                   $filter: {
                                     input: "$replyOwners",
-                                    cond: { $eq: ["$$this._id", "$$nestedReply.owner"] }
-                                  }
+                                    cond: {
+                                      $eq: [
+                                        "$$this._id",
+                                        "$$nestedReply.owner",
+                                      ],
+                                    },
+                                  },
                                 },
-                                0
-                              ]
-                            }
+                                0,
+                              ],
+                            },
                           },
                           in: {
                             id: "$$nestedReply._id",
@@ -110,23 +117,23 @@ const getPaginatedCommentsForVideo = async (req, res) => {
                             fullName: "$$nestedReplyOwner.fullName",
                             text: "$$nestedReply.content",
                             time: {
-                              $dateToString: { 
-                                format: "%Y-%m-%d %H:%M", 
-                                date: "$$nestedReply.createdAt" 
-                              }
+                              $dateToString: {
+                                format: "%Y-%m-%d %H:%M",
+                                date: "$$nestedReply.createdAt",
+                              },
                             },
-                            parentComment: "$$nestedReply.parentComment"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                            parentComment: "$$nestedReply.parentComment",
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     {
       $project: {
@@ -157,7 +164,7 @@ const getPaginatedCommentsForVideo = async (req, res) => {
 
 const addComment = async (req, res) => {
   try {
-    const { content, videoId,  parentComment } = req.body;
+    const { content, videoId, parentComment } = req.body;
     const userId = req.user._id;
 
     if (!content || !videoId || !userId) {

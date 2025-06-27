@@ -326,11 +326,7 @@ export const myQuery = {
     isPublic: boolean,
     videoId: string
   ) => {
-    console.log({
-      playlistName,
-      isPublic,
-      videoId,
-    });
+   
     const response = await axiosInstance.post(
       "/playlist/create-playlist",
       { name: playlistName, isPublic, videoId },
@@ -487,11 +483,11 @@ export const myQuery = {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response);
+    
     return response.data;
   },
 
-  getTweetById: async (token: string, tweetId: string) => {
+  getTweetById: async (token: string, tweetId: string|undefined) => {
     const response = await axiosInstance.get(`/tweet/${tweetId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -509,5 +505,33 @@ export const myQuery = {
     return response.data;
   },
 
-  
+  bookMarkTweet: async (token: string, tweetId: string|undefined) => {
+    console.log(token)
+    const response = await axiosInstance.post(`/tweet/bookmark/${tweetId}`,{}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+
+  getBookMarkedTweets: async (token: string) => {
+    const response = await axiosInstance.get("/tweet/bookmarks", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+  getBookmarkStatus: async (token: string, tweetId: string|undefined) => {
+    const response = await axiosInstance.get(`/tweet/bookmark-status/${tweetId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
 };

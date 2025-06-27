@@ -527,7 +527,7 @@ const getHomeFeed = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page ) || 1;
   const limit = parseInt(req.query.limit ) || 20;
 
-  const videoChunk = 12;
+  const videoChunk = 8;
   const tweetChunk = 3;
 
   const rawVideos = await Video.find({ isPublished: true })

@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Flex,
@@ -8,23 +9,23 @@ import {
   Divider,
   useColorMode,
 } from "@chakra-ui/react";
-import {
-  IconHeart,
-  IconMessageCircle,
-  IconEye,
-  IconShare,
-  IconBookmark,
-} from "@tabler/icons-react";
+import { IconBookmark, IconBookmarkFilled } from "@tabler/icons-react";
 import Image from "next/image";
 import { formatPostTime } from "@/utils/relativeTime";
 import { useRouter } from "next/navigation";
+import Engagement from "./profile/tweets/Engagement";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { myQuery } from "@/api/query";
 
 interface TweetProps {
-  id?: string;
+  id?: string | undefined;
   author?: {
     name: string;
     username: string;
     avatar: string;
+    _id: string;
   };
   content?: string;
   timestamp?: string;
@@ -37,27 +38,55 @@ interface TweetProps {
 
 const Tweet: React.FC<TweetProps> = ({
   id,
-
-  author = {
-    name: "John Doe",
-    username: "johndoe",
-    avatar: "https://via.placeholder.com/40",
-  },
-  content = "This is a sample tweet content.",
-  timestamp = "2h ago",
-  likes = 0,
-  comments = 0,
-  views = 0,
+  author,
+  content,
+  timestamp,
+  likes,
+  comments,
+  views,
   image,
 }) => {
   const { colorMode } = useColorMode();
   const router = useRouter();
+  const token = useSelector((state: RootState) => state.token);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  const bookMarkMutation = useMutation({
+    mutationFn: () => myQuery.bookMarkTweet(token, id),
+    onSuccess: () => {
+      console.log("bookmarked");
+    },
+    onError: () => {
+      console.log("error");
+      setIsBookmarked(!isBookmarked);
+    },
+  });
+
+  const { data: bookmarkStatus } = useQuery({
+    queryKey: ["bookmarkStatus", id],
+    queryFn: () => myQuery.getBookmarkStatus(token, id),
+    enabled: !!id,
+  });
+
+  useEffect(() => {
+    if (bookmarkStatus) {
+      setIsBookmarked(bookmarkStatus.data.isBookmarked);
+    }
+  }, [bookmarkStatus]);
+
+  const handleBookMark = () => {
+    setIsBookmarked(!isBookmarked);
+    bookMarkMutation.mutate();
+  };
+
   return (
     <Box
       borderWidth="1px"
       borderRadius="lg"
       overflow="hidden"
-      p={4}
+      px={4}
+      pb={2}
+      pt={4}
       key={id}
       mb={2}
       w="100%"
@@ -70,7 +99,7 @@ const Tweet: React.FC<TweetProps> = ({
     >
       <Flex mb={3} justifyContent="space-between">
         <Flex>
-          <Avatar src={author.avatar} size="md" mr={3} />
+          <Avatar src={author?.avatar} size="md" mr={3} />
           <Box>
             <Flex alignItems="center">
               <Text
@@ -78,23 +107,30 @@ const Tweet: React.FC<TweetProps> = ({
                 mr={1}
                 color={colorMode == "light" ? "black" : "white"}
               >
-                {author.name}
+                {author?.name}
               </Text>
               <Text color="gray.500" fontSize="xs" ml={1}>
-                • {formatPostTime(timestamp)}
+                • {formatPostTime(timestamp || "")}
               </Text>
             </Flex>
             <Text color="gray.500" fontSize="xs">
-              @{author.username}
+              @{author?.username}
             </Text>
           </Box>
         </Flex>
         <IconButton
           aria-label="Comment"
-          icon={<IconBookmark size={18} />}
+          icon={
+            isBookmarked ? (
+              <IconBookmarkFilled size={18} fill="currentColor" />
+            ) : (
+              <IconBookmark size={18} />
+            )
+          }
           variant="ghost"
+          colorScheme="gray"
           size="sm"
-          _hover={{ color: "blue.500" }}
+          onClick={handleBookMark}
         />
       </Flex>
 
@@ -127,78 +163,21 @@ const Tweet: React.FC<TweetProps> = ({
             alt="Tweet Image"
             fill
             style={{ objectFit: "cover" }}
-            className="blur-lg"
+            // className="blur-xl"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
-
-          <Box className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-            <IconEye size={50} color="white" />
-          </Box>
         </Box>
       )}
 
-      <Divider my={2} />
+      <Divider my={0} />
 
-      <Flex justifyContent="space-between" mt="auto">
-        <Flex alignItems="center">
-          <IconButton
-            aria-label="Like"
-            icon={<IconHeart size={18} />}
-            variant="ghost"
-            size="sm"
-            _hover={{ color: "red.500" }}
-          />
-          <Text
-            fontSize="xs"
-            mr={1}
-            color={colorMode == "light" ? "black" : "white"}
-          >
-            {likes}
-          </Text>
-        </Flex>
-
-        <Flex alignItems="center">
-          <IconButton
-            aria-label="Comment"
-            icon={<IconEye size={18} />}
-            variant="ghost"
-            size="sm"
-            _hover={{ color: "blue.500" }}
-          />
-          <Text
-            fontSize="xs"
-            mr={1}
-            color={colorMode == "light" ? "black" : "white"}
-          >
-            {views}
-          </Text>
-        </Flex>
-
-        <Flex alignItems="center">
-          <IconButton
-            aria-label="Comment"
-            icon={<IconMessageCircle size={18} />}
-            variant="ghost"
-            size="sm"
-            _hover={{ color: "blue.500" }}
-          />
-          <Text
-            fontSize="xs"
-            mr={1}
-            color={colorMode == "light" ? "black" : "white"}
-          >
-            {comments}
-          </Text>
-        </Flex>
-
-        <IconButton
-          aria-label="Share"
-          icon={<IconShare size={18} />}
-          variant="ghost"
-          size="sm"
-          _hover={{ color: "blue.500" }}
-        />
-      </Flex>
+      <Engagement
+        _id={id || ""}
+        userId={author?._id || ""}
+        likes={likes || 0}
+        comments={comments || 0}
+        views={views || 0}
+      />
     </Box>
   );
 };

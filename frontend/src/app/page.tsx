@@ -35,7 +35,7 @@ type Video = {
 type Tweet = {
   createdAt: string | undefined;
   views: number | undefined;
-  _id: string;
+  _id: string|undefined;
   content: string;
   image?: string;
   owner: {
@@ -209,7 +209,7 @@ const Home: React.FC = () => {
       router.push("/login");
     }
   }
-  console.log("data", data);
+
   if (isError) {
     return <div>Error</div>;
   }
@@ -305,6 +305,7 @@ const Home: React.FC = () => {
                       name: tweet.owner.fullName,
                       username: tweet.owner.username,
                       avatar: tweet.owner.avatar,
+                      _id: tweet.owner._id,
                     }}
                     content={tweet.content}
                     timestamp={tweet.createdAt}

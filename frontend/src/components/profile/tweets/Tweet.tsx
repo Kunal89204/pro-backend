@@ -97,7 +97,7 @@ const Tweet = ({
             mr={1}
             color={colorMode == "light" ? "black" : "white"}
           >
-            123
+            12323
           </Text>
         </Flex>
 

@@ -12,6 +12,7 @@ import Myvideos from "@/components/profile/Myvideos";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 import EditProfile from "@/components/Modals/EditProfile";
 import Tweets from "@/components/profile/tweets/Tweets";
+import Bookmarks from "@/components/profile/bookmarks/Bookmarks";
 
 
 const Profile = () => {
@@ -238,7 +239,7 @@ const Profile = () => {
         <TabPanels>
           <TabPanel><Myvideos /></TabPanel>
           <TabPanel><Tweets /></TabPanel>
-          <TabPanel><p>Saved</p></TabPanel>
+          <TabPanel><Bookmarks /></TabPanel>
         </TabPanels>
       </Tabs>
 

@@ -66,6 +66,8 @@ if (isLoading) {
   );
 }
 
+console.log("data",data?.data)
+
   return (
     <div className="grid grid-cols-4 gap-2">
       {data?.data?.length === 0 ? (
@@ -100,7 +102,7 @@ if (isLoading) {
             content: string;
             image: string;
             createdAt: string;
-            likes: number;
+            likesCount: number;
             comments: number;
             views: number;
           };
@@ -117,7 +119,7 @@ if (isLoading) {
             content={item.tweet.content}
             image={item.tweet.image}
             timestamp={item.tweet.createdAt}
-            likes={item.tweet.likes}
+            likesCount={item.tweet.likesCount}
             comments={item.tweet.comments}
             views={item.tweet.views}
           />

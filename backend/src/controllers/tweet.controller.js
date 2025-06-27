@@ -104,7 +104,8 @@ const getBookmarkedTweets = asyncHandler(async (req, res) => {
   const bookmarks = await Bookmark.find({ bookmarkedBy: userId })
     .populate({
       path: "tweet",
-      select: "content image owner createdAt _id",
+      select:
+        "content image owner createdAt _id likesCount commentsCount viewsCount",
       populate: {
         path: "owner",
         select: "fullName username avatar _id",
@@ -120,27 +121,30 @@ const getBookmarkedTweets = asyncHandler(async (req, res) => {
 });
 
 const bookmarkStatus = asyncHandler(async (req, res) => {
-const userId = req?.user?._id;
-const tweetId = req?.params?.id;
-const bookmark = await Bookmark.findOne({ tweet: tweetId, bookmarkedBy: userId });
+  const userId = req?.user?._id;
+  const tweetId = req?.params?.id;
+  const bookmark = await Bookmark.findOne({
+    tweet: tweetId,
+    bookmarkedBy: userId,
+  });
 
-if(bookmark){
+  if (bookmark) {
+    return res.status(200).json({
+      success: true,
+      message: "Tweet bookmarked",
+      data: {
+        isBookmarked: true,
+      },
+    });
+  }
+
   return res.status(200).json({
     success: true,
-    message: "Tweet bookmarked",
+    message: "Tweet not bookmarked",
     data: {
-      isBookmarked: true,
+      isBookmarked: false,
     },
   });
-}
-
-return res.status(200).json({
-  success: true,
-  message: "Tweet not bookmarked",
-  data: {
-    isBookmarked: false,
-  },
-});
 });
 
 export {

@@ -3,7 +3,7 @@ import {
   Box,
   
   Flex,
-  IconButton,
+
   Text,
   useColorMode,
 } from "@chakra-ui/react";
@@ -11,9 +11,9 @@ import Image from "next/image";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { formatPostTime } from "@/utils/relativeTime";
 
-import { IconDotsVertical, IconEye, IconShare } from "@tabler/icons-react";
-import { IconHeart } from "@tabler/icons-react";
-import { IconMessageCircle } from "@tabler/icons-react";
+import { IconDotsVertical} from "@tabler/icons-react";
+
+import Engagement from "./Engagement";
 
 // Chakra Menu Imports
 import {
@@ -34,6 +34,8 @@ const Tweet = ({
     createdAt: string;
     content: string;
     image: string;
+    _id: string;
+   
   };
 }) => {
   const { colorMode } = useColorMode();
@@ -78,86 +80,7 @@ const Tweet = ({
           />
         </Box>
       )}
-      <Flex justifyContent="space-between" mt="1" className="w-full">
-        <Flex alignItems="center">
-          <IconButton
-            aria-label="Like"
-            icon={
-              <IconHeart
-                size={20}
-                color={colorMode == "light" ? "black" : "white"}
-              />
-            }
-            variant="ghost"
-            size="sm"
-            _hover={{ color: "red.500" }}
-          />
-          <Text
-            fontSize="xs"
-            mr={1}
-            color={colorMode == "light" ? "black" : "white"}
-          >
-            12323
-          </Text>
-        </Flex>
-
-        <Flex alignItems="center">
-          <IconButton
-            aria-label="Comment"
-            icon={
-              <IconEye
-                size={20}
-                color={colorMode == "light" ? "black" : "white"}
-              />
-            }
-            variant="ghost"
-            size="sm"
-            _hover={{ color: "blue.500" }}
-          />
-          <Text
-            fontSize="xs"
-            mr={1}
-            color={colorMode == "light" ? "black" : "white"}
-          >
-            {/* {data?.views} */}12
-          </Text>
-        </Flex>
-
-        <Flex alignItems="center">
-          <IconButton
-            aria-label="Comment"
-            icon={
-              <IconMessageCircle
-                size={20}
-                color={colorMode == "light" ? "black" : "white"}
-              />
-            }
-            variant="ghost"
-            size="sm"
-            _hover={{ color: "blue.500" }}
-          />
-          <Text
-            fontSize="xs"
-            mr={1}
-            color={colorMode == "light" ? "black" : "white"}
-          >
-            123
-          </Text>
-        </Flex>
-
-        <IconButton
-          aria-label="Share"
-          icon={
-            <IconShare
-              size={20}
-              color={colorMode == "light" ? "black" : "white"}
-            />
-          }
-          variant="ghost"
-          size="sm"
-          _hover={{ color: "blue.500" }}
-        />
-      </Flex>
+      <Engagement _id={tweet._id} likes={tweet.likesCount} comments={tweet.commentsCount} views={tweet.viewsCount} />
     </Box>
   );
 };

@@ -18,6 +18,8 @@ const TweetPage = () => {
     queryFn: () => myQuery.getTweetById(token, id as string),
   });
 
+
+
   return (
     <div className="w-full p-2 flex gap-2">
       <div className="w-3/5 ">

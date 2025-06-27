@@ -534,4 +534,21 @@ export const myQuery = {
     return response.data;
   },
 
+  toggleLikeTweet: async (token: string, tweetId: string|undefined) => {
+    const response = await axiosInstance.post(`/like/tweet/${tweetId}`,{}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+  likeStatus: async (token: string, tweetId: string|undefined) => {
+    const response = await axiosInstance.get(`/like/tweet/${tweetId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
 };

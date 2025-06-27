@@ -29,7 +29,7 @@ interface TweetProps {
   };
   content?: string;
   timestamp?: string;
-  likes?: number;
+  likesCount?: number|undefined;
 
   comments?: number;
   views?: number;
@@ -41,7 +41,7 @@ const Tweet: React.FC<TweetProps> = ({
   author,
   content,
   timestamp,
-  likes,
+  likesCount,
   comments,
   views,
   image,
@@ -173,8 +173,8 @@ const Tweet: React.FC<TweetProps> = ({
 
       <Engagement
         _id={id || ""}
-        userId={author?._id || ""}
-        likes={likes || 0}
+      
+        likes={likesCount }
         comments={comments || 0}
         views={views || 0}
       />

@@ -44,6 +44,7 @@ type Tweet = {
     username: string;
     avatar: string;
   };
+  likesCount: number;
 };
 
 const Home: React.FC = () => {
@@ -312,6 +313,7 @@ const Home: React.FC = () => {
                     views={tweet.views}
                     image={tweet.image}
                     id={tweet._id}
+                    likesCount={tweet?.likesCount}
                   />
                 ))}
               </div>

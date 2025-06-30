@@ -8,7 +8,8 @@ import {
     updateVideo,
     userVideos,
     onPageVideoRecommendation,
-    getVideoByIdForEmbed
+    getVideoByIdForEmbed,
+    suggestSearchQueries
 } from "../controllers/video.controller.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 import { upload } from "../middlewares/multer.middleware.js"
@@ -49,5 +50,7 @@ router.route("/toggle/publish/:videoId").patch(togglePublishStatus);
 router.route('/delete-video/:videoId').delete(deleteVideo);
 
 router.route("/recommendations/:videoId").get(onPageVideoRecommendation);
+
+router.route('/suggestions').get(suggestSearchQueries)
 
 export default router

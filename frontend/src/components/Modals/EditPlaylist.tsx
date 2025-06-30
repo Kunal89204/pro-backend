@@ -24,14 +24,12 @@ const EditPlaylist = ({
   isOpen,
   onClose,
   playlistId,
-  // colors,
   title,
   isPublic,
 }: {
   isOpen: boolean;
   onClose: () => void;
   playlistId: string;
-  // colors: string[];
   title: string;
   isPublic: boolean;
 }) => {

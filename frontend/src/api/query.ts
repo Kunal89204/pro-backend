@@ -51,6 +51,7 @@ interface VideoData {
 }
 
 export const myQuery = {
+  
   register: async (credentials: LoginCredentials) => {
     try {
       const response = await axiosInstance.post("/users/register", credentials);
@@ -515,7 +516,6 @@ export const myQuery = {
     return response.data;
   },
 
-
   getBookMarkedTweets: async (token: string) => {
     const response = await axiosInstance.get("/tweet/bookmarks", {
       headers: {
@@ -551,4 +551,14 @@ export const myQuery = {
     });
     return response.data;
   },
+
+  getSuggestions: async (token: string, query: string) => {
+    const response = await axiosInstance.get(`/video/suggestions?q=${query}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
 };

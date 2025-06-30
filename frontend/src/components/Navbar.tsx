@@ -1,9 +1,5 @@
 "use client";
-import {
-  IconMessage2Plus,
-  IconSearch,
-  IconVideo,
-} from "@tabler/icons-react";
+import { IconMessage2Plus, IconSearch, IconVideo } from "@tabler/icons-react";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import {
@@ -14,18 +10,25 @@ import {
   Input,
   InputGroup,
   InputRightAddon,
+  Text,
   useColorMode,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
 import { useThemeColors } from "@/hooks/useThemeColors";
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { myQuery } from "@/api/query";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
 
 const Navbar: React.FC = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const pathname = usePathname();
   const [showCreate, setShowCreate] = useState(false);
   const router = useRouter();
-
+  const [query, setQuery] = useState("");
+  const token = useSelector((state: RootState) => state.token);
   const { buttonBg, hoverBg, inputTextColor } = useThemeColors();
 
   if (
@@ -35,6 +38,26 @@ const Navbar: React.FC = () => {
   ) {
     return null;
   }
+
+  const {
+    data: suggestions,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["suggestions"],
+    queryFn: () => myQuery.getSuggestions(token, query),
+    // enabled: !!query,
+  });
+
+  console.log(suggestions?.suggestions);
+
+  const handleSearch = (value: string) => {
+    if (value.trim().split("").length == 0) {
+      setQuery("");
+    }
+    setQuery(value);
+    refetch();
+  };
 
   return (
     <Box
@@ -62,13 +85,16 @@ const Navbar: React.FC = () => {
         >
           <Input
             placeholder="Search..."
-            bg={colorMode == "light" ? "gray.200" : "rgba(10, 10, 10, 0.8)"}
+            bg={colorMode == "light" ? "gray.200" : "rgba(10, 10, 10, 1)"}
             color={inputTextColor}
             borderRadius="full"
             py={2}
             px={4}
             _focusVisible={{ outline: "none" }}
             _focus={{ outline: "none", borderColor: "primary.main" }}
+            onChange={(e) => {
+              handleSearch(e.target.value);
+            }}
           />
           <InputRightAddon borderRightRadius={"full"}>
             <IconButton
@@ -81,15 +107,26 @@ const Navbar: React.FC = () => {
             />
           </InputRightAddon>
 
-          {/* <Box className="absolute top-12 rounded left-0 w-full h-full flex items-center justify-start bg-[#424242] text-white">
-            <Flex gap={2} px={4} py={2}>
-
-              <Link href={'/'}>
-                <Text className="">All</Text>
-              </Link>
-            </Flex>
-            
-          </Box> */}
+          {suggestions?.suggestions?.length > 0 && (
+            <Box className="absolute top-12 rounded left-0 w-full p-4 flex items-center justify-start bg-[#424242] text-white">
+              <Flex className="flex-col gap-2">
+                {isLoading ? (
+                  <Text>Loading...</Text>
+                ) : (
+                  suggestions?.suggestions?.map((item: any, i: number) => (
+                    <Link
+                      onClick={() => setQuery("")}
+                      href={`/search?q=${item}`}
+                      key={i}
+                      className="hover:underline"
+                    >
+                      <Text>{item}</Text>
+                    </Link>
+                  ))
+                )}
+              </Flex>
+            </Box>
+          )}
         </InputGroup>
 
         {/* Color Mode Toggle & Create Button */}
@@ -117,7 +154,10 @@ const Navbar: React.FC = () => {
             </Button>
 
             {showCreate && (
-              <Box className="absolute top-[110%] right-0 flex flex-col gap-2  rounded-md p-2" bg={colorMode == "light" ? "gray.200" : "#222222"}>
+              <Box
+                className="absolute top-[110%] right-0 flex flex-col gap-2  rounded-md p-2"
+                bg={colorMode == "light" ? "gray.200" : "#222222"}
+              >
                 <Button
                   onClick={() => {
                     router.push("/create/video");

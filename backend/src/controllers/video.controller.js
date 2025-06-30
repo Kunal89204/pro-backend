@@ -470,6 +470,192 @@ const onPageVideoRecommendation = asyncHandler(async (req, res) => {
   });
 });
 
+const suggestSearchQueries = asyncHandler(async (req, res) => {
+  const { q = "" } = req.query;
+
+  // Validate and sanitize input
+  const query = q.trim();
+  if (!query || query.length < 2) {
+    return res.status(200).json({ suggestions: [] });
+  }
+
+  // Escape special regex characters and create case-insensitive pattern
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(escapedQuery, "i");
+
+  try {
+    const suggestions = await Video.aggregate([
+      {
+        $match: {
+          isPublished: true,
+          $or: [
+            { title: { $regex: regex } },
+            { 
+              tags: { 
+                $exists: true, 
+                $ne: null, 
+                $elemMatch: { $regex: regex } 
+              } 
+            },
+            { description: { $regex: regex } }, // Optional: search in description too
+          ],
+        },
+      },
+      {
+        $addFields: {
+          // Calculate relevance score for better sorting
+          relevanceScore: {
+            $add: [
+              // Higher score for title matches
+              {
+                $cond: [
+                  { 
+                    $and: [
+                      { $ne: ["$title", null] },
+                      { $regexMatch: { input: "$title", regex: escapedQuery, options: "i" } }
+                    ]
+                  },
+                  10,
+                  0
+                ]
+              },
+              // Medium score for exact tag matches
+              {
+                $cond: [
+                  {
+                    $and: [
+                      { $ne: ["$tags", null] },
+                      { $isArray: "$tags" },
+                      { $gt: [{ $size: "$tags" }, 0] },
+                      { 
+                        $in: [
+                          { $toLower: query }, 
+                          { 
+                            $map: { 
+                              input: { $ifNull: ["$tags", []] }, 
+                              as: "tag", 
+                              in: { $toLower: "$tag" } 
+                            } 
+                          }
+                        ] 
+                      }
+                    ]
+                  },
+                  8,
+                  0
+                ]
+              },
+              // Lower score for partial tag matches
+              {
+                $cond: [
+                  {
+                    $and: [
+                      { $ne: ["$tags", null] },
+                      { $isArray: "$tags" }
+                    ]
+                  },
+                  {
+                    $size: {
+                      $filter: {
+                        input: { $ifNull: ["$tags", []] },
+                        cond: { 
+                          $and: [
+                            { $ne: ["$this", null] },
+                            { $regexMatch: { input: "$this", regex: escapedQuery, options: "i" } }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  0
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        $sort: { relevanceScore: -1, createdAt: -1 }
+      },
+      {
+        $project: {
+          _id: 0,
+          title: 1,
+          tags: 1,
+          relevanceScore: 1,
+        },
+      },
+      { $limit: 20 }, // Get more results for better filtering
+    ]);
+
+    // Process and deduplicate suggestions
+    const processedSuggestions = new Map();
+    
+    suggestions.forEach(video => {
+      // Add title if it matches
+      if (video.title && regex.test(video.title)) {
+        const key = video.title.toLowerCase();
+        if (!processedSuggestions.has(key)) {
+          processedSuggestions.set(key, {
+            text: video.title,
+            type: 'title',
+            score: video.relevanceScore
+          });
+        }
+      }
+      
+      // Add matching tags
+      if (video.tags && Array.isArray(video.tags)) {
+        video.tags.forEach(tag => {
+          if (tag && regex.test(tag)) {
+            const key = tag.toLowerCase();
+            if (!processedSuggestions.has(key)) {
+              processedSuggestions.set(key, {
+                text: tag,
+                type: 'tag',
+                score: video.relevanceScore
+              });
+            }
+          }
+        });
+      }
+    });
+
+    // Sort by relevance and return top suggestions
+    const finalSuggestions = Array.from(processedSuggestions.values())
+      .sort((a, b) => {
+        // Prioritize exact matches
+        const aExact = a.text.toLowerCase() === query.toLowerCase();
+        const bExact = b.text.toLowerCase() === query.toLowerCase();
+        if (aExact && !bExact) return -1;
+        if (!aExact && bExact) return 1;
+        
+        // Then sort by score and type
+        if (a.score !== b.score) return b.score - a.score;
+        if (a.type === 'title' && b.type === 'tag') return -1;
+        if (a.type === 'tag' && b.type === 'title') return 1;
+        
+        return a.text.localeCompare(b.text);
+      })
+      .slice(0, 10)
+      .map(item => item.text);
+
+    res.status(200).json({
+      suggestions: finalSuggestions.reverse(),
+      query: query,
+      count: finalSuggestions.length
+    });
+
+  } catch (error) {
+    console.error('Search suggestion error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch search suggestions',
+      suggestions: []
+    });
+  }
+});
+
+
 export {
   getAllVideos,
   getVideoById,
@@ -480,4 +666,5 @@ export {
   userVideos,
   deleteVideo,
   onPageVideoRecommendation,
+  suggestSearchQueries,
 };

@@ -670,10 +670,10 @@ const searchResults = asyncHandler(async (req, res) => {
     ],
   }).populate({
     path: "owner",
-    select: "fullName _id avatar",
+    select: "fullName _id avatar username",
   }).select('-viewers -videoFile')
 
-  res.json({videos})
+  res.json({data:videos})
 });
 
 

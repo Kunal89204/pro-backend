@@ -1,11 +1,14 @@
-import React from 'react'
+import React from "react";
+import Image from "next/image";
+import { SearchResult } from "./Results";
 
-const Result = () => {
+const Result = ({ item }: { item: SearchResult }) => {
   return (
     <div>
-      i am 1 result
+      <Image src={item.thumbnail} alt={item.title} width={100} height={100} />
+      {item.title}
     </div>
-  )
-}
+  );
+};
 
-export default Result
+export default Result;

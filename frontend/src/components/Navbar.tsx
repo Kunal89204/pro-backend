@@ -36,17 +36,8 @@ const Navbar: React.FC = () => {
   const { buttonBg, hoverBg, inputTextColor } = useThemeColors();
   const debouncedQuery = useDebounce(query, 300);
 
-  if (
-    pathname === "/login" ||
-    pathname === "/register" ||
-    pathname.startsWith("/embed/video/")
-  ) {
-    return null;
-  }
-
   const {
     data: suggestions,
-    isLoading,
     isFetching,
   } = useQuery({
     queryKey: ["suggestions", debouncedQuery],
@@ -67,6 +58,14 @@ const Navbar: React.FC = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  if (
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname.startsWith("/embed/video/")
+  ) {
+    return null;
+  }
 
   const handleSearch = (value: string) => {
     setQuery(value);

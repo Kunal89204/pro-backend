@@ -561,4 +561,13 @@ export const myQuery = {
     return response.data;
   },
 
+  getSearchResults: async (token: string, query: string|null) => {
+    const response = await axiosInstance.get(`/video/search?q=${query}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
 };

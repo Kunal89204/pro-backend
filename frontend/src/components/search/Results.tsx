@@ -1,14 +1,33 @@
-import React from 'react'
-import Result from './Result'
+import React from "react";
+import Result from "./Result";
 
-const Results = () => {
-  return (
-    <div>
-      {Array.from({ length: 10 }).map((_, index) => (
-        <Result key={index} />
-      ))}
-    </div>
-  )
+export interface SearchResult {
+  _id: string;
+  title: string;
+  thumbnail: string;
+  duration: string | number;
+  views: number;
+  owner: {
+    _id: string;
+    fullName: string;
+    username: string;
+    avatar: string;
+  };
+  description: string;
 }
 
-export default Results
+const Results = ({ results, isLoading }: { results: SearchResult[], isLoading: boolean }) => {
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  return (
+    <div>
+      {results?.map((item: SearchResult, index: number) => (
+        <Result key={index} item={item} />
+      ))}
+     
+    </div>
+  );
+};
+
+export default Results;

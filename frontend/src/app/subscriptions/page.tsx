@@ -6,12 +6,12 @@ import {
   Text,
   Flex,
   Heading,
-  Spinner,
+
   Grid,
   useColorModeValue,
   Container,
   Badge,
-  IconButton,
+
   VStack,
   HStack,
   Skeleton,
@@ -206,7 +206,7 @@ const Subscriptions = () => {
                 cursor="pointer"
                 _hover={{ 
                   transform: "translateY(-4px)",
-                  shadow: useColorModeValue("lg", "dark-lg"),
+                  // shadow: useColorModeValue("lg", "dark-lg"),
                   borderColor: accentColor,
                 }}
                 _active={{
@@ -233,7 +233,7 @@ const Subscriptions = () => {
                       src={sub.channel.avatar}
                       size="lg"
                       ring={2}
-                      ringColor={useColorModeValue("gray.200", "gray.600")}
+                      // ringColor={useColorModeValue("gray.200", "gray.600")}
                       transition="all 0.2s"
                       _hover={{
                         ringColor: accentColor,

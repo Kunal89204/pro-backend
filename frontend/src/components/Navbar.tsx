@@ -1,7 +1,7 @@
 "use client";
 import { IconMessage2Plus, IconSearch, IconVideo } from "@tabler/icons-react";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -12,6 +12,7 @@ import {
   InputRightAddon,
   Text,
   useColorMode,
+  Spinner,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
@@ -21,6 +22,7 @@ import { useQuery } from "@tanstack/react-query";
 import { myQuery } from "@/api/query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const Navbar: React.FC = () => {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -28,8 +30,11 @@ const Navbar: React.FC = () => {
   const [showCreate, setShowCreate] = useState(false);
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
   const token = useSelector((state: RootState) => state.token);
   const { buttonBg, hoverBg, inputTextColor } = useThemeColors();
+  const debouncedQuery = useDebounce(query, 300);
 
   if (
     pathname === "/login" ||
@@ -42,22 +47,42 @@ const Navbar: React.FC = () => {
   const {
     data: suggestions,
     isLoading,
-    refetch,
+    isFetching,
   } = useQuery({
-    queryKey: ["suggestions"],
-    queryFn: () => myQuery.getSuggestions(token, query),
-    // enabled: !!query,
+    queryKey: ["suggestions", debouncedQuery],
+    queryFn: () => myQuery.getSuggestions(token, debouncedQuery),
+    enabled: debouncedQuery.trim().length > 0,
+    staleTime: 60000, // 1 minute
   });
 
-  console.log(suggestions?.suggestions);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchFocused(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleSearch = (value: string) => {
-    if (value.trim().split("").length == 0) {
-      setQuery("");
-    }
     setQuery(value);
-    refetch();
   };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) {
+      router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+      setIsSearchFocused(false);
+    }
+  };
+
+  const showSuggestions = isSearchFocused && 
+    debouncedQuery.trim().length > 0 && 
+    (isFetching || suggestions?.suggestions?.length > 0);
 
   return (
     <Box
@@ -65,7 +90,6 @@ const Navbar: React.FC = () => {
       position="sticky"
       top={0}
       zIndex={10}
-      // bg={pathname.startsWith("/playlists/") ? "transparent" : "#121212"}
       bg={"transparent"}
       backdropFilter="blur(10px)"
       px={4}
@@ -82,6 +106,9 @@ const Navbar: React.FC = () => {
           border="0px solid"
           borderColor={"rgba(255, 255, 255, 0.1)"}
           className="relative"
+          ref={searchRef}
+          as="form"
+          onSubmit={handleSearchSubmit}
         >
           <Input
             placeholder="Search..."
@@ -90,11 +117,13 @@ const Navbar: React.FC = () => {
             borderRadius="full"
             py={2}
             px={4}
+            value={query}
             _focusVisible={{ outline: "none" }}
             _focus={{ outline: "none", borderColor: "primary.main" }}
             onChange={(e) => {
               handleSearch(e.target.value);
             }}
+            onFocus={() => setIsSearchFocused(true)}
           />
           <InputRightAddon borderRightRadius={"full"}>
             <IconButton
@@ -104,25 +133,41 @@ const Navbar: React.FC = () => {
               borderRadius="full"
               _hover={"none"}
               _focus={"none"}
+              type="submit"
             />
           </InputRightAddon>
 
-          {suggestions?.suggestions?.length > 0 && (
-            <Box className="absolute top-12 rounded left-0 w-full p-4 flex items-center justify-start bg-[#424242] text-white">
-              <Flex className="flex-col gap-2">
-                {isLoading ? (
-                  <Text>Loading...</Text>
-                ) : (
-                  suggestions?.suggestions?.map((item: any, i: number) => (
+          {showSuggestions && (
+            <Box 
+              className="absolute top-12 rounded left-0 w-full p-4 flex items-center justify-start bg-[#424242] text-white"
+              boxShadow="md"
+              animation="fadeIn 0.2s ease-in-out"
+            >
+              <Flex className="flex-col gap-2 w-full">
+                {isFetching ? (
+                  <Flex justify="center" align="center" py={2}>
+                    <Spinner size="sm" mr={2} />
+                    <Text>Searching...</Text>
+                  </Flex>
+                ) : suggestions?.suggestions?.length > 0 ? (
+                  suggestions.suggestions.map((item: string, i: number) => (
                     <Link
-                      onClick={() => setQuery("")}
-                      href={`/search?q=${item}`}
+                      onClick={() => {
+                        setQuery(item);
+                        setIsSearchFocused(false);
+                      }}
+                      href={`/search?q=${encodeURIComponent(item)}`}
                       key={i}
-                      className="hover:underline"
+                      className="hover:bg-[#525252] p-2 rounded transition-colors"
                     >
-                      <Text>{item}</Text>
+                      <Flex align="center">
+                        <IconSearch size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
+                        <Text>{item}</Text>
+                      </Flex>
                     </Link>
                   ))
+                ) : (
+                  <Text py={2} opacity={0.7}>No suggestions found</Text>
                 )}
               </Flex>
             </Box>

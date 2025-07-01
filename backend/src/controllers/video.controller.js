@@ -655,6 +655,27 @@ const suggestSearchQueries = asyncHandler(async (req, res) => {
   }
 });
 
+const searchResults = asyncHandler(async (req, res) => {
+  const { q = "" } = req.query;
+  const query = q.trim();
+  if (!query || query.length < 2) {
+    return res.status(200).json({ suggestions: [] });
+  }
+
+  const videos = await Video.find({
+    $or: [
+      { title: { $regex: query, $options: "i" } },
+      { description: { $regex: query, $options: "i" } },
+      { tags: { $regex: query, $options: "i" } },
+    ],
+  }).populate({
+    path: "owner",
+    select: "fullName _id avatar",
+  }).select('-viewers -videoFile')
+
+  res.json({videos})
+});
+
 
 export {
   getAllVideos,
@@ -667,4 +688,5 @@ export {
   deleteVideo,
   onPageVideoRecommendation,
   suggestSearchQueries,
+  searchResults
 };

@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { useSearchParams } from "next/navigation";
-import { Text } from "@chakra-ui/react";
 import Results from "@/components/search/Results";
 import { useQuery } from "@tanstack/react-query";
 import { myQuery } from "@/api/query";
@@ -23,7 +22,7 @@ const Search = () => {
 
   return (
     <div>
-      <Text>{query} search page</Text>
+     
       <Results results={searchResults?.data} isLoading={isLoading} />
     </div>
   );

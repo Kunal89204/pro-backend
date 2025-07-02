@@ -14,6 +14,7 @@ export interface SearchResult {
     avatar: string;
   };
   description: string;
+  createdAt: string;
 }
 
 const Results = ({ results, isLoading }: { results: SearchResult[], isLoading: boolean }) => {

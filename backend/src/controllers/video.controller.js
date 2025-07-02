@@ -101,7 +101,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
 const publishAVideo = asyncHandler(async (req, res) => {
   const { title, description, publish } = req.body;
 
-  if (!title ) {
+  if (!title) {
     throw new ApiError(400, "Title and description are required");
   }
 
@@ -480,7 +480,7 @@ const suggestSearchQueries = asyncHandler(async (req, res) => {
   }
 
   // Escape special regex characters and create case-insensitive pattern
-  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const regex = new RegExp(escapedQuery, "i");
 
   try {
@@ -490,12 +490,12 @@ const suggestSearchQueries = asyncHandler(async (req, res) => {
           isPublished: true,
           $or: [
             { title: { $regex: regex } },
-            { 
-              tags: { 
-                $exists: true, 
-                $ne: null, 
-                $elemMatch: { $regex: regex } 
-              } 
+            {
+              tags: {
+                $exists: true,
+                $ne: null,
+                $elemMatch: { $regex: regex },
+              },
             },
             { description: { $regex: regex } }, // Optional: search in description too
           ],
@@ -509,15 +509,21 @@ const suggestSearchQueries = asyncHandler(async (req, res) => {
               // Higher score for title matches
               {
                 $cond: [
-                  { 
+                  {
                     $and: [
                       { $ne: ["$title", null] },
-                      { $regexMatch: { input: "$title", regex: escapedQuery, options: "i" } }
-                    ]
+                      {
+                        $regexMatch: {
+                          input: "$title",
+                          regex: escapedQuery,
+                          options: "i",
+                        },
+                      },
+                    ],
                   },
                   10,
-                  0
-                ]
+                  0,
+                ],
               },
               // Medium score for exact tag matches
               {
@@ -527,55 +533,58 @@ const suggestSearchQueries = asyncHandler(async (req, res) => {
                       { $ne: ["$tags", null] },
                       { $isArray: "$tags" },
                       { $gt: [{ $size: "$tags" }, 0] },
-                      { 
+                      {
                         $in: [
-                          { $toLower: query }, 
-                          { 
-                            $map: { 
-                              input: { $ifNull: ["$tags", []] }, 
-                              as: "tag", 
-                              in: { $toLower: "$tag" } 
-                            } 
-                          }
-                        ] 
-                      }
-                    ]
+                          { $toLower: query },
+                          {
+                            $map: {
+                              input: { $ifNull: ["$tags", []] },
+                              as: "tag",
+                              in: { $toLower: "$tag" },
+                            },
+                          },
+                        ],
+                      },
+                    ],
                   },
                   8,
-                  0
-                ]
+                  0,
+                ],
               },
               // Lower score for partial tag matches
               {
                 $cond: [
                   {
-                    $and: [
-                      { $ne: ["$tags", null] },
-                      { $isArray: "$tags" }
-                    ]
+                    $and: [{ $ne: ["$tags", null] }, { $isArray: "$tags" }],
                   },
                   {
                     $size: {
                       $filter: {
                         input: { $ifNull: ["$tags", []] },
-                        cond: { 
+                        cond: {
                           $and: [
                             { $ne: ["$this", null] },
-                            { $regexMatch: { input: "$this", regex: escapedQuery, options: "i" } }
-                          ]
-                        }
-                      }
-                    }
+                            {
+                              $regexMatch: {
+                                input: "$this",
+                                regex: escapedQuery,
+                                options: "i",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    },
                   },
-                  0
-                ]
-              }
-            ]
-          }
-        }
+                  0,
+                ],
+              },
+            ],
+          },
+        },
       },
       {
-        $sort: { relevanceScore: -1, createdAt: -1 }
+        $sort: { relevanceScore: -1, createdAt: -1 },
       },
       {
         $project: {
@@ -590,30 +599,30 @@ const suggestSearchQueries = asyncHandler(async (req, res) => {
 
     // Process and deduplicate suggestions
     const processedSuggestions = new Map();
-    
-    suggestions.forEach(video => {
+
+    suggestions.forEach((video) => {
       // Add title if it matches
       if (video.title && regex.test(video.title)) {
         const key = video.title.toLowerCase();
         if (!processedSuggestions.has(key)) {
           processedSuggestions.set(key, {
             text: video.title,
-            type: 'title',
-            score: video.relevanceScore
+            type: "title",
+            score: video.relevanceScore,
           });
         }
       }
-      
+
       // Add matching tags
       if (video.tags && Array.isArray(video.tags)) {
-        video.tags.forEach(tag => {
+        video.tags.forEach((tag) => {
           if (tag && regex.test(tag)) {
             const key = tag.toLowerCase();
             if (!processedSuggestions.has(key)) {
               processedSuggestions.set(key, {
                 text: tag,
-                type: 'tag',
-                score: video.relevanceScore
+                type: "tag",
+                score: video.relevanceScore,
               });
             }
           }
@@ -629,28 +638,27 @@ const suggestSearchQueries = asyncHandler(async (req, res) => {
         const bExact = b.text.toLowerCase() === query.toLowerCase();
         if (aExact && !bExact) return -1;
         if (!aExact && bExact) return 1;
-        
+
         // Then sort by score and type
         if (a.score !== b.score) return b.score - a.score;
-        if (a.type === 'title' && b.type === 'tag') return -1;
-        if (a.type === 'tag' && b.type === 'title') return 1;
-        
+        if (a.type === "title" && b.type === "tag") return -1;
+        if (a.type === "tag" && b.type === "title") return 1;
+
         return a.text.localeCompare(b.text);
       })
       .slice(0, 10)
-      .map(item => item.text);
+      .map((item) => item.text);
 
     res.status(200).json({
       suggestions: finalSuggestions.reverse(),
       query: query,
-      count: finalSuggestions.length
+      count: finalSuggestions.length,
     });
-
   } catch (error) {
-    console.error('Search suggestion error:', error);
+    console.error("Search suggestion error:", error);
     res.status(500).json({
-      error: 'Failed to fetch search suggestions',
-      suggestions: []
+      error: "Failed to fetch search suggestions",
+      suggestions: [],
     });
   }
 });
@@ -658,22 +666,32 @@ const suggestSearchQueries = asyncHandler(async (req, res) => {
 const searchResults = asyncHandler(async (req, res) => {
   const { q = "" } = req.query;
   const query = q.trim();
+
   if (!query || query.length < 2) {
     return res.status(200).json({ suggestions: [] });
   }
 
+  // Escape regex function
+  function escapeRegex(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  const escapedQuery = escapeRegex(query);
+
   const videos = await Video.find({
     $or: [
-      { title: { $regex: query, $options: "i" } },
-      { description: { $regex: query, $options: "i" } },
-      { tags: { $regex: query, $options: "i" } },
+      { title: { $regex: escapedQuery, $options: "i" } },
+      { description: { $regex: escapedQuery, $options: "i" } },
+      { tags: { $regex: escapedQuery, $options: "i" } },
     ],
-  }).populate({
-    path: "owner",
-    select: "fullName _id avatar username",
-  }).select('-viewers -videoFile')
+  })
+    .populate({
+      path: "owner",
+      select: "fullName _id avatar username",
+    })
+    .select("-viewers -videoFile");
 
-  res.json({data:videos})
+  res.status(200).json({ data: videos });
 });
 
 
@@ -688,5 +706,5 @@ export {
   deleteVideo,
   onPageVideoRecommendation,
   suggestSearchQueries,
-  searchResults
+  searchResults,
 };

@@ -51,7 +51,6 @@ interface VideoData {
 }
 
 export const myQuery = {
-  
   register: async (credentials: LoginCredentials) => {
     try {
       const response = await axiosInstance.post("/users/register", credentials);
@@ -327,7 +326,6 @@ export const myQuery = {
     isPublic: boolean,
     videoId: string
   ) => {
-   
     const response = await axiosInstance.post(
       "/playlist/create-playlist",
       { name: playlistName, isPublic, videoId },
@@ -484,11 +482,11 @@ export const myQuery = {
         Authorization: `Bearer ${token}`,
       },
     });
-    
+
     return response.data;
   },
 
-  getTweetById: async (token: string, tweetId: string|undefined) => {
+  getTweetById: async (token: string, tweetId: string | undefined) => {
     const response = await axiosInstance.get(`/tweet/${tweetId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -506,13 +504,17 @@ export const myQuery = {
     return response.data;
   },
 
-  bookMarkTweet: async (token: string, tweetId: string|undefined) => {
-    console.log(token)
-    const response = await axiosInstance.post(`/tweet/bookmark/${tweetId}`,{}, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  bookMarkTweet: async (token: string, tweetId: string | undefined) => {
+    console.log(token);
+    const response = await axiosInstance.post(
+      `/tweet/bookmark/${tweetId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   },
 
@@ -525,25 +527,32 @@ export const myQuery = {
     return response.data;
   },
 
-  getBookmarkStatus: async (token: string, tweetId: string|undefined) => {
-    const response = await axiosInstance.get(`/tweet/bookmark-status/${tweetId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  getBookmarkStatus: async (token: string, tweetId: string | undefined) => {
+    const response = await axiosInstance.get(
+      `/tweet/bookmark-status/${tweetId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   },
 
-  toggleLikeTweet: async (token: string, tweetId: string|undefined) => {
-    const response = await axiosInstance.post(`/like/tweet/${tweetId}`,{}, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  toggleLikeTweet: async (token: string, tweetId: string | undefined) => {
+    const response = await axiosInstance.post(
+      `/like/tweet/${tweetId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   },
 
-  likeStatus: async (token: string, tweetId: string|undefined) => {
+  likeStatus: async (token: string, tweetId: string | undefined) => {
     const response = await axiosInstance.get(`/like/tweet/${tweetId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -561,7 +570,7 @@ export const myQuery = {
     return response.data;
   },
 
-  getSearchResults: async (token: string, query: string|null) => {
+  getSearchResults: async (token: string, query: string | null) => {
     const response = await axiosInstance.get(`/video/search?q=${query}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -569,5 +578,4 @@ export const myQuery = {
     });
     return response.data;
   },
-
 };

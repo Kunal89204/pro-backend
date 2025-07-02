@@ -161,7 +161,7 @@ const Navbar: React.FC = () => {
                     >
                       <Flex align="center">
                         <IconSearch size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
-                        <Text>{item}</Text>
+                        <Text noOfLines={1}>{item}</Text>
                       </Flex>
                     </Link>
                   ))

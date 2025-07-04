@@ -30,7 +30,6 @@ interface TweetProps {
   content?: string;
   timestamp?: string;
   likesCount?: number|undefined;
-
   comments?: number;
   views?: number;
   image?: string;
@@ -77,6 +76,17 @@ const Tweet: React.FC<TweetProps> = ({
   const handleBookMark = () => {
     setIsBookmarked(!isBookmarked);
     bookMarkMutation.mutate();
+  };
+
+  // Markdown processing function
+  const processMarkdown = (text: string) => {
+    if (!text) return "";
+    
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+      .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
+      .replace(/`(.*?)`/g, `<code style="background: ${colorMode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}; padding: 2px 4px; border-radius: 4px; font-family: monospace;">$1</code>`) // Code
+      .replace(/\n/g, '<br>'); // Line breaks
   };
 
   return (
@@ -134,7 +144,7 @@ const Tweet: React.FC<TweetProps> = ({
         />
       </Flex>
 
-      <Text
+      <Box
         onClick={() => {
           router.push(`/tweet/${id}`);
         }}
@@ -142,9 +152,26 @@ const Tweet: React.FC<TweetProps> = ({
         mb={3}
         color={colorMode == "light" ? "black" : "white"}
         className="line-clamp-1"
-      >
-        {content}
-      </Text>
+        dangerouslySetInnerHTML={{
+          __html: processMarkdown(content || "")
+        }}
+        sx={{
+          // Custom styles for markdown elements
+          'strong': {
+            fontWeight: 'bold',
+          },
+          'em': {
+            fontStyle: 'italic',
+          },
+          'code': {
+            fontSize: '0.9em',
+          },
+          // Ensure line breaks are preserved
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+        }}
+      />
+      
       {image && (
         <Box
           position="relative"
@@ -163,7 +190,6 @@ const Tweet: React.FC<TweetProps> = ({
             alt="Tweet Image"
             fill
             style={{ objectFit: "cover" }}
-            // className="blur-xl"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </Box>
@@ -173,7 +199,6 @@ const Tweet: React.FC<TweetProps> = ({
 
       <Engagement
         _id={id || ""}
-      
         likes={likesCount }
         comments={comments || 0}
         views={views || 0}

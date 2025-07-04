@@ -29,6 +29,7 @@ const TweetUpload = () => {
   const [previewUrl, setPreviewUrl] = useState<string>("");
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const toast = useToast();
   const token = useSelector((state: RootState) => state.token);
   const { colorMode } = useColorMode();
@@ -114,7 +115,27 @@ const TweetUpload = () => {
     }
 
     createTweetMutation.mutate(formData);
-  
+  };
+
+  // Handle keyboard events for proper line breaks
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      // Regular Enter - submit tweet
+      e.preventDefault();
+      handleTweet();
+    } else if (e.key === 'Enter' && e.shiftKey) {
+      // Shift+Enter - add line break (default behavior)
+      // Let the default behavior handle this
+    }
+  };
+
+  // Basic markdown processing for display
+  const processMarkdown = (text: string) => {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+      .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
+      .replace(/`(.*?)`/g, '<code style="background: rgba(255,255,255,0.1); padding: 2px 4px; border-radius: 4px;">$1</code>') // Code
+      .replace(/\n/g, '<br>'); // Line breaks
   };
 
   const getProgressColor = () => {
@@ -131,13 +152,9 @@ const TweetUpload = () => {
       margin={"auto"}
       backdropFilter="blur(20px)"
       borderRadius="2xl"
-      //   border="1px solid rgba(255, 255, 255, 0.1)"
-      //   boxShadow="0 25px 50px -12px rgba(0, 0, 0, 0.5)"
       position="relative"
       overflow="hidden"
     >
-      {/* Gradient background overlay */}
-
       <VStack spacing={6} align="stretch">
         {/* Header */}
         <Flex justify="space-between" align="center">
@@ -145,8 +162,6 @@ const TweetUpload = () => {
             fontSize="2xl"
             fontWeight="bold"
             color={colorMode === "dark" ? "white" : "gray.700"}
-            // bgGradient="linear(135deg, #1DA1F2, #8A2BE2)"
-            // bgClip="text"
           >
             Compose Tweet
           </Text>
@@ -203,9 +218,11 @@ const TweetUpload = () => {
           {/* Text input area */}
           <Box flex={1}>
             <Textarea
+              ref={textareaRef}
               value={tweetText}
               onChange={(e) => setTweetText(e.target.value)}
-              placeholder="What's happening?"
+              onKeyDown={handleKeyDown}
+              placeholder="What's happening? (Use **bold**, *italic*, `code`, or Shift+Enter for line breaks)"
               bg="rgba(255, 255, 255, 0.1)"
               border={
                 colorMode === "dark"
@@ -220,7 +237,6 @@ const TweetUpload = () => {
               color={colorMode === "dark" ? "white" : "black"}
               _hover={{
                 bg: "rgba(255, 255, 255, 0.08)",
-                // borderColor: "rgba(29, 161, 242, 0.5)"
               }}
               _focus={{
                 bg: "rgba(255, 255, 255, 0.08)",
@@ -230,19 +246,37 @@ const TweetUpload = () => {
               _placeholder={{
                 color: "gray.400",
               }}
-              //   transition="all 0.3s ease"
               overflow={"hidden"}
+              whiteSpace="pre-wrap"
             />
           </Box>
         </HStack>
 
+        {/* Preview area for formatted text */}
+        {tweetText && (
+          <Box ml="60px">
+            <Text fontSize="sm" color="gray.500" mb={2}>
+              Preview:
+            </Text>
+            <Box
+              bg="rgba(255, 255, 255, 0.05)"
+              border="1px solid rgba(255, 255, 255, 0.1)"
+              borderRadius="lg"
+              p={4}
+              fontSize="md"
+              color={colorMode === "dark" ? "white" : "black"}
+              dangerouslySetInnerHTML={{
+                __html: processMarkdown(tweetText)
+              }}
+            />
+          </Box>
+        )}
+
         {/* Image preview */}
         <Collapse in={!!previewUrl} animateOpacity>
           <Box
-            // bg="rgba(255, 255, 255, 0.05)"
             borderRadius="xl"
             p={4}
-            // border="1px solid rgba(255, 255, 255, 0.1)"
           >
             <ScaleFade in={!!previewUrl} initialScale={0.8}>
               <Box
@@ -277,6 +311,13 @@ const TweetUpload = () => {
           </Box>
         </Collapse>
 
+        {/* Markdown help text */}
+        <Box ml="60px">
+          <Text fontSize="xs" color="gray.500">
+            Markdown tips: **bold**, *italic*, `code` • Shift+Enter for line breaks • Enter to post
+          </Text>
+        </Box>
+
         {/* Action buttons */}
         <Flex justify="space-between" align="center">
           {/* Media options */}
@@ -309,7 +350,6 @@ const TweetUpload = () => {
             fontSize="md"
             _hover={{
               transform: "translateY(-1px)",
-              //   boxShadow: "0 10px 25px rgba(29, 161, 242, 0.2)"
             }}
             _active={{
               transform: "translateY(0px)",

@@ -2,9 +2,8 @@ import {
   Box,
   Divider,
   Flex,
-
   Text,
-
+  useColorMode,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import React from "react";
@@ -30,6 +29,18 @@ const Tweet = ({
 }) => {
   
   const { textColor, secondaryTextColor } = useThemeColors();
+  const { colorMode } = useColorMode();
+
+  // Markdown processing function
+  const processMarkdown = (text: string) => {
+    if (!text) return "";
+    
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+      .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
+      .replace(/`(.*?)`/g, `<code style="background: ${colorMode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}; padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 0.9em;">$1</code>`) // Code
+      .replace(/\n/g, '<br>'); // Line breaks
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -67,9 +78,28 @@ const Tweet = ({
         </Flex>
       </div>
 
-      <Text className=" my-3" color={textColor}>
-        {data?.content}
-      </Text>
+      <Box
+        className="my-3"
+        color={textColor}
+        dangerouslySetInnerHTML={{
+          __html: processMarkdown(data?.content || "")
+        }}
+        sx={{
+          // Custom styles for markdown elements
+          'strong': {
+            fontWeight: 'bold',
+          },
+          'em': {
+            fontStyle: 'italic',
+          },
+          'code': {
+            fontSize: '0.9em',
+          },
+          // Ensure line breaks are preserved
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+        }}
+      />
 
       {data?.image && (
         <Box className="w-full min-h-[400px] max-h-[600px] overflow-hidden flex justify-center items-center relative rounded-lg">

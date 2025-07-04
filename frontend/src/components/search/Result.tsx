@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { SearchResult } from "./Results";
-import { Box, Flex, Text, Avatar, HStack, VStack } from "@chakra-ui/react";
+import { Box, Flex, Text, Avatar, HStack, VStack, useColorModeValue } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 
 const Result = ({ item }: { item: SearchResult }) => {
@@ -28,7 +28,7 @@ const Result = ({ item }: { item: SearchResult }) => {
     <Box
       p={4}
       borderRadius="lg"
-      bg="white"
+      bg={useColorModeValue("white", "gray.800")}
       boxShadow="sm"
      
       transition="all 0.2s"
@@ -73,7 +73,7 @@ const Result = ({ item }: { item: SearchResult }) => {
             fontWeight="semibold"
             lineHeight="short"
             noOfLines={2}
-            color="gray.800"
+            color={useColorModeValue("gray.800", "white")}
             onClick={() => {
               router.push(`/watch/${item._id}`);
             }}
@@ -82,16 +82,16 @@ const Result = ({ item }: { item: SearchResult }) => {
             {item.title}
           </Text>
 
-          <Flex alignItems="center" gap={2}><Text fontSize="sm" color="gray.600">
+          <Flex alignItems="center" gap={2}><Text fontSize="sm" color={useColorModeValue("gray.600", "white")}>
             {formatViews(item.views)} views
           </Text>
-          <Box className="w-1 h-1 rounded-full bg-gray-600"></Box>
-          <Text fontSize="sm" color="gray.600">
+          <Box className="w-1 h-1 rounded-full bg-gray-600" bg={useColorModeValue("gray.600", "white")}></Box>
+          <Text fontSize="sm" color={useColorModeValue("gray.600", "white")}>
             {new Date(item.createdAt).toLocaleDateString()}
           </Text>
           </Flex>
 
-          <Text fontSize="sm" color="gray.600" noOfLines={2} lineHeight="base">
+          <Text fontSize="sm" color={useColorModeValue("gray.600", "white")} noOfLines={2} lineHeight="base">
             {item.description}
           </Text>
 
@@ -102,7 +102,7 @@ const Result = ({ item }: { item: SearchResult }) => {
               name={item.owner.fullName}
             />
             <VStack align="start" spacing={0}>
-              <Text fontSize="sm" fontWeight="medium" color="gray.700">
+              <Text fontSize="sm" fontWeight="medium" color={useColorModeValue("gray.700", "white")}>
                 {item.owner.fullName}
               </Text>
              

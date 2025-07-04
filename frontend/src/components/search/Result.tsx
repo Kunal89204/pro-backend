@@ -28,7 +28,7 @@ const Result = ({ item }: { item: SearchResult }) => {
     <Box
       p={4}
       borderRadius="lg"
-      bg={useColorModeValue("white", "gray.800")}
+      bg={useColorModeValue("white", "#121212")}
       boxShadow="sm"
      
       transition="all 0.2s"

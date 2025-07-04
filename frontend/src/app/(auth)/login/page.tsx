@@ -13,6 +13,7 @@ import {
   useToast,
   Container,
   useBreakpointValue,
+  useColorModeValue,
 } from '@chakra-ui/react'
 import { myQuery } from '../../../api/query'
 import { useDispatch } from 'react-redux'
@@ -38,6 +39,7 @@ interface User {
   createdAt: string
   updatedAt: string
   wathcedVideos: string[]
+  bio: string
   __v: number
 }
 
@@ -73,7 +75,7 @@ const Login: React.FC = () => {
   const [username, setUsername] = React.useState('')
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
-  const { textColor, secondaryTextColor, inputBg, inputTextColor, borderColor } = useThemeColors()
+  const { textColor, secondaryTextColor, inputBg, inputTextColor} = useThemeColors()
 
   // Responsive values
   const showImage = useBreakpointValue({ base: false, md: true })
@@ -152,7 +154,7 @@ const Login: React.FC = () => {
       minH="100vh"
       w="100%"
       direction={{ base: 'column', md: 'row' }}
-      bg={useBreakpointValue({ base: inputBg, md: 'transparent' })}
+      bg={useColorModeValue("gray.50", "black")}
     >
       {showImage && (
         <Box
@@ -253,13 +255,14 @@ const Login: React.FC = () => {
               
               <Button
                 type="submit"
-                bg="black"
-                color="white"
-                border={borderColor}
-                _hover={{ bg: 'white', color: 'black' }}
+                bg={useColorModeValue("black", "white")}
+                color={useColorModeValue("white", "black")}
+                borderWidth="1px"
+                borderColor={useColorModeValue("black", "gray")}
+                _hover={{ bg: useColorModeValue("white", "black"), color: useColorModeValue("black", "white") }}
                 width="full"
                 isLoading={loginMutation.isPending}
-                py="23px"
+                py="22px"
                 my={6}
                 borderRadius="lg"
                 fontSize="md"

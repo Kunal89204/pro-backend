@@ -11,6 +11,7 @@ import {
   Container,
   useBreakpointValue,
   useToast,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import React, { FormEvent, useState } from "react";
@@ -68,7 +69,7 @@ const Register: React.FC = () => {
       minH="100vh"
       w="100%"
       direction={{ base: 'column', md: 'row' }}
-      bg={useBreakpointValue({ base: inputBg, md: 'transparent' })}
+      bg={useColorModeValue("gray.50", "black")}
     >
       {showImage && (
         <Box
@@ -193,14 +194,14 @@ const Register: React.FC = () => {
 
               <Button
                 type="submit"
-                bg="black"
-                color="white"
-                border="1px solid"
-                borderColor={borderColor}
-                _hover={{ bg: 'white', color: 'black' }}
+                bg={useColorModeValue("black", "white")}
+                color={useColorModeValue("white", "black")}
+                borderWidth="1px"
+                borderColor={useColorModeValue("black", "gray")}
+                _hover={{ bg: useColorModeValue("white", "black"), color: useColorModeValue("black", "white") }}
                 width="full"
                 isLoading={handleRegister.isPending}
-                py="23px"
+                py="22px"
                 my={6}
                 borderRadius="lg"
                 fontSize="md"

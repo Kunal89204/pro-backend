@@ -26,7 +26,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 const Profile = () => {
   const token = useSelector((state: RootState) => state.token);
-  const userId = useSelector((state: RootState) => state.user._id);
   const coverFileInputRef = useRef<HTMLInputElement>(null);
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();
@@ -229,6 +228,7 @@ const Profile = () => {
                   {user?.data?.fullName}
                 </Text>
                 <Text color={secondaryTextColor}>@{user?.data?.username}</Text>
+                <Text color={secondaryTextColor}>{user?.data?.bio}</Text>
 
                 <Flex gap={2}>
                   <Button
@@ -319,9 +319,10 @@ const Profile = () => {
       <EditProfile
         isOpen={isOpen}
         onClose={onClose}
-        userId={userId}
+    
         fullName={user?.data?.fullName}
-      />
+        bio={user?.data?.bio}
+        />
     </div>
   );
 };

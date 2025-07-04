@@ -18,6 +18,7 @@ interface UserData {
   createdAt: string;
   updatedAt: string;
   wathcedVideos: string[];
+  bio: string;
   __v: number;
 }
 
@@ -572,6 +573,15 @@ export const myQuery = {
 
   getSearchResults: async (token: string, query: string | null) => {
     const response = await axiosInstance.get(`/video/search?q=${query}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+
+  updateProfile: async (token: string, fullName: string|undefined, bio: string|undefined) => {
+    const response = await axiosInstance.patch("/users/update-account", { fullName, bio }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

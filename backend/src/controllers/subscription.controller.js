@@ -261,7 +261,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
 
   const subscribedChannels = await Subscription.find({
     subscriber: userId,
-  }).populate("channel", "_id username fullName avatar bio");
+  }).populate("channel", "_id username fullName avatar bio subscribersCount");
 
   if (!subscribedChannels) {
     return res.status(404).json({

@@ -588,4 +588,13 @@ export const myQuery = {
     });
     return response.data;
   },
+
+  subscribedChannels: async (token: string) => {
+    const response = await axiosInstance.get("/subscription/subscribed-channels", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
 };

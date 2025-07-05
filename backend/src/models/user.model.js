@@ -38,6 +38,11 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Password is required"],
     },
+    subscribersCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     refreshToken: {
       type: String,
     },

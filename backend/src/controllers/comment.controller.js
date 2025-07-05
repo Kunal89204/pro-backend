@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import { Comment } from "../models/comment.model.js";
+import { redis } from "../../index.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 const getPaginatedCommentsForVideo = async (req, res) => {
   const { videoId } = req.params;
@@ -162,22 +164,104 @@ const getPaginatedCommentsForVideo = async (req, res) => {
   });
 };
 
-const addComment = async (req, res) => {
+const getComments = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+
+  if (!mongoose.Types.ObjectId.isValid(videoId)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid video ID",
+    });
+  }
+
+  const skip = (page - 1) * limit;
+  const cacheKey = `videoComments:${videoId}:page:${page}:limit:${limit}`;
+  const cacheTTL = 60 * 3; // 3 minutes
+
   try {
-    const { content, videoId, parentComment } = req.body;
-    const userId = req.user._id;
-
-    if (!content || !videoId || !userId) {
-      return res.status(400).json({ message: "Missing required fields" });
+    // 1. Try Redis cache
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return res.status(200).json(JSON.parse(cached));
     }
 
-    if (
-      !mongoose.Types.ObjectId.isValid(videoId) ||
-      !mongoose.Types.ObjectId.isValid(userId)
-    ) {
-      return res.status(400).json({ message: "Invalid videoId or userId" });
-    }
+    // 2. Fetch top-level comments from MongoDB
+    const topLevelComments = await Comment.find({
+      video: videoId,
+      parentComment: null,
+    })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("owner", "_id username avatar fullName")
+      .lean();
 
+    // 3. Recursive reply population
+    const populateReplies = async (comments) => {
+      for (let comment of comments) {
+        comment.replies = await Comment.find({
+          parentComment: comment._id,
+        })
+          .sort({ createdAt: 1 })
+          .populate("owner", "_id username avatar fullName")
+          .lean();
+
+        if (comment.replies.length > 0) {
+          await populateReplies(comment.replies);
+        }
+      }
+    };
+
+    await populateReplies(topLevelComments);
+
+    // 4. Get total top-level comments (for pagination)
+    const totalTopLevelComments = await Comment.countDocuments({
+      video: videoId,
+      parentComment: null,
+    });
+
+    const totalPages = Math.ceil(totalTopLevelComments / limit);
+
+    const response = {
+      success: true,
+      currentPage: page,
+      totalPages,
+      totalComments: totalTopLevelComments,
+      comments: topLevelComments,
+    };
+
+    // 5. Cache the full response
+    await redis.set(cacheKey, JSON.stringify(response), 'EX', cacheTTL);
+
+    return res.status(200).json(response);
+  } catch (err) {
+    console.error("❌ Error fetching comments:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
+
+const addComment = asyncHandler(async (req, res) => {
+  const { content, videoId, parentComment } = req.body;
+  const userId = req.user._id;
+
+  if (!content || !videoId || !userId) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  if (
+    !mongoose.Types.ObjectId.isValid(videoId) ||
+    !mongoose.Types.ObjectId.isValid(userId)
+  ) {
+    return res.status(400).json({ message: "Invalid videoId or userId" });
+  }
+
+  try {
+    // 1. Save new comment
     const newComment = new Comment({
       content,
       video: videoId,
@@ -186,17 +270,39 @@ const addComment = async (req, res) => {
     });
 
     await newComment.save();
-    res
-      .status(201)
-      .json({ message: "Comment added successfully", comment: newComment });
+
+    // 2. Invalidate all related Redis comment cache entries
+    const stream = redis.scanStream({
+      match: `videoComments:${videoId}:page:*`,
+    });
+
+    stream.on('data', async (keys) => {
+      if (keys.length) {
+        await redis.del(...keys);
+      }
+    });
+
+    stream.on('end', () => {
+      console.log(`🔁 Redis cache invalidated for video ${videoId}`);
+    });
+
+    // 3. Response
+    return res.status(201).json({
+      message: "Comment added successfully",
+      comment: newComment,
+    });
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error", error });
+    console.error("❌ Error adding comment:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error,
+    });
   }
-};
+});
 
 const checkComment = (req, res) => {
   res.json({ message: "I am working" });
 };
 
-export { checkComment, getPaginatedCommentsForVideo, addComment };
+export { checkComment, getPaginatedCommentsForVideo, addComment, getComments };

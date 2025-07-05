@@ -29,10 +29,15 @@ import { useMutation } from "@tanstack/react-query";
 // Define comment type
 interface Comment {
   id: string;
-  user: string;
-  avatar: string;
-  text: string;
-  time: string;
+  owner: {
+    _id: string;
+    fullName: string;
+    username: string;
+    avatar: string;
+  };
+ 
+  content: string;
+  createdAt: string;
   replies: Comment[];
 }
 
@@ -79,18 +84,18 @@ const CommentItem = ({
   return (
     <Box w="full" pl={depth * 6}>
       <HStack align="start" spacing={3}>
-        <Avatar src={comment.avatar} size="sm" />
+        <Avatar src={comment.owner.avatar} size="sm" />
         <Box>
           <Flex alignItems="center" gap={2}>
             <Text fontWeight="bold" color={textColor}>
-              {comment.user}
+              {comment.owner.fullName}
             </Text>
             <Text fontSize="xs" color={secondaryTextColor}>
-              {comment.time}
+              {comment.createdAt}
             </Text>
           </Flex>
           <Text mt={1} color={textColor}>
-            {comment.text}
+            {comment.content}
           </Text>
           <HStack mt={2} spacing={4}>
             <IconThumbUp

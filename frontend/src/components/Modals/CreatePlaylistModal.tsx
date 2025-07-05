@@ -57,7 +57,7 @@ const CreatePlaylistModal = ({
             className="border bg-black border-[#101010] rounded-md p-2"
           >
             <CheckIcon color="green" />
-            <Text>Playlist created successfully</Text>
+            <Text color={'white'}>Playlist created successfully</Text>
           </Flex>
         ),
       });

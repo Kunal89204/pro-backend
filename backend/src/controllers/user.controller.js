@@ -17,6 +17,7 @@ import os from "os";
 import fs from "fs";
 import WatchHistory from "../models/watchHistory.model.js";
 import { Tweet } from "../models/tweet.model.js";
+import { redis } from "../../index.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -248,6 +249,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 const changeCurrentPassword = async (req, res) => {
+  
   try {
     const { oldPassword, newPassword } = req.body;
     const user = await User.findById(req.user?._id);
@@ -256,6 +258,9 @@ const changeCurrentPassword = async (req, res) => {
     if (!isPasswordCorrect) {
       throw new ApiError(400, "Invalid old Password");
     }
+
+
+    
 
     user.password = newPassword;
     await user.save({ validateBeforeSave: false });
@@ -431,30 +436,53 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 const getWatchHistory = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
-  const history = await WatchHistory.find({ userId })
-    .sort({ updatedAt: -1 }) // Most recent first
-    .populate({
-      path: "videoId",
-      model: "Video",
-      select: "thumbnail views title description _id duration createdAt",
-      populate: {
-        path: "owner",
-        model: "User",
-        select: "fullName _id",
-      },
-    });
+  const cacheKey = `watchHistory:${userId}`;
+  const cacheTTL = 60 * 5; // 5 minutes
 
-  // Format result: include watchedAt and video details
-  const formattedHistory = history
-    .filter(entry => entry.videoId) // filter out deleted videos
-    .map(entry => ({
-      watchedAt: entry.updatedAt,
-      video: entry.videoId,
-    }));
+  try {
+    // 1. Try fetching from Redis cache
+    const cachedHistory = await redis.get(cacheKey);
+    if (cachedHistory) {
+      return res.status(200).json(
+        new ApiResponse(200, JSON.parse(cachedHistory), "Watch History (Cached)")
+      );
+    }
 
-  return res.status(200).json(
-    new ApiResponse(200, formattedHistory, "Watch History Fetched Successfully")
-  );
+    // 2. Fetch from MongoDB if not in cache
+    const history = await WatchHistory.find({ userId })
+      .sort({ updatedAt: -1 })
+      .populate({
+        path: "videoId",
+        model: "Video",
+        select: "thumbnail views title description _id duration createdAt",
+        populate: {
+          path: "owner",
+          model: "User",
+          select: "fullName _id",
+        },
+      });
+
+    // 3. Format the data
+    const formattedHistory = history
+      .filter(entry => entry.videoId)
+      .map(entry => ({
+        watchedAt: entry.updatedAt,
+        video: entry.videoId,
+      }));
+
+    // 4. Store in Redis with expiry
+    await redis.set(cacheKey, JSON.stringify(formattedHistory), 'EX', cacheTTL);
+
+    // 5. Return response
+    return res.status(200).json(
+      new ApiResponse(200, formattedHistory, "Watch History (Fresh)")
+    );
+  } catch (error) {
+    console.error("Redis/Mongo Error:", error);
+    return res.status(500).json(
+      new ApiResponse(500, null, "Failed to fetch watch history")
+    );
+  }
 });
 
 
@@ -522,56 +550,77 @@ const removeFromWatchHistory = asyncHandler(async (req, res) => {
 
 
 
-
 const getHomeFeed = asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page ) || 1;
-  const limit = parseInt(req.query.limit ) || 20;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
 
   const videoChunk = 8;
   const tweetChunk = 3;
 
-  const rawVideos = await Video.find({ isPublished: true })
-    .select('-viewers')
-    .populate('owner', '_id username avatar')
-    .sort({ createdAt: -1 })
-    .limit(limit * 4); // more videos to allow mixing
+  const cacheKey = `homeFeed:page:${page}:limit:${limit}`;
+  const cacheTTL = 60 * 2; // 2 minutes
 
-  const rawTweets = await Tweet.find()
-    .select('-viewers')
-    .populate('owner', '_id username avatar fullName')
-    .sort({ createdAt: -1 })
-    .limit(limit * 2); // more tweets to allow mixing
-
-  let vi = 0;
-  let ti = 0;
-  const structuredFeed = [];
-
-  while (vi < rawVideos.length || ti < rawTweets.length) {
-    const videoBlock = rawVideos.slice(vi, vi + videoChunk);
-    if (videoBlock.length) {
-      structuredFeed.push({ videos: videoBlock });
+  try {
+    // 1. Try cache first
+    const cachedFeed = await redis.get(cacheKey);
+    if (cachedFeed) {
+      return res.status(200).json(JSON.parse(cachedFeed));
     }
-    vi += videoChunk;
 
-    const tweetBlock = rawTweets.slice(ti, ti + tweetChunk);
-    if (tweetBlock.length) {
-      structuredFeed.push({ tweets: tweetBlock });
+    // 2. Fetch raw videos and tweets
+    const rawVideos = await Video.find({ isPublished: true })
+      .select("-viewers")
+      .populate("owner", "_id username avatar")
+      .sort({ createdAt: -1 })
+      .limit(limit * 4);
+
+    const rawTweets = await Tweet.find()
+      .select("-viewers")
+      .populate("owner", "_id username avatar fullName")
+      .sort({ createdAt: -1 })
+      .limit(limit * 2);
+
+    // 3. Interleave video and tweet blocks
+    let vi = 0;
+    let ti = 0;
+    const structuredFeed = [];
+
+    while (vi < rawVideos.length || ti < rawTweets.length) {
+      const videoBlock = rawVideos.slice(vi, vi + videoChunk);
+      if (videoBlock.length) {
+        structuredFeed.push({ videos: videoBlock });
+      }
+      vi += videoChunk;
+
+      const tweetBlock = rawTweets.slice(ti, ti + tweetChunk);
+      if (tweetBlock.length) {
+        structuredFeed.push({ tweets: tweetBlock });
+      }
+      ti += tweetChunk;
+
+      if (structuredFeed.length >= limit) break;
     }
-    ti += tweetChunk;
 
-    if (structuredFeed.length >= limit) break;
+    // 4. Paginate final interleaved feed
+    const start = (page - 1) * limit;
+    const paginatedFeed = structuredFeed.slice(start, start + limit);
+
+    const response = {
+      success: true,
+      page,
+      limit,
+      feed: paginatedFeed,
+      hasMore: start + limit < structuredFeed.length,
+    };
+
+    // 5. Store in Redis
+    await redis.set(cacheKey, JSON.stringify(response), 'EX', cacheTTL);
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error("❌ Home feed error:", error);
+    return res.status(500).json({ success: false, message: "Server Error" });
   }
-
-  const start = (page - 1) * limit;
-  const paginatedFeed = structuredFeed.slice(start, start + limit);
-
-  res.status(200).json({
-    success: true,
-    page,
-    limit,
-    feed: paginatedFeed,
-    hasMore: start + limit < structuredFeed.length,
-  });
 });
 
 

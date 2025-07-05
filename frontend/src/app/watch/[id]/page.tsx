@@ -50,18 +50,8 @@ const Watch = ({ params }: { params: { id: string } }) => {
     queryFn: () => myQuery.getVideoById(token, params.id),
   });
 
-  const {
-    data: comments,
-    isLoading: commentsLoading,
-    refetch: commentsRefetch,
-    isError: isCommentsError,
-    error: commentsError,
-  } = useQuery({
-    queryKey: ["comments", params.id],
-    queryFn: () => myQuery.getComments(token, params.id),
-  });
-
- const {data:commentsData, isLoading:commentsDataLoading} = useQuery({
+ 
+ const {data:commentsData, isLoading:commentsDataLoading, isError:isCommentsError, error:commentsError, refetch:commentsRefetch} = useQuery({
   queryKey: ["commentsData", params.id],
   queryFn: () => commentQueries.getComments(token, params.id),
  })
@@ -162,7 +152,7 @@ const Watch = ({ params }: { params: { id: string } }) => {
           comments={commentsData?.comments}
           videoId={params.id}
           refetch={commentsRefetch}
-          isLoading={commentsLoading}
+          isLoading={commentsDataLoading}
         />
       </Box>
       <Box className="lg:w-1/3 px-3 lg:px-0">

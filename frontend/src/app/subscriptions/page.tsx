@@ -130,7 +130,7 @@ const Subscriptions = () => {
               No subscriptions yet
             </AlertTitle>
             <AlertDescription maxWidth="sm" color={secondaryTextColor}>
-              You haven't subscribed to any channels yet. Start exploring and subscribe to channels you like!
+              You haven&apos;t subscribed to any channels yet. Start exploring and subscribe to channels you like!
             </AlertDescription>
           </Alert>
         </Center>

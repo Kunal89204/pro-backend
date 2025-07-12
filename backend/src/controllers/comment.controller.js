@@ -233,7 +233,7 @@ const getComments = asyncHandler(async (req, res) => {
     };
 
     // 5. Cache the full response
-    await redis.set(cacheKey, JSON.stringify(response), 'EX', cacheTTL);
+    await redis.set(cacheKey, JSON.stringify(response), "EX", cacheTTL);
 
     return res.status(200).json(response);
   } catch (err) {
@@ -276,13 +276,13 @@ const addComment = asyncHandler(async (req, res) => {
       match: `videoComments:${videoId}:page:*`,
     });
 
-    stream.on('data', async (keys) => {
+    stream.on("data", async (keys) => {
       if (keys.length) {
         await redis.del(...keys);
       }
     });
 
-    stream.on('end', () => {
+    stream.on("end", () => {
       console.log(`🔁 Redis cache invalidated for video ${videoId}`);
     });
 
@@ -291,7 +291,6 @@ const addComment = asyncHandler(async (req, res) => {
       message: "Comment added successfully",
       comment: newComment,
     });
-
   } catch (error) {
     console.error("❌ Error adding comment:", error);
     return res.status(500).json({
@@ -305,4 +304,157 @@ const checkComment = (req, res) => {
   res.json({ message: "I am working" });
 };
 
-export { checkComment, getPaginatedCommentsForVideo, addComment, getComments };
+// <------------------------------Tweets Comments Controllers------------------------------ >
+
+const addCommentToTweet = asyncHandler(async (req, res) => {
+  const userId = req?.user?._id;
+  const { tweetId } = req?.params;
+  const { content, parentComment } = req.body;
+
+  if (!content || !userId || !tweetId) {
+    return res.status(400).json({
+      success: false,
+      message: "Missing required fields",
+      userId,
+    });
+  }
+
+  if (
+    !mongoose.Types.ObjectId.isValid(tweetId) ||
+    !mongoose.Types.ObjectId.isValid(userId)
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid tweetId or userId",
+    });
+  }
+
+  try {
+    // 1. Save new comment
+    const comment = await Comment.create({
+      content,
+      tweet: tweetId,
+      owner: userId,
+      parentComment: parentComment || null,
+    });
+
+    // 2. Invalidate all related Redis comment cache entries
+    const stream = redis.scanStream({
+      match: `tweetComments:${tweetId}:page:*`,
+    });
+
+    stream.on("data", async (keys) => {
+      if (keys.length) {
+        await redis.del(...keys);
+      }
+    });
+
+    stream.on("end", () => {
+      console.log(`🔁 Redis cache invalidated for tweet ${tweetId}`);
+    });
+
+    // 3. Response
+    return res.status(201).json({
+      success: true,
+      message: "Comment added successfully",
+      comment,
+    });
+  } catch (error) {
+    console.error("❌ Error adding comment to tweet:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error,
+    });
+  }
+});
+
+const getTweetComments = asyncHandler(async (req, res) => {
+  const { tweetId } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+
+  if (!mongoose.Types.ObjectId.isValid(tweetId)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid tweet ID",
+    });
+  }
+
+  const skip = (page - 1) * limit;
+  const cacheKey = `tweetComments:${tweetId}:page:${page}:limit:${limit}`;
+  const cacheTTL = 60 * 3; // 3 minutes
+
+  try {
+    // 1. Try Redis cache
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return res.status(200).json(JSON.parse(cached));
+    }
+
+    // 2. Fetch top-level comments from MongoDB
+    const topLevelComments = await Comment.find({
+      tweet: tweetId,
+      parentComment: null,
+    })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("owner", "_id username avatar fullName")
+      .lean();
+
+    // 3. Recursive reply population
+    const populateReplies = async (comments) => {
+      for (let comment of comments) {
+        comment.replies = await Comment.find({
+          parentComment: comment._id,
+        })
+          .sort({ createdAt: 1 })
+          .populate("owner", "_id username avatar fullName")
+          .lean();
+
+        if (comment.replies.length > 0) {
+          await populateReplies(comment.replies);
+        }
+      }
+    };
+
+    await populateReplies(topLevelComments);
+
+    // 4. Get total top-level comments (for pagination)
+    const totalTopLevelComments = await Comment.countDocuments({
+      tweet: tweetId,
+      parentComment: null,
+    });
+
+    const totalPages = Math.ceil(totalTopLevelComments / limit);
+
+    const response = {
+      success: true,
+      currentPage: page,
+      totalPages,
+      totalComments: totalTopLevelComments,
+      comments: topLevelComments,
+    };
+
+    // 5. Cache the full response
+    await redis.set(cacheKey, JSON.stringify(response), "EX", cacheTTL);
+
+    return res.status(200).json(response);
+  } catch (err) {
+    console.error("❌ Error fetching comments:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
+
+export {
+  checkComment,
+  getPaginatedCommentsForVideo,
+  addComment,
+  getComments,
+  addCommentToTweet,
+  getTweetComments,
+};

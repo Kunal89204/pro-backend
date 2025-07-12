@@ -29,7 +29,7 @@ const TweetPage = () => {
           
         />
         
-        <Comments />
+        <Comments tweetId={id as string} />
       </div>
 
       <div className="w-2/5">

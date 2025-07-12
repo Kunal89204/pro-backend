@@ -682,7 +682,7 @@ const healthCheck = asyncHandler(async (req, res) => {
 
     const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
-      contents: `Plpease give a brief summary of the system status from the following data: ${JSON.stringify(checks)}`,
+      contents: `Please give a brief summary of the system status from the following data: ${JSON.stringify(checks)}`,
     });
 
     console.log(response);

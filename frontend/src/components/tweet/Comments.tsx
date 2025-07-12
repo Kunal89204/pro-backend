@@ -13,12 +13,12 @@ import {
   Flex,
   useColorMode,
 } from "@chakra-ui/react";
-import { IconThumbUp, IconSend } from "@tabler/icons-react";
+import { IconThumbUp, IconSend, IconTrash } from "@tabler/icons-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import myQuery from "@/api/commentQueries";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
-
+import { formatPostTime } from "@/utils/relativeTime";
 
 // Define comment type
 interface Comment {
@@ -32,6 +32,10 @@ interface Comment {
   createdAt: string;
   likes: number;
   replies: Comment[];
+}
+
+interface Reply extends Comment {
+  comments: Comment;
 }
 
 // Define the structure for tweet comments data
@@ -62,6 +66,7 @@ const CommentItem = ({
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyText, setReplyText] = useState("");
   const token = useSelector((state: RootState) => state.token);
+  const userId = useSelector((state: RootState) => state.user._id);
   const queryClient = useQueryClient();
 
   const textColor = colorMode === "light" ? "gray.800" : "gray.100";
@@ -70,32 +75,65 @@ const CommentItem = ({
   const addReplyMutation = useMutation({
     mutationFn: (reply: string) =>
       myQuery.addTweetComment(token, tweetId, reply, comment._id),
-    onSuccess: (data: Comment) => {
+    onSuccess: (data: Reply) => {
+      queryClient.setQueryData(
+        ["tweet-comments", tweetId],
+        (old: TweetCommentsData | undefined) => {
+          if (!old) return old;
+
+          const updateCommentReplies = (comments: Comment[]): Comment[] => {
+            return comments.map((c: Comment) => {
+              if (c._id === comment._id) {
+                return {
+                  ...c,
+                  replies: [data.comments, ...c.replies],
+                };
+              }
+
+              if (c.replies && c.replies.length > 0) {
+                return {
+                  ...c,
+                  replies: updateCommentReplies(c.replies),
+                };
+              }
+              return c;
+            });
+          };
+
+          return {
+            ...old,
+            comments: updateCommentReplies(old.comments),
+          };
+        }
+      );
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const deleteCommentMutation = useMutation({
+    mutationFn: (commentId: string) => myQuery.deleteComment(token, commentId),
+    onSuccess: () => {
       queryClient.setQueryData(["tweet-comments", tweetId], (old: TweetCommentsData | undefined) => {
         if (!old) return old;
         
-        const updateCommentReplies = (comments: Comment[]): Comment[] => {
-          return comments.map((c: Comment) => {
-            if (c._id === comment._id) {
-              return {
-                ...c,
-                replies: [...c.replies, data],
-              };
-            }
-            // Check nested replies recursively
-            if (c.replies && c.replies.length > 0) {
-              return {
-                ...c,
-                replies: updateCommentReplies(c.replies),
-              };
-            }
-            return c;
-          });
+        // Helper function to recursively remove comment from nested structure
+        const removeCommentRecursively = (comments: Comment[], targetId: string): Comment[] => {
+          return comments
+            .filter((c: Comment) => c._id !== targetId)
+            .map((c: Comment) => ({
+              ...c,
+              replies: c.replies ? removeCommentRecursively(c.replies, targetId) : []
+            }));
         };
 
+        const updatedComments = removeCommentRecursively(old.comments, comment._id);
+        
         return {
           ...old,
-          comments: updateCommentReplies(old.comments),
+          comments: updatedComments,
+          totalComments: Math.max(0, old.totalComments - 1),
         };
       });
     },
@@ -121,11 +159,11 @@ const CommentItem = ({
               {comment?.owner?.username}
             </Text>
             <Text fontSize="xs" color={secondaryTextColor}>
-              {comment.createdAt}
+              {formatPostTime(comment?.createdAt)}
             </Text>
           </Flex>
           <Text mt={1} color={textColor}>
-            {comment.content}
+            {comment?.content}
           </Text>
           <HStack mt={2} spacing={4}>
             <Flex alignItems="center">
@@ -135,7 +173,7 @@ const CommentItem = ({
                 color={colorMode === "light" ? "black" : "white"}
               />
               <Text ml={1} fontSize="xs">
-                {comment.likes || 0}
+                {comment?.likes || 0}
               </Text>
             </Flex>
 
@@ -184,7 +222,7 @@ const CommentItem = ({
             <VStack mt={3} align="start" spacing={3} w="full">
               {comment?.replies?.map((reply) => (
                 <CommentItem
-                  key={reply._id}
+                  key={reply?._id}
                   comment={reply}
                   depth={depth + 1}
                   tweetId={tweetId}
@@ -193,6 +231,18 @@ const CommentItem = ({
             </VStack>
           </Collapse>
         </Box>
+
+        {userId === comment?.owner?._id && (
+          <IconTrash
+            size={16}
+            cursor="pointer"
+            color={"red"}
+            onClick={() => {
+              console.log("Delete comment:", comment._id);
+              deleteCommentMutation.mutate(comment._id);
+            }}
+          />
+        )}
       </HStack>
     </Box>
   );
@@ -202,6 +252,7 @@ const Comments = ({ tweetId }: { tweetId: string }) => {
   const { colorMode } = useColorMode();
   const [commentText, setCommentText] = useState("");
   const token = useSelector((state: RootState) => state.token);
+  const avatar = useSelector((state: RootState) => state.user.avatarImage);
   const textColor = colorMode === "light" ? "gray.800" : "gray.100";
   const queryClient = useQueryClient();
 
@@ -214,15 +265,17 @@ const Comments = ({ tweetId }: { tweetId: string }) => {
     mutationFn: (comment: string) =>
       myQuery.addTweetComment(token, tweetId, comment, null),
     onSuccess: (data: AddCommentResponse) => {
-      queryClient.setQueryData(["tweet-comments", tweetId], (old: TweetCommentsData | undefined) => {
-        if (!old) return old;
-        
-        return {
-          ...old,
-          totalComments: old.totalComments + 1,
-          comments: [...old.comments, data.comment],
-        };
-      });
+      queryClient.setQueryData(
+        ["tweet-comments", tweetId],
+        (old: TweetCommentsData | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            totalComments: old.totalComments + 1,
+            comments: [data.comment, ...old.comments],
+          };
+        }
+      );
     },
     onError: (error) => {
       console.log(error);
@@ -247,7 +300,7 @@ const Comments = ({ tweetId }: { tweetId: string }) => {
 
       {/* Add comment input */}
       <HStack mb={6}>
-        <Avatar size="sm" src="https://i.pravatar.cc/150?img=8" />
+        <Avatar size="sm" src={avatar} />
         <Input
           placeholder="Add a comment..."
           value={commentText}

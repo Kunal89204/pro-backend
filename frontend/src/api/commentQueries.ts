@@ -41,6 +41,19 @@ const commentQueries = {
     } catch (error) {
       return error;
     }
+  },
+
+  deleteComment: async (token: string,commentId: string) => {
+    try {
+      const response = await axiosInstance.delete(`/comment/${commentId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return error;
+    }
   }
 };
 

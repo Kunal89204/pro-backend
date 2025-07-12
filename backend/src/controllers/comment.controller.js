@@ -304,6 +304,88 @@ const checkComment = (req, res) => {
   res.json({ message: "I am working" });
 };
 
+const deleteComment = asyncHandler(async (req, res) => {
+  const { commentId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(commentId)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid comment ID",
+    });
+  }
+
+  const comment = await Comment.findById(commentId);
+
+  if (!comment) {
+    return res.status(404).json({
+      success: false,
+      message: "Comment not found",
+    });
+  }
+
+  if (comment.owner.toString() !== req.user._id.toString()) {
+    return res.status(403).json({
+      success: false,
+      message: "You are not authorized to delete this comment",
+    });
+  }
+
+  // Recursive function to collect all nested comment IDs
+  const collectAllNestedReplies = async (parentId, collected = []) => {
+    const replies = await Comment.find({ parentComment: parentId });
+    for (const reply of replies) {
+      collected.push(reply._id);
+      await collectAllNestedReplies(reply._id, collected);
+    }
+    return collected;
+  };
+
+  const nestedReplyIds = await collectAllNestedReplies(comment._id);
+  nestedReplyIds.push(comment._id); // Include the root comment itself
+
+  // Delete all in one go
+  await Comment.deleteMany({ _id: { $in: nestedReplyIds } });
+
+  // Invalidate Redis cache for video comments
+  if (comment.video) {
+    const stream = redis.scanStream({
+      match: `videoComments:${comment.video}:page:*`,
+    });
+
+    stream.on("data", async (keys) => {
+      if (keys.length) {
+        await redis.del(...keys);
+      }
+    });
+
+    stream.on("end", () => {
+      console.log(`🔁 Redis cache invalidated for video ${comment.video}`);
+    });
+  }
+
+  // Invalidate Redis cache for tweet comments
+  if (comment.tweet) {
+    const stream = redis.scanStream({
+      match: `tweetComments:${comment.tweet}:page:*`,
+    });
+
+    stream.on("data", async (keys) => {
+      if (keys.length) {
+        await redis.del(...keys);
+      }
+    });
+
+    stream.on("end", () => {
+      console.log(`🔁 Redis cache invalidated for tweet ${comment.tweet}`);
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "Comment and all nested replies deleted successfully",
+  });
+});
+
 // <------------------------------Tweets Comments Controllers------------------------------ >
 
 const addCommentToTweet = asyncHandler(async (req, res) => {
@@ -457,4 +539,5 @@ export {
   getComments,
   addCommentToTweet,
   getTweetComments,
+  deleteComment,
 };

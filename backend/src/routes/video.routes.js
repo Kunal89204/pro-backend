@@ -1,19 +1,20 @@
-import { Router } from 'express';
+import { Router } from "express";
 import {
-    deleteVideo,
-    getAllVideos,
-    getVideoById,
-    publishAVideo,
-    togglePublishStatus,
-    updateVideo,
-    userVideos,
-    onPageVideoRecommendation,
-    getVideoByIdForEmbed,
-    suggestSearchQueries,
-    searchResults
-} from "../controllers/video.controller.js"
-import { verifyJWT } from "../middlewares/auth.middleware.js"
-import { upload } from "../middlewares/multer.middleware.js"
+  deleteVideo,
+  getAllVideos,
+  getVideoById,
+  publishAVideo,
+  togglePublishStatus,
+  updateVideo,
+  userVideos,
+  onPageVideoRecommendation,
+  getVideoByIdForEmbed,
+  suggestSearchQueries,
+  searchResults,
+  editVideo,
+} from "../controllers/video.controller.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
@@ -24,35 +25,39 @@ router.route("/embed/:videoId").get(getVideoByIdForEmbed);
 router.use(verifyJWT);
 
 router
-    .route("/")
-    .get(getAllVideos)
-    .post(
-        upload.fields([
-            {
-                name: "videoFile",
-                maxCount: 1,
-            },
-            {
-                name: "thumbnail",
-                maxCount: 1,
-            },
-        ]),
-        publishAVideo
-    );
+  .route("/")
+  .get(getAllVideos)
+  .post(
+    upload.fields([
+      {
+        name: "videoFile",
+        maxCount: 1,
+      },
+      {
+        name: "thumbnail",
+        maxCount: 1,
+      },
+    ]),
+    publishAVideo
+  );
 
-router.route('/uservideos').get(userVideos);
+router.route("/uservideos").get(userVideos);
 
-router.route("/:videoId([0-9a-fA-F]{24})") // ✅ Only match valid ObjectIds
-    .get(getVideoById)
-    .patch(upload.single("thumbnail"), updateVideo);
+router
+  .route("/:videoId([0-9a-fA-F]{24})") // ✅ Only match valid ObjectIds
+  .get(getVideoById)
+  .patch(upload.single("thumbnail"), updateVideo);
 
 router.route("/toggle/publish/:videoId").patch(togglePublishStatus);
 
-router.route('/delete-video/:videoId').delete(deleteVideo);
+router.route("/delete-video/:videoId").delete(deleteVideo);
 
 router.route("/recommendations/:videoId").get(onPageVideoRecommendation);
 
-router.route('/suggestions').get(suggestSearchQueries)
-router.route('/search').get(searchResults)
+router.route("/suggestions").get(suggestSearchQueries);
+router.route("/search").get(searchResults);
+router
+  .route("/edit-video/:videoId")
+  .patch(upload.single("thumbnail"), editVideo);
 
-export default router
+export default router;

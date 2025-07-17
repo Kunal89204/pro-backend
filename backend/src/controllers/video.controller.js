@@ -694,6 +694,60 @@ const searchResults = asyncHandler(async (req, res) => {
   res.status(200).json({ data: videos });
 });
 
+const editVideo = asyncHandler(async (req, res) => {
+  const { title, description } = req.body;
+  const thumbnail = req?.file?.path;
+  const userId = req.user._id;
+  const videoId = req.params.videoId;
+
+  if (!title && !description && !thumbnail) {
+    return res.status(400).json({
+      success: false,
+      status: 400,
+      message: "At least one field is required to update",
+    });
+  }
+
+  const video = await Video.findById(videoId);
+
+  if (!video) {
+    res.status(404).json({
+      success: false,
+      status: 404,
+      message: "Video not found",
+    });
+  }
+
+  if (video.owner.toString() !== userId.toString()) {
+    return res.status(403).json({
+      success: false,
+      status: 403,
+      message: "Unauthorized to edit this video",
+    });
+  }
+
+  if (title) video.title = title;
+  if (description) video.description = description;
+  if (thumbnail) {
+    const oldUrl = video.thumbnail;
+    const uploadedThumbnail = await uploadOnCloudinary(thumbnail);
+    video.thumbnail = uploadedThumbnail.secure_url;
+    await deleteFromCloudinary(getPublicIdFromUrl(oldUrl));
+  }
+
+  await video.save();
+
+  return res.status(200).json({
+    success: true,
+    status: 200,
+    message: "Video edited successfullyeeeee",
+    data: {
+      title,
+      description,
+      thumbnail: video.thumbnail,
+    },
+  });
+});
 
 export {
   getAllVideos,
@@ -707,4 +761,5 @@ export {
   onPageVideoRecommendation,
   suggestSearchQueries,
   searchResults,
+  editVideo,
 };

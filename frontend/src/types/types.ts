@@ -4,5 +4,6 @@ export interface VideoProps {
     _id: string,
     createdAt: string,
     title: string,
-    views: number
+    views: number,
+    owner: string
 }

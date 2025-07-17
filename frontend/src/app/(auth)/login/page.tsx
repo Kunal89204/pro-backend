@@ -87,6 +87,7 @@ const Login: React.FC = () => {
     mutationFn: (credentials: LoginCredentials) => myQuery.login(credentials),
     onSuccess: (data) => {
       const user = data?.data?.user
+      console.log("user", user)
       dispatch(
         setAuth({
           user: {

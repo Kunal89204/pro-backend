@@ -34,6 +34,7 @@ const TweetUpload = () => {
   const token = useSelector((state: RootState) => state.token);
   const { colorMode } = useColorMode();
   const MAX_CHARACTERS = 280;
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
   const charactersLeft = MAX_CHARACTERS - tweetText.length;
   const progressValue = (tweetText.length / MAX_CHARACTERS) * 100;
 
@@ -42,18 +43,41 @@ const TweetUpload = () => {
       if (!files || files.length === 0) return;
 
       const file = files[0];
-      if (file.type.startsWith("image/")) {
-        // Clean up previous preview URL
-        if (previewUrl) {
-          URL.revokeObjectURL(previewUrl);
-        }
-
-        const url = URL.createObjectURL(file);
-        setSelectedImage(file);
-        setPreviewUrl(url);
+      
+      // Check file type - only images and gifs
+      if (!file.type.startsWith("image/")) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image or GIF file",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
       }
+
+      // Check file size - 10MB limit
+      if (file.size > MAX_FILE_SIZE) {
+        toast({
+          title: "File too large",
+          description: "Please select a file smaller than 10MB",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      // Clean up previous preview URL
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+
+      const url = URL.createObjectURL(file);
+      setSelectedImage(file);
+      setPreviewUrl(url);
     },
-    [previewUrl]
+    [previewUrl, toast]
   );
 
   const removeImage = useCallback(() => {

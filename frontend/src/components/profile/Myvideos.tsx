@@ -19,6 +19,9 @@ const Myvideos: React.FC = () => {
     })
 
 
+
+
+
     return (
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-6 gap-4'>
            
@@ -31,6 +34,7 @@ const Myvideos: React.FC = () => {
                     createdAt={vdo.createdAt}
                     title={vdo.title}
                     views={vdo.views}
+                    owner={vdo?.owner}
                 />
             ))}
         </div>

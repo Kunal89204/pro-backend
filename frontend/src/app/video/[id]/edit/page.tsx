@@ -3,7 +3,7 @@ import { myQuery } from "@/api/query";
 import { RootState } from "@/lib/store";
 import { useSelector } from "react-redux";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   Box,
   Button,
@@ -29,6 +29,7 @@ const EditVideo = () => {
   const [thumbnailChanged, setThumbnailChanged] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { textColor } = useThemeColors();
+  const router = useRouter();
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["video", id],
@@ -61,8 +62,8 @@ const EditVideo = () => {
   const handleUpdateVideoMutation = useMutation({
     mutationFn: (formData: FormData) =>
       videoQueries.updateVideo(token, id as string, formData),
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
+      router.push(`/watch/${id}`);
     },
     onError: (error) => {
       console.log(error);
@@ -82,6 +83,9 @@ const EditVideo = () => {
       console.log("Thumbnail file:", newThumbnailFile);
       formData.append("thumbnail", newThumbnailFile);
     }
+
+    const formDataObj = Object.fromEntries(formData.entries());
+    console.log(formDataObj);
 
     handleUpdateVideoMutation.mutate(formData);
   };
@@ -139,7 +143,11 @@ const EditVideo = () => {
             style={{ display: "none" }}
           />
 
-          <Button mt={4} onClick={handleUpdate}>
+          <Button
+            mt={4}
+            onClick={handleUpdate}
+            isLoading={handleUpdateVideoMutation.isPending}
+          >
             Update
           </Button>
         </FormControl>

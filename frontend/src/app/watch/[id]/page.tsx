@@ -37,7 +37,7 @@ const Watch = ({ params }: { params: { id: string } }) => {
       console.log(error);
     },
     onSuccess: () => {
-      console.log("Video added to watch history");
+    
     },
   });
 
@@ -56,7 +56,7 @@ const Watch = ({ params }: { params: { id: string } }) => {
   queryFn: () => commentQueries.getComments(token, params.id),
  })
 
-  console.log(commentsData)
+  
 
   if (isError) {
     console.log("error in video", error);

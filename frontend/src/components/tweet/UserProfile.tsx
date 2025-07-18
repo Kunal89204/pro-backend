@@ -5,6 +5,7 @@ import { useThemeColors } from "@/hooks/useThemeColors";
 
 const UserProfile = ({
   data,
+  tweetsCount,
 }: {
   data: {
     fullName: string;
@@ -12,14 +13,18 @@ const UserProfile = ({
     bio: string;
     coverImage: string;
     avatar: string;
+    subscribersCount: number;
+    tweetsCount: number;
   };
+  tweetsCount: number;
 }) => {
   const { textColor, secondaryTextColor } = useThemeColors();
 
   return (
     <Box
-      borderWidth="1px"
+      // borderWidth="1px"
       borderRadius="lg"
+      bg={"#161616"}
       overflow="hidden"
       p={4}
       maxWidth={"60%"}
@@ -62,32 +67,24 @@ const UserProfile = ({
         <Flex gap={4} mb={3}>
           <Flex direction="column" alignItems="center">
             <Text fontWeight="bold" color={textColor}>
-              245
+              {tweetsCount}
             </Text>
             <Text color={secondaryTextColor} fontSize="sm">
-              Posts
+              Tweets
             </Text>
           </Flex>
           <Flex direction="column" alignItems="center">
             <Text fontWeight="bold" color={textColor}>
-              15.3K
+              {data?.subscribersCount}
             </Text>
             <Text color={secondaryTextColor} fontSize="sm">
-              Followers
-            </Text>
-          </Flex>
-          <Flex direction="column" alignItems="center">
-            <Text fontWeight="bold" color={textColor}>
-              843
-            </Text>
-            <Text color={secondaryTextColor} fontSize="sm">
-              Following
+              Subscribers
             </Text>
           </Flex>
         </Flex>
 
         <Button colorScheme="gray" size="md" width="full" borderRadius={"full"}>
-          Subscribe
+          Go to Profile
         </Button>
       </Flex>
     </Box>

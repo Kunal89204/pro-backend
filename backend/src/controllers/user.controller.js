@@ -249,7 +249,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 const changeCurrentPassword = async (req, res) => {
-  
   try {
     const { oldPassword, newPassword } = req.body;
     const user = await User.findById(req.user?._id);
@@ -258,9 +257,6 @@ const changeCurrentPassword = async (req, res) => {
     if (!isPasswordCorrect) {
       throw new ApiError(400, "Invalid old Password");
     }
-
-
-    
 
     user.password = newPassword;
     await user.save({ validateBeforeSave: false });
@@ -278,9 +274,9 @@ const getCurrentUser = async (req, res) => {
 };
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-  const { fullName,  bio } = req.body;
+  const { fullName, bio } = req.body;
 
-  if (!fullName ) {
+  if (!fullName) {
     throw new ApiError(400, "All fields are required");
   }
 
@@ -443,9 +439,15 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     // 1. Try fetching from Redis cache
     const cachedHistory = await redis.get(cacheKey);
     if (cachedHistory) {
-      return res.status(200).json(
-        new ApiResponse(200, JSON.parse(cachedHistory), "Watch History (Cached)")
-      );
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            JSON.parse(cachedHistory),
+            "Watch History (Cached)"
+          )
+        );
     }
 
     // 2. Fetch from MongoDB if not in cache
@@ -464,27 +466,26 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 
     // 3. Format the data
     const formattedHistory = history
-      .filter(entry => entry.videoId)
-      .map(entry => ({
+      .filter((entry) => entry.videoId)
+      .map((entry) => ({
         watchedAt: entry.updatedAt,
         video: entry.videoId,
       }));
 
     // 4. Store in Redis with expiry
-    await redis.set(cacheKey, JSON.stringify(formattedHistory), 'EX', cacheTTL);
+    await redis.set(cacheKey, JSON.stringify(formattedHistory), "EX", cacheTTL);
 
     // 5. Return response
-    return res.status(200).json(
-      new ApiResponse(200, formattedHistory, "Watch History (Fresh)")
-    );
+    return res
+      .status(200)
+      .json(new ApiResponse(200, formattedHistory, "Watch History (Fresh)"));
   } catch (error) {
     console.error("Redis/Mongo Error:", error);
-    return res.status(500).json(
-      new ApiResponse(500, null, "Failed to fetch watch history")
-    );
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Failed to fetch watch history"));
   }
 });
-
 
 const addToWatchHistory = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
@@ -544,11 +545,10 @@ const removeFromWatchHistory = asyncHandler(async (req, res) => {
 
   await WatchHistory.findOneAndDelete({ userId, videoId });
 
-  return res.status(200).json(new ApiResponse(200, {}, "Video removed from watch history"));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Video removed from watch history"));
 });
-
-
-
 
 const getHomeFeed = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -614,7 +614,7 @@ const getHomeFeed = asyncHandler(async (req, res) => {
     };
 
     // 5. Store in Redis
-    await redis.set(cacheKey, JSON.stringify(response), 'EX', cacheTTL);
+    await redis.set(cacheKey, JSON.stringify(response), "EX", cacheTTL);
 
     return res.status(200).json(response);
   } catch (error) {
@@ -622,7 +622,6 @@ const getHomeFeed = asyncHandler(async (req, res) => {
     return res.status(500).json({ success: false, message: "Server Error" });
   }
 });
-
 
 const healthCheck = asyncHandler(async (req, res) => {
   try {

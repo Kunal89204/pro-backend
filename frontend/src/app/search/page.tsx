@@ -18,7 +18,7 @@ const Search = () => {
     enabled: !!query,
   });
 
-  console.log(searchResults);
+
 
   return (
     <div>

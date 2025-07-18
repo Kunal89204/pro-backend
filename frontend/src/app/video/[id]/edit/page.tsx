@@ -71,8 +71,7 @@ const EditVideo = () => {
   });
 
   const handleUpdate = () => {
-    console.log("Title:", title);
-    console.log("Description:", description);
+   
 
     const formData = new FormData();
 
@@ -80,12 +79,12 @@ const EditVideo = () => {
     formData.append("description", description);
 
     if (thumbnailChanged && newThumbnailFile) {
-      console.log("Thumbnail file:", newThumbnailFile);
+      
       formData.append("thumbnail", newThumbnailFile);
     }
 
-    const formDataObj = Object.fromEntries(formData.entries());
-    console.log(formDataObj);
+    
+    
 
     handleUpdateVideoMutation.mutate(formData);
   };

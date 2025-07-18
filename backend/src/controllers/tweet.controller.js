@@ -3,6 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Tweet } from "../models/tweet.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Bookmark } from "../models/bookmark.model.js";
+import WatchHistory from "../models/watchHistory.model.js";
 import mongoose from "mongoose";
 
 const createTweet = asyncHandler(async (req, res) => {
@@ -67,11 +68,16 @@ const getTweetById = asyncHandler(async (req, res) => {
   const { id } = req?.params;
   const tweet = await Tweet.findById(id).populate(
     "owner",
-    "fullName username email avatar coverImage"
+    "fullName username email avatar coverImage subscribersCount bio"
   );
+
+  const tweetsCount = await Tweet.countDocuments({ owner: tweet?.owner });
+
   res
     .status(200)
-    .json(new ApiResponse(200, tweet, "Tweet fetched successfully"));
+    .json(
+      new ApiResponse(200, { tweet, tweetsCount }, "Tweet fetched successfully")
+    );
 });
 
 const bookmarkTweet = asyncHandler(async (req, res) => {
@@ -147,6 +153,55 @@ const bookmarkStatus = asyncHandler(async (req, res) => {
   });
 });
 
+const addTweetView = asyncHandler(async (req, res) => {
+  const { id } = req?.params;
+  const userId = req?.user?._id;
+
+  const session = await mongoose.startSession();
+
+  try {
+    await session.withTransaction(async () => {
+      const [tweet, existingView] = await Promise.all([
+        Tweet.findById(id).session(session),
+        WatchHistory.findOne({ tweetId: id, userId }).session(session),
+      ]);
+
+      if (!tweet) {
+        throw new Error("Tweet not found");
+      }
+
+      if (existingView) {
+        return res
+          .status(200)
+          .json(new ApiResponse(200, existingView, "Tweet already viewed"));
+      }
+
+      await Promise.all([
+        WatchHistory.create([{ tweetId: id, userId }], { session }),
+        Tweet.findByIdAndUpdate(id, { $inc: { viewsCount: 1 } }, { session }),
+      ]);
+
+      const newView = await WatchHistory.findOne({
+        tweetId: id,
+        userId,
+      }).session(session);
+
+      res
+        .status(200)
+        .json(new ApiResponse(200, newView, "Tweet viewed successfully"));
+    });
+  } catch (error) {
+    if (error.message === "Tweet not found") {
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "Tweet not found"));
+    }
+    throw error;
+  } finally {
+    await session.endSession();
+  }
+});
+
 export {
   createTweet,
   getTweetsOfUser,
@@ -155,4 +210,5 @@ export {
   bookmarkTweet,
   getBookmarkedTweets,
   bookmarkStatus,
+  addTweetView,
 };

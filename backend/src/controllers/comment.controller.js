@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Comment } from "../models/comment.model.js";
 import { redis } from "../../index.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { Tweet } from "../models/tweet.model.js";
 
 const getPaginatedCommentsForVideo = async (req, res) => {
   const { videoId } = req.params;
@@ -343,8 +344,35 @@ const deleteComment = asyncHandler(async (req, res) => {
   const nestedReplyIds = await collectAllNestedReplies(comment._id);
   nestedReplyIds.push(comment._id); // Include the root comment itself
 
-  // Delete all in one go
-  await Comment.deleteMany({ _id: { $in: nestedReplyIds } });
+  const session = await mongoose.startSession();
+
+  try {
+    await session.withTransaction(async () => {
+      // Delete all comments in one go
+      await Comment.deleteMany({ _id: { $in: nestedReplyIds } }, { session });
+
+      // Update commentsCount for video or tweet
+      const deletedCommentsCount = nestedReplyIds.length;
+
+      if (comment.video) {
+        await Video.findByIdAndUpdate(
+          comment.video,
+          { $inc: { commentsCount: -deletedCommentsCount } },
+          { session }
+        );
+      }
+
+      if (comment.tweet) {
+        await Tweet.findByIdAndUpdate(
+          comment.tweet,
+          { $inc: { commentsCount: -deletedCommentsCount } },
+          { session }
+        );
+      }
+    });
+  } finally {
+    await session.endSession();
+  }
 
   // Invalidate Redis cache for video comments
   if (comment.video) {
@@ -411,31 +439,67 @@ const addCommentToTweet = asyncHandler(async (req, res) => {
     });
   }
 
+  const session = await mongoose.startSession();
+
   try {
-    // 1. Save new comment
-    const comment = await Comment.create({
-      content,
-      tweet: tweetId,
-      owner: userId,
-      parentComment: parentComment || null,
+    let comment;
+
+    // 1. Database operations in transaction
+    await session.withTransaction(async () => {
+      // Create comment and update tweet comment count atomically
+      const [createdComment] = await Promise.all([
+        Comment.create(
+          [
+            {
+              content,
+              tweet: tweetId,
+              owner: userId,
+              parentComment: parentComment || null,
+            },
+          ],
+          { session }
+        ),
+        Tweet.findByIdAndUpdate(
+          tweetId,
+          { $inc: { commentsCount: 1 } },
+          { session }
+        ),
+      ]);
+
+      comment = createdComment[0];
     });
 
-    // 2. Invalidate all related Redis comment cache entries
-    const stream = redis.scanStream({
-      match: `tweetComments:${tweetId}:page:*`,
+    // 2. Cache invalidation (outside transaction)
+    const invalidateCachePromise = new Promise((resolve, reject) => {
+      const stream = redis.scanStream({
+        match: `tweetComments:${tweetId}:page:*`,
+      });
+
+      const keysToDelete = [];
+
+      stream.on("data", (keys) => {
+        keysToDelete.push(...keys);
+      });
+
+      stream.on("end", async () => {
+        try {
+          if (keysToDelete.length) {
+            await redis.del(...keysToDelete);
+          }
+          console.log(`🔁 Redis cache invalidated for tweet ${tweetId}`);
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      });
+
+      stream.on("error", reject);
     });
 
-    stream.on("data", async (keys) => {
-      if (keys.length) {
-        await redis.del(...keys);
-      }
-    });
+    // 3. Wait for cache invalidation to complete
+    await invalidateCachePromise;
 
-    stream.on("end", () => {
-      console.log(`🔁 Redis cache invalidated for tweet ${tweetId}`);
-    });
-
-    // 3. Response
+    // 4. Response
     return res.status(201).json({
       success: true,
       message: "Comment added successfully",
@@ -448,6 +512,8 @@ const addCommentToTweet = asyncHandler(async (req, res) => {
       message: "Internal Server Error",
       error,
     });
+  } finally {
+    await session.endSession();
   }
 });
 

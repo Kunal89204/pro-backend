@@ -37,8 +37,8 @@ const Upload: React.FC<UploadProps> = ({
         videoFile: videoFile[0],
       });
     },
-    onSuccess: (data) => {
-      console.log("Upload successful:", data);
+    onSuccess: () => {
+ 
       onSuccess();
     },
     onError: (error) => {

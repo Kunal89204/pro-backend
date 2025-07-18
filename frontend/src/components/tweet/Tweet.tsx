@@ -24,6 +24,9 @@ const Tweet = ({
     createdAt: string;
     _id: string;
     userId: string;
+    owner: {
+      avatar: string;
+    };
   };
   isLoading: boolean;
 }) => {
@@ -46,7 +49,7 @@ const Tweet = ({
     return <div>Loading...</div>;
   }
 
-  console.log("data.image", data.image);
+
   return (
     <div>
       {/* Header */}
@@ -54,7 +57,7 @@ const Tweet = ({
         <div>
           <Image
             src={
-              "https://res.cloudinary.com/dqvqvvwc8/image/upload/v1749469493/iaa6foq2m5lslbkaruxu.png"
+              data?.owner?.avatar
             }
             className="object-cover rounded-full w-10 aspect-square"
             alt="tweet"
@@ -102,7 +105,7 @@ const Tweet = ({
       />
 
       {data?.image && (
-        <Box className="w-full min-h-[400px] max-h-[600px] overflow-hidden flex justify-center items-center relative rounded-lg">
+        <Box className="w-full min-h-[400px] max-h-[600px] overflow-hidden flex justify-center items-center relative rounded-lg -z-0">
           <Box className="absolute inset-0 z-0">
             <Image
               src={data?.image}

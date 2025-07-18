@@ -73,7 +73,7 @@ const SaveToPlaylistModal = ({
       myQuery.addVideoToPlaylist(token, playlistId, videoId),
     onSuccess: () => {
       //   queryClient.invalidateQueries({ queryKey: ["playlists"] });
-      console.log("Added to playlist");
+    
       toast({
         title: "Video added to playlist",
         description: "Video added to playlist",

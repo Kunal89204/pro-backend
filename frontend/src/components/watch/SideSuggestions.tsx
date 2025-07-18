@@ -18,8 +18,7 @@ const SideSuggestions = ({ videoId }: { videoId: string }) => {
   });
 
   useEffect(() => {
-    console.log("I am heresss", data);
-    console.log(videoId);
+  
   }, [data, videoId]);
 
   const dummyArray = Array.from({ length: 10 });

@@ -33,6 +33,7 @@ interface TweetProps {
   comments?: number;
   views?: number;
   image?: string;
+  commentsCount?: number;
 }
 
 const Tweet: React.FC<TweetProps> = ({
@@ -41,9 +42,9 @@ const Tweet: React.FC<TweetProps> = ({
   content,
   timestamp,
   likesCount,
-  comments,
   views,
   image,
+  commentsCount,
 }) => {
   const { colorMode } = useColorMode();
   const router = useRouter();
@@ -53,7 +54,7 @@ const Tweet: React.FC<TweetProps> = ({
   const bookMarkMutation = useMutation({
     mutationFn: () => myQuery.bookMarkTweet(token, id),
     onSuccess: () => {
-      console.log("bookmarked");
+   
     },
     onError: () => {
       console.log("error");
@@ -200,7 +201,7 @@ const Tweet: React.FC<TweetProps> = ({
       <Engagement
         _id={id || ""}
         likes={likesCount }
-        comments={comments || 0}
+        comments={commentsCount || 0}
         views={views || 0}
       />
     </Box>

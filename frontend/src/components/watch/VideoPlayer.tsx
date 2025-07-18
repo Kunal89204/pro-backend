@@ -108,7 +108,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
         playerRef.current = player;
 
         player.ready(() => {
-          console.log("Video.js player is ready");
+          
         });
       }
     }
@@ -173,8 +173,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
     likeVideoMutation.mutate(id);
   };
 
-  const handleVideoSave = async (id: string) => {
-    console.log(id)
+  const handleVideoSave = async () => {
+
     onOpen();
   };
 
@@ -286,7 +286,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
           <Button
             borderRadius={"full"}
             className="flex gap-2 rounded-full"
-            onClick={() => handleVideoSave(vdo?._id)}
+            onClick={() => handleVideoSave()}
             fontWeight={"normal"}
           >
             <CiBookmark size={20} /> Save

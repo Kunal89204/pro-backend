@@ -87,7 +87,7 @@ const Login: React.FC = () => {
     mutationFn: (credentials: LoginCredentials) => myQuery.login(credentials),
     onSuccess: (data) => {
       const user = data?.data?.user
-      console.log("user", user)
+    
       dispatch(
         setAuth({
           user: {
@@ -100,7 +100,7 @@ const Login: React.FC = () => {
           token: data?.data?.accessToken,
         })
       )
-      console.log("i am received data", data)
+   
       window.location.href = '/'
       toast({
         title: 'Login Successful',

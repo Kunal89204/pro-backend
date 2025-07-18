@@ -66,7 +66,7 @@ if (isLoading) {
   );
 }
 
-console.log("data",data?.data)
+
 
   return (
     <div className="grid grid-cols-4 gap-2">

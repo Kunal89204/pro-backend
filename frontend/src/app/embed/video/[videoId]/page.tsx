@@ -63,7 +63,7 @@ const EmbedVideoPlayer = () => {
         playerRef.current = player;
 
         player.ready(() => {
-          console.log("Video.js player is ready");
+         
         });
       }
     }

@@ -69,7 +69,7 @@ const CommentItem = ({
   const { mutate: addReply, isPending } = useMutation({
     mutationFn: () => myQuery.addReply(token, videoId, comment._id, replyText),
     onSuccess: () => {
-      console.log("Reply added successfully");
+    
       refetch();
     },
     onError: () => {
@@ -89,7 +89,7 @@ const CommentItem = ({
       queryClient.setQueryData(
         ["comments", videoId],
         (old: Comment[] | undefined) => {
-          console.log("old", old);
+      
           if (!old) return old;
 
           // Helper function to recursively remove comment from nested structure
@@ -209,7 +209,7 @@ const CommentItem = ({
             cursor="pointer"
             color={"red"}
             onClick={() => {
-              console.log("Delete comment:", comment._id);
+             
               deleteCommentMutation.mutate(comment._id);
             }}
           />
@@ -238,7 +238,7 @@ const Comments = ({
   const { mutate: addComment, isPending } = useMutation({
     mutationFn: () => myQuery.addComment(token, videoId, commentText),
     onSuccess: () => {
-      console.log("Comment added successfully");
+ 
       refetch();
     },
     onError: () => {
@@ -248,8 +248,7 @@ const Comments = ({
   });
   const handleCommentSubmit = () => {
     addComment();
-    // console.log("I am here", commentText);
-    // setCommentText(""); // Clear input after submission
+   
   };
 
   return (

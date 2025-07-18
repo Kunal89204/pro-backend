@@ -22,7 +22,7 @@ const Engagement = ({
 }: {
   _id: string | undefined;
   likes: number | undefined;
-  comments: number;
+  comments: number | undefined;
   views: number;
 }) => {
   const { colorMode } = useColorMode();
@@ -34,7 +34,7 @@ const Engagement = ({
   const likeMutation = useMutation({
     mutationFn: () => myQuery.toggleLikeTweet(token, _id),
     onSuccess: () => {
-      console.log("yee");
+ 
     },
     onError: () => {
       setIsLiked(!isLiked);

@@ -83,7 +83,7 @@ const Profile = () => {
           token: token,
         })
       );
-      console.log(data);
+   
       refetch();
       setSelectedAvatar(null);
     },

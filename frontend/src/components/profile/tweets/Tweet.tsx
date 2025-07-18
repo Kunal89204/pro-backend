@@ -39,6 +39,8 @@ const Tweet = ({
   const { colorMode } = useColorMode();
   const { textColor, secondaryTextColor } = useThemeColors();
   const router = useRouter();
+
+ 
   // Markdown processing function
   const processMarkdown = (text: string) => {
     if (!text) return "";

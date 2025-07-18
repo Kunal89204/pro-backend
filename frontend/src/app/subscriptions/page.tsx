@@ -40,7 +40,7 @@ const Subscriptions = () => {
     queryFn: () => myQuery.subscribedChannels(token),
   });
 
-  console.log(data?.data);
+
 
   if (isLoading) {
     return (

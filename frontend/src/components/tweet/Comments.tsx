@@ -143,7 +143,7 @@ const CommentItem = ({
   });
 
   const handleReply = () => {
-    console.log("Reply text:", replyText, "Parent comment ID:", comment._id);
+ 
     addReplyMutation.mutate(replyText);
     setReplyText("");
     setShowReplyInput(false);
@@ -238,7 +238,7 @@ const CommentItem = ({
             cursor="pointer"
             color={"red"}
             onClick={() => {
-              console.log("Delete comment:", comment._id);
+          
               deleteCommentMutation.mutate(comment._id);
             }}
           />
@@ -287,7 +287,7 @@ const Comments = ({ tweetId }: { tweetId: string }) => {
   }
 
   const handleComment = () => {
-    console.log("Comment text:", commentText);
+
     addCommentMutation.mutate(commentText);
     setCommentText("");
   };

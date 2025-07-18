@@ -22,7 +22,6 @@ const RemoveVideoFromPlaylist = ({
   onClose,
   playlistId,
   videoId,
-  playlistData,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -34,7 +33,7 @@ const RemoveVideoFromPlaylist = ({
   const token = useSelector((state: RootState) => state.token);
   const { textColor } = useThemeColors();
   const queryClient = useQueryClient();
-  console.log("playlistData", playlistData);
+
 
   const removeVideoFromPlaylistMutation = useMutation({
     mutationFn: () =>

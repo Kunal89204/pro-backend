@@ -623,11 +623,11 @@ const getHomeFeed = asyncHandler(async (req, res) => {
   }
 });
 
+let i = 0;
 const healthCheck = asyncHandler(async (req, res) => {
+  console.log("Health check accessed", i + 1);
+  i++
   try {
-    const ai = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY,
-    });
     const checks = {};
 
     // 1. Check Database Connection
@@ -638,7 +638,7 @@ const healthCheck = asyncHandler(async (req, res) => {
       checks.database = { status: "unhealthy", error: err.message };
     }
 
-    // 3. Check System Resource Utilization
+    // 2. Check System Resource Utilization
     const memoryUsage = process.memoryUsage();
     const totalMemory = os.totalmem();
     const freeMemory = os.freemem();
@@ -656,7 +656,7 @@ const healthCheck = asyncHandler(async (req, res) => {
       cpuUsage: process.cpuUsage(),
     };
 
-    // 4. Check Disk Space
+    // 3. Check Disk Space
     try {
       const diskStat = fs.statSync("/");
       checks.disk = {
@@ -667,7 +667,7 @@ const healthCheck = asyncHandler(async (req, res) => {
       checks.disk = { status: "unhealthy", error: err.message };
     }
 
-    // 5. API Health
+    // 4. API Health
     checks.api = { status: "healthy", message: "User service is operational" };
 
     // If any service is unhealthy, return a 503 status
@@ -678,15 +678,6 @@ const healthCheck = asyncHandler(async (req, res) => {
     if (unhealthyServices.length > 0) {
       throw new ApiError(503, "Some dependencies are unhealthy", checks);
     }
-
-    const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
-      contents: `Please give a brief summary of the system status from the following data: ${JSON.stringify(checks)}`,
-    });
-
-    console.log(response);
-
-    checks.aisummary = response.candidates[0].content.parts[0].text;
 
     return res
       .status(200)

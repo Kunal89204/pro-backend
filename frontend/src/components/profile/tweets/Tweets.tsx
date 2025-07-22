@@ -56,7 +56,7 @@ const Tweets = ({username, userId}: {username: string | undefined, userId: strin
   return (
     <div className="grid grid-cols-4 gap-2">
       {tweets?.data?.map((tweet: TweetType) => (
-        <Tweet key={tweet._id} tweet={tweet} username={username} userId={userId} />
+        <Tweet key={tweet._id} tweet={tweet}  userId={userId} />
       ))}
     </div>
   );

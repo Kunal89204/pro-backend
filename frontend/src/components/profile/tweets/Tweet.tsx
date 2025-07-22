@@ -26,7 +26,7 @@ import { useSelector } from "react-redux";
 
 const Tweet = ({
   tweet,
-  username,
+  
   userId,
 }: {
   tweet: {
@@ -39,7 +39,7 @@ const Tweet = ({
     _id: string;
    
   };
-  username: string | undefined;
+ 
   userId: string | undefined;
 }) => {
   const { colorMode } = useColorMode();

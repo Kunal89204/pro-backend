@@ -76,6 +76,7 @@ const Videos: React.FC = () => {
             ownerDetails: {
               avatar: string;
               fullName: string;
+              username: string;
             };
             createdAt: string;
             views: number;
@@ -93,6 +94,7 @@ const Videos: React.FC = () => {
             duration={item.duration}
             videoId={item._id}
             isProfile={false}
+            username={item.ownerDetails.username}
           />
         )
       )}

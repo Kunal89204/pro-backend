@@ -23,7 +23,6 @@ import SaveToPlaylistModal from "../Modals/SaveToPlaylistModal";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 
-
 const formatDuration = (input: number | string | bigint): string => {
   const seconds = typeof input === "bigint" ? Number(input) : Number(input);
 
@@ -121,7 +120,9 @@ const Video: React.FC<VideoProps> = ({
                 )}
                 <MenuItem onClick={onOpen}>Save to Playlist</MenuItem>
                 <MenuItem>Share</MenuItem>
-                <DeleteButton id={_id}>Delete</DeleteButton>
+                {owner === userId && (
+                  <DeleteButton id={_id}>Delete</DeleteButton>
+                )}
               </MenuList>
             </Menu>
           </Flex>

@@ -48,6 +48,7 @@ interface VideoProps {
   duration: number | string;
   videoId: string;
   isProfile: boolean;
+  username: string;
 }
 
 const Video: React.FC<VideoProps> = ({
@@ -60,11 +61,14 @@ const Video: React.FC<VideoProps> = ({
   duration,
   videoId,
   isProfile,
+  username,
 }) => {
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isOpenShare, onOpen: onOpenShare, onClose: onCloseShare } = useDisclosure();
+
+  console.log("channelName", channelName);
   return (
     <Box
       borderRadius="2xl"
@@ -104,6 +108,8 @@ const Video: React.FC<VideoProps> = ({
             name={channelName}
             width={"35px"}
             height={"35px"}
+            as={Link}
+            href={`/profile/${username}`}
           />
         )}
         <Box flex={1}>

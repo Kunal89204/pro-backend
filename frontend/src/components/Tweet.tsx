@@ -31,7 +31,7 @@ interface TweetProps {
   timestamp?: string;
   likesCount?: number|undefined;
   comments?: number;
-  views?: number;
+  viewsCount?: number;
   image?: string;
   commentsCount?: number;
 }
@@ -42,7 +42,7 @@ const Tweet: React.FC<TweetProps> = ({
   content,
   timestamp,
   likesCount,
-  views,
+  viewsCount,
   image,
   commentsCount,
 }) => {
@@ -202,7 +202,7 @@ const Tweet: React.FC<TweetProps> = ({
         _id={id || ""}
         likes={likesCount }
         comments={commentsCount || 0}
-        views={views || 0}
+        views={viewsCount || 0}
       />
     </Box>
   );

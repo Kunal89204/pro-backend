@@ -66,9 +66,9 @@ export const myQuery = {
     return response.data;
   },
 
-  getCurrentUser: async (token: string): Promise<User> => {
+  getCurrentUser: async (token: string, username: string): Promise<User> => {
     try {
-      const response = await axiosInstance.get("/users/current-user", {
+      const response = await axiosInstance.get(`/users/current-user/${username}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -226,9 +226,9 @@ export const myQuery = {
     }
   },
 
-  getUserVideos: async (token: string) => {
+  getUserVideos: async (token: string, username: string) => {
     try {
-      const response = await axiosInstance.get("video/uservideos", {
+      const response = await axiosInstance.get(`video/uservideos/${username}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -496,8 +496,8 @@ export const myQuery = {
     return response.data;
   },
 
-  getTweetsOfUser: async (token: string) => {
-    const response = await axiosInstance.get("/tweet/get-tweets", {
+  getTweetsOfUser: async (token: string, username: string) => {
+    const response = await axiosInstance.get(`/tweet/get-tweets/${username}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

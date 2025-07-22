@@ -10,6 +10,7 @@ import mongoose from "mongoose";
 import { getPublicIdFromUrl } from "../utils/publicIdExtracter.js";
 
 import { Subscription } from "../models/subscription.model.js";
+import { User } from "../models/user.model.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
@@ -257,6 +258,7 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
 const userVideos = async (req, res) => {
   try {
     const userId = req.user._id;
+    const username = req.params.username;
 
     // Default values for pagination
     let page = parseInt(req.query.page) || 1;
@@ -268,14 +270,18 @@ const userVideos = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
+    const user = await User.findOne({ username }).select(
+      "-password -refreshToken -watchHistory"
+    );
+
     // Fetch videos with pagination
-    const videos = await Video.find({ owner: userId })
+    const videos = await Video.find({ owner: user._id })
       .sort({ createdAt: -1 }) // Sort by newest videos first
       .skip(skip)
       .limit(limit);
 
     // Count total videos for pagination info
-    const totalVideos = await Video.countDocuments({ owner: userId });
+    const totalVideos = await Video.countDocuments({ owner: user._id });
 
     res.json({
       success: true,
@@ -707,8 +713,6 @@ const editVideo = asyncHandler(async (req, res) => {
       message: "At least one field is required to update",
     });
   }
-
-
 
   const video = await Video.findById(videoId);
 

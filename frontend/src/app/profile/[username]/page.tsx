@@ -14,6 +14,9 @@ import {
   Input,
   useColorMode,
   useDisclosure,
+  Skeleton,
+  SkeletonCircle,
+  SkeletonText,
 } from "@chakra-ui/react";
 import { setAuth } from "@/lib/slices/authSlice";
 import { useThemeColors } from "@/hooks/useThemeColors";
@@ -22,7 +25,8 @@ import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import EditProfile from "@/components/Modals/EditProfile";
 import Tweets from "@/components/profile/tweets/Tweets";
 import Bookmarks from "@/components/profile/bookmarks/Bookmarks";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
+import { logout } from "@/lib/slices/authSlice";
 
 const Profile = () => {
   const token = useSelector((state: RootState) => state.token);
@@ -34,10 +38,11 @@ const Profile = () => {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
   const router = useRouter();
-  const username = searchParams.get("username") || "";
+  const username = useParams().username;
   // Color modes import
   const { textColor, secondaryTextColor, buttonBg } = useThemeColors();
 
+  const owner = useSelector((state: RootState) => state.user.username);
   // Cover Image States
   const [coverImage, setCoverImage] = useState<File | undefined>();
   const [selectedBanner, setSelectedBanner] = useState<string | null>(null);
@@ -53,9 +58,7 @@ const Profile = () => {
     refetch,
   } = useQuery({
     queryKey: ["currentUser"],
-    queryFn: () => myQuery.getCurrentUser(token),
-    refetchOnWindowFocus: false,
-    staleTime: 60000,
+    queryFn: () => myQuery.getCurrentUser(token, username as string),
   });
 
   const coverImageMutation = useMutation({
@@ -83,7 +86,7 @@ const Profile = () => {
           token: token,
         })
       );
-   
+
       refetch();
       setSelectedAvatar(null);
     },
@@ -137,13 +140,31 @@ const Profile = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div>Loading...</div>
-      </div>
+      <>
+        <Skeleton
+          className="w-[98%]  mx-auto h-64  overflow-hidden"
+          borderRadius={"2xl"}
+        />
+        <Flex>
+          <SkeletonCircle size="40" m={2} />
+          <SkeletonText
+            mt="8"
+            noOfLines={2}
+            spacing="4"
+            skeletonHeight="5"
+            width={"400px"}
+          />
+        </Flex>
+      </>
     );
   }
 
   if (error) {
+    console.log("I am error", error?.message);
+    if (error?.message == "Access token has expired. Please log in again.") {
+      dispatch(logout());
+      router.push("/login");
+    }
     return (
       <div className="flex items-center justify-center min-h-screen text-red-500">
         {error instanceof Error ? error.message : "An error occurred"}
@@ -161,8 +182,17 @@ const Profile = () => {
           <div>
             {/* Cover Image */}
             <Box
-              className="w-full h-64 relative rounded-xl overflow-hidden cursor-pointer"
-              onClick={() => coverFileInputRef.current?.click()}
+              className="w-full h-64 relative rounded-xl overflow-hidden"
+              onClick={
+                owner === username && owner === user?.data?.username
+                  ? () => coverFileInputRef.current?.click()
+                  : undefined
+              }
+              cursor={
+                owner === username && owner === user?.data?.username
+                  ? "pointer"
+                  : "default"
+              }
             >
               {selectedBanner || user?.data?.coverImage ? (
                 <Image
@@ -175,28 +205,34 @@ const Profile = () => {
               ) : (
                 <Box className="w-full h-full bg-gray-300 flex items-center justify-center">
                   <Text fontSize="lg" color="gray.600">
-                    Select Banner Image
+                    {owner === username && owner === user?.data?.username
+                      ? "Select Banner Image"
+                      : "No Banner Image"}
                   </Text>
                 </Box>
               )}
-              <Input
-                type="file"
-                accept="image/*"
-                hidden
-                ref={coverFileInputRef}
-                onChange={handleBannerChange}
-              />
+              {owner === username && owner === user?.data?.username && (
+                <Input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  ref={coverFileInputRef}
+                  onChange={handleBannerChange}
+                />
+              )}
             </Box>
 
-            {selectedBanner && (
-              <Button
-                onClick={handleCoverImageUpdate}
-                mt={2}
-                isLoading={coverImageMutation.isPending}
-              >
-                Upload Cover
-              </Button>
-            )}
+            {selectedBanner &&
+              owner === username &&
+              owner === user?.data?.username && (
+                <Button
+                  onClick={handleCoverImageUpdate}
+                  mt={2}
+                  isLoading={coverImageMutation.isPending}
+                >
+                  Upload Cover
+                </Button>
+              )}
 
             {/* Avatar Image */}
             <Flex py={4} alignItems={"start"} gap={6}>
@@ -207,16 +243,26 @@ const Profile = () => {
                   className="w-32 rounded-full"
                   width={40}
                   height={40}
-                  onClick={() => avatarFileInputRef.current?.click()}
-                  cursor="pointer"
+                  onClick={
+                    owner === username && owner === user?.data?.username
+                      ? () => avatarFileInputRef.current?.click()
+                      : undefined
+                  }
+                  cursor={
+                    owner === username && owner === user?.data?.username
+                      ? "pointer"
+                      : "default"
+                  }
                 />
-                <Input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  ref={avatarFileInputRef}
-                  onChange={handleAvatarChange}
-                />
+                {owner === username && owner === user?.data?.username && (
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    ref={avatarFileInputRef}
+                    onChange={handleAvatarChange}
+                  />
+                )}
               </Box>
 
               <Box>
@@ -230,53 +276,64 @@ const Profile = () => {
                 <Text color={secondaryTextColor}>@{user?.data?.username}</Text>
                 <Text color={secondaryTextColor}>{user?.data?.bio}</Text>
 
-                <Flex gap={2}>
-                  <Button
-                    variant={"unstyled"}
-                    textColor={secondaryTextColor}
-                    px={4}
-                    my={4}
-                    bg={buttonBg}
-                    onClick={onOpen}
-                    borderRadius={"full"}
-                  >
-                    Edit Profile
-                  </Button>
-                  <Button
-                    variant={"unstyled"}
-                    textColor={secondaryTextColor}
-                    px={4}
-                    my={4}
-                    bg={buttonBg}
-                    borderRadius={"full"}
-                  >
-                    Change Password
-                  </Button>
-                </Flex>
+                {owner === username && owner === user?.data?.username && (
+                  <Flex gap={2}>
+                    <Button
+                      variant={"unstyled"}
+                      textColor={secondaryTextColor}
+                      px={4}
+                      my={4}
+                      bg={buttonBg}
+                      onClick={onOpen}
+                      borderRadius={"full"}
+                    >
+                      Edit Profile
+                    </Button>
+                    <Button
+                      variant={"unstyled"}
+                      textColor={secondaryTextColor}
+                      px={4}
+                      my={4}
+                      bg={buttonBg}
+                      borderRadius={"full"}
+                    >
+                      Change Password
+                    </Button>
+                  </Flex>
+                )}
               </Box>
             </Flex>
 
-            {selectedAvatar && (
-              <Button
-                onClick={handleAvatarImageUpdate}
-                mt={2}
-                isLoading={avatarImageMutation.isPending}
-              >
-                Upload Avatar
-              </Button>
-            )}
+            {selectedAvatar &&
+              owner === username &&
+              owner === user?.data?.username && (
+                <Button
+                  onClick={handleAvatarImageUpdate}
+                  mt={2}
+                  isLoading={avatarImageMutation.isPending}
+                >
+                  Upload Avatar
+                </Button>
+              )}
           </div>
         )}
       </div>
 
-      <Tabs variant={"solid-rounded"} defaultIndex={tab === "videos" ? 0 : tab === "tweets" ? 1 : tab === "saved" ? 2 : 0}>
+      <Tabs
+        variant={"solid-rounded"}
+        defaultIndex={
+          tab === "videos" ? 0 : tab === "tweets" ? 1 : tab === "saved" ? 2 : 0
+        }
+      >
         <TabList>
           <Tab
             mx={1}
             color={colorMode == "dark" ? "white" : "black"}
             _selected={{ color: "white", bg: "gray.500" }}
             onClick={() => {
-              router.push(`/profile/${profileUsername}?tab=videos`, { scroll: false });
+              router.push(`/profile/${profileUsername}?tab=videos`, {
+                scroll: false,
+              });
             }}
           >
             Videos
@@ -286,29 +343,35 @@ const Profile = () => {
             color={colorMode == "dark" ? "white" : "black"}
             _selected={{ color: "white", bg: "gray.500" }}
             onClick={() => {
-              router.push(`/profile/${profileUsername}?tab=tweets`, { scroll: false });
+              router.push(`/profile/${profileUsername}?tab=tweets`, {
+                scroll: false,
+              });
             }}
           >
             Tweets
           </Tab>
-          <Tab
-            mx={1}
-            color={colorMode == "dark" ? "white" : "black"}
-            _selected={{ color: "white", bg: "gray.500" }}
-            onClick={() => {
-              router.push(`/profile/${profileUsername}?tab=saved`, { scroll: false });
-            }}
-          >
-            Saved
-          </Tab>
+          {owner === username && owner === user?.data?.username && (
+            <Tab
+              mx={1}
+              color={colorMode == "dark" ? "white" : "black"}
+              _selected={{ color: "white", bg: "gray.500" }}
+              onClick={() => {
+                router.push(`/profile/${profileUsername}?tab=saved`, {
+                  scroll: false,
+                });
+              }}
+            >
+              Saved
+            </Tab>
+          )}
         </TabList>
 
         <TabPanels>
-          <TabPanel >
-            <Myvideos />
+          <TabPanel>
+            <Myvideos username={username as string} />
           </TabPanel>
           <TabPanel>
-            <Tweets />
+            <Tweets username={user?.data?.username} userId={user?.data?._id} />
           </TabPanel>
           <TabPanel>
             <Bookmarks />
@@ -319,10 +382,9 @@ const Profile = () => {
       <EditProfile
         isOpen={isOpen}
         onClose={onClose}
-    
         fullName={user?.data?.fullName}
         bio={user?.data?.bio}
-        />
+      />
     </div>
   );
 };

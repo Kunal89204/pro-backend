@@ -18,7 +18,7 @@ const Tweet = ({
   data: {
     content: string;
     image: string;
-    views: number;
+    viewsCount: number;
     likesCount: number;
     comments: number;
     createdAt: string;
@@ -126,7 +126,7 @@ const Tweet = ({
 
       <Divider my={2} />
 
-      <Engagement _id={data._id}  likes={data.likesCount} comments={data.comments} views={data.views} />
+      <Engagement _id={data._id}  likes={data.likesCount} comments={data.comments} views={data.viewsCount} />
     </div>
   );
 };

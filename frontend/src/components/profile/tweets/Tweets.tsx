@@ -16,7 +16,7 @@ type TweetType = {
   _id: string;
 };
 
-const Tweets = () => {
+const Tweets = ({username, userId}: {username: string | undefined, userId: string | undefined}) => {
   const token = useSelector((state: RootState) => state.token);
 
   const {
@@ -26,7 +26,7 @@ const Tweets = () => {
     error,
   } = useQuery({
     queryKey: ["tweets"],
-    queryFn: () => myQuery.getTweetsOfUser(token),
+    queryFn: () => myQuery.getTweetsOfUser(token, username as string),
   });
 
   if (isError) {
@@ -56,7 +56,7 @@ const Tweets = () => {
   return (
     <div className="grid grid-cols-4 gap-2">
       {tweets?.data?.map((tweet: TweetType) => (
-        <Tweet key={tweet._id} tweet={tweet} />
+        <Tweet key={tweet._id} tweet={tweet} username={username} userId={userId} />
       ))}
     </div>
   );

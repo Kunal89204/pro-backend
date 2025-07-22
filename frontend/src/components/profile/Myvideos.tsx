@@ -9,13 +9,13 @@ import { VideoProps } from '@/types/types'
 
 
 
-const Myvideos: React.FC = () => {
+const Myvideos: React.FC<{username: string | undefined}> = ({username}) => {
     const token = useSelector((state: RootState) => state.token)
   
 
     const { data } = useQuery({
         queryKey: ['myvideos'],
-        queryFn: () => myQuery.getUserVideos(token)
+        queryFn: () => myQuery.getUserVideos(token, username as string)
     })
 
 

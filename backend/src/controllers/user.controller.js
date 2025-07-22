@@ -68,12 +68,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const user = await User.create({
     fullName,
-    // avatar: avatar.url,
-    // coverImage: coverImage?.url || "",
     email,
     password,
     username: username.toLowerCase(),
   });
+
+  console.log(user)
 
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
@@ -240,9 +240,21 @@ const changeCurrentPassword = async (req, res) => {
 };
 
 const getCurrentUser = async (req, res) => {
+  const userId = req.user._id;
+  const username  = req.params.username;
+
+  const user = await User.findOne({ username }).select("-password -refreshToken -watchHistory");
+
+  let isOwnChannel = false;
+  if(user._id.toString() === userId.toString()){
+    isOwnChannel = true;
+  }
+  
+
+  
   return res
     .status(200)
-    .json(new ApiResponse(200, req.user, "current user fetched"));
+    .json(new ApiResponse(200, user, "current user fetched"));
 };
 
 const updateAccountDetails = asyncHandler(async (req, res) => {

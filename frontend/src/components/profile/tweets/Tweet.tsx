@@ -21,9 +21,13 @@ import {
   MenuList,
   MenuItem,
 } from "@chakra-ui/react";
+import { RootState } from "@/lib/store";
+import { useSelector } from "react-redux";
 
 const Tweet = ({
   tweet,
+  username,
+  userId,
 }: {
   tweet: {
     viewsCount: number;
@@ -35,11 +39,14 @@ const Tweet = ({
     _id: string;
    
   };
+  username: string | undefined;
+  userId: string | undefined;
 }) => {
   const { colorMode } = useColorMode();
   const { textColor, secondaryTextColor } = useThemeColors();
   const router = useRouter();
-
+  const userIdAccount = useSelector((state: RootState) => state.user?._id);
+  
  
   // Markdown processing function
   const processMarkdown = (text: string) => {
@@ -70,10 +77,15 @@ const Tweet = ({
           </MenuButton>
 
           <MenuList>
-            <MenuItem>View</MenuItem>
-            <MenuItem>Edit</MenuItem>
-            <MenuItem>Delete</MenuItem>
-          </MenuList>
+            <MenuItem onClick={() => router.push(`/tweet/${tweet._id}`)} textColor={textColor}>View</MenuItem>
+            {/* <MenuItem onClick={() => router.push(`/tweet/${tweet._id}`)} textColor={textColor}>Bookmark</MenuItem> */}
+              {userIdAccount === userId && (
+                <>
+                  <MenuItem onClick={() => router.push(`/tweet/${tweet._id}/edit`)} textColor={textColor}>Edit</MenuItem>
+                  <MenuItem onClick={() => router.push(`/tweet/${tweet._id}/delete`)} textColor={textColor}>Delete</MenuItem>
+                </>
+              )}
+            </MenuList>
         </Menu>
       </Flex>
 

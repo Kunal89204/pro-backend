@@ -5,6 +5,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Bookmark } from "../models/bookmark.model.js";
 import WatchHistory from "../models/watchHistory.model.js";
 import mongoose from "mongoose";
+import { User } from "../models/user.model.js";
 
 const createTweet = asyncHandler(async (req, res) => {
   console.log("requested");
@@ -45,8 +46,13 @@ const createTweet = asyncHandler(async (req, res) => {
 
 const getTweetsOfUser = asyncHandler(async (req, res) => {
   const userId = req?.user?._id;
+  const username = req?.params?.username;
 
-  const tweets = await Tweet.find({ owner: userId }).sort({ createdAt: -1 });
+  console.log("username", username)
+
+  const user = await User.findOne({ username }).select("-password -refreshToken -watchHistory");
+
+  const tweets = await Tweet.find({ owner: user._id }).sort({ createdAt: -1 });
 
   res
     .status(200)

@@ -35,7 +35,7 @@ type Video = {
 type Tweet = {
   commentsCount: number | undefined;
   createdAt: string | undefined;
-  views: number | undefined;
+  viewsCount: number | undefined;
   _id: string|undefined;
   content: string;
   image?: string;
@@ -290,6 +290,7 @@ const Home: React.FC = () => {
                     duration={video.duration}
                     videoId={video._id}
                     isProfile={false}
+                    username={video.owner.username}
                   />
                 ))}
               </div>
@@ -311,7 +312,7 @@ const Home: React.FC = () => {
                     }}
                     content={tweet.content}
                     timestamp={tweet.createdAt}
-                    views={tweet.views}
+                    viewsCount={tweet.viewsCount}
                     image={tweet.image}
                     id={tweet._id}
                     likesCount={tweet?.likesCount}

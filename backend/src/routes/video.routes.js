@@ -41,7 +41,7 @@ router
     publishAVideo
   );
 
-router.route("/uservideos").get(userVideos);
+router.route("/uservideos/:username").get(userVideos);
 
 router
   .route("/:videoId([0-9a-fA-F]{24})") // ✅ Only match valid ObjectIds

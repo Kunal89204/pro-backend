@@ -22,7 +22,7 @@ const TweetPage = () => {
   const addTweetViewMutation = useMutation({
     mutationFn: () => tweetQueries.addTweetView(token, id as string),
     onSuccess: () => {
-     
+      console.log("after success: view added");
     },
     onError: () => {
       console.log("error");
@@ -33,8 +33,6 @@ const TweetPage = () => {
     console.log("view added");
     addTweetViewMutation.mutate();
   }, []);
-
-
 
   return (
     <div className="w-full p-2 flex gap-2">

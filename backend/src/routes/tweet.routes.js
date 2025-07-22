@@ -5,7 +5,7 @@ import { upload } from "../middlewares/multer.middleware.js";
 const router = express.Router();
 
 router.post("/create", verifyJWT, upload.single("image"), createTweet);
-router.get("/get-tweets", verifyJWT, getTweetsOfUser);
+router.get("/get-tweets/:username", verifyJWT, getTweetsOfUser);
 router.get("/", verifyJWT, getTweets);
 router.get("/bookmarks", verifyJWT, getBookmarkedTweets);
 router.post("/bookmark/:id", verifyJWT, bookmarkTweet);

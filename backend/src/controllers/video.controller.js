@@ -11,6 +11,10 @@ import { getPublicIdFromUrl } from "../utils/publicIdExtracter.js";
 
 import { Subscription } from "../models/subscription.model.js";
 import { User } from "../models/user.model.js";
+import { Like } from "../models/like.model.js";
+import { Comment } from "../models/comment.model.js";
+import { Playlist } from "../models/playlist.model.js";
+import WatchHistory from "../models/watchHistory.model.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
@@ -346,6 +350,14 @@ const deleteVideo = asyncHandler(async (req, res) => {
       deleteFromCloudinary(publicVideoId, "video"),
       deleteFromCloudinary(publicThumbnailId),
       Video.deleteOne({ _id: videoId }),
+      Like.deleteMany({
+        video: videoId,
+      }),
+      Playlist.updateMany({ videos: videoId }, { $pull: { videos: videoId } }),
+      WatchHistory.deleteMany({
+        videoId,
+      }),
+      Comment.deleteMany({ video: videoId }),
     ]);
 
     return res.status(200).json({

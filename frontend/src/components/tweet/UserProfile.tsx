@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Flex, Text, Button, Avatar } from "@chakra-ui/react";
 import Image from "next/image";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { useRouter } from "next/navigation";
 
 const UserProfile = ({
   data,
@@ -18,13 +19,13 @@ const UserProfile = ({
   };
   tweetsCount: number;
 }) => {
-  const { textColor, secondaryTextColor } = useThemeColors();
-
+  const { textColor, secondaryTextColor, bgColor } = useThemeColors();
+  const router = useRouter();
   return (
     <Box
       // borderWidth="1px"
       borderRadius="lg"
-      bg={"#161616"}
+      bg={bgColor}
       overflow="hidden"
       p={4}
       maxWidth={"60%"}
@@ -83,7 +84,7 @@ const UserProfile = ({
           </Flex>
         </Flex>
 
-        <Button colorScheme="gray" size="md" width="full" borderRadius={"full"}>
+        <Button onClick={() => router.push(`/profile/${data?.username}`)} colorScheme="gray" size="md" width="full" borderRadius={"full"}>
           Go to Profile
         </Button>
       </Flex>

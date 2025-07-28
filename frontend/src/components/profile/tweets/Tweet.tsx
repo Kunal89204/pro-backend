@@ -81,7 +81,7 @@ const Tweet = ({
             {/* <MenuItem onClick={() => router.push(`/tweet/${tweet._id}`)} textColor={textColor}>Bookmark</MenuItem> */}
               {userIdAccount === userId && (
                 <>
-                  <MenuItem onClick={() => router.push(`/tweet/${tweet._id}/edit`)} textColor={textColor}>Edit</MenuItem>
+                  {/* <MenuItem onClick={() => router.push(`/tweet/${tweet._id}/edit`)} textColor={textColor}>Edit</MenuItem> */}
                   <MenuItem onClick={() => router.push(`/tweet/${tweet._id}/delete`)} textColor={textColor}>Delete</MenuItem>
                 </>
               )}

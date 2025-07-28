@@ -22,6 +22,7 @@ import DeleteButton from "./DeleteButton";
 import SaveToPlaylistModal from "../Modals/SaveToPlaylistModal";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
+import ShareVideo from "../Modals/ShareVideo";
 
 const formatDuration = (input: number | string | bigint): string => {
   const seconds = typeof input === "bigint" ? Number(input) : Number(input);
@@ -57,6 +58,12 @@ const Video: React.FC<VideoProps> = ({
     isOpen: isSaveToPlaylistOpen,
     onClose: onSaveToPlaylistClose,
     onOpen,
+  } = useDisclosure();
+
+  const {
+    isOpen: isShareOpen,
+    onClose: onShareClose,
+    onOpen: onOpenShare,
   } = useDisclosure();
 
   return (
@@ -112,14 +119,36 @@ const Video: React.FC<VideoProps> = ({
                 variant="unstyled"
                 aria-label="Options"
               />
-              <MenuList textColor={textColor}>
+              <MenuList
+                textColor={textColor}
+                bg={"transparent"}
+                border={"0px solid #202020"}
+                backdropFilter="blur(20px)"
+              >
                 {owner === userId && (
-                  <MenuItem as={Link} href={`/video/${_id}/edit`}>
+                  <MenuItem
+                    as={Link}
+                    href={`/video/${_id}/edit`}
+                    bg={"transparent"}
+                    _hover={{ bg: "transparent" }}
+                  >
                     Edit
                   </MenuItem>
                 )}
-                <MenuItem onClick={onOpen}>Save to Playlist</MenuItem>
-                <MenuItem>Share</MenuItem>
+                <MenuItem
+                  onClick={onOpen}
+                  bg={"transparent"}
+                  _hover={{ bg: "transparent" }}
+                >
+                  Save to Playlist
+                </MenuItem>
+                <MenuItem
+                  onClick={onOpenShare}
+                  bg={"transparent"}
+                  _hover={{ bg: "transparent" }}
+                >
+                  Share
+                </MenuItem>
                 {owner === userId && (
                   <DeleteButton id={_id}>Delete</DeleteButton>
                 )}
@@ -146,6 +175,8 @@ const Video: React.FC<VideoProps> = ({
         onClose={onSaveToPlaylistClose}
         videoId={_id}
       />
+
+      <ShareVideo isOpen={isShareOpen} onClose={onShareClose} videoId={_id} />
     </Box>
   );
 };

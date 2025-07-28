@@ -19,7 +19,7 @@ const DeleteButton = ({ id, children }: { id: string; children: ReactNode }) => 
     })
 
     return (
-        <MenuItem onClick={() => mutation.mutate({ token, id })}>
+        <MenuItem onClick={() => mutation.mutate({ token, id })} bg={'transparent'} _hover={{bg: 'transparent'}}>
             {children}
         </MenuItem>
     )

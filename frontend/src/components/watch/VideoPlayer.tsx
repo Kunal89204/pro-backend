@@ -26,12 +26,14 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { CiBookmark } from "react-icons/ci";
 import ShareVideo from "../Modals/ShareVideo";
+import { useRouter } from "next/navigation";
 
 // Define types
 interface Owner {
   avatar: string;
   fullName: string;
   _id: string;
+  username: string;
 }
 
 interface VideoData {
@@ -63,6 +65,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
   const { colorMode } = useColorMode();
   const { isOpen, onClose, onOpen } = useDisclosure();
   const { isOpen: isOpenShare, onOpen: onOpenShare, onClose: onCloseShare } = useDisclosure();
+  const router = useRouter();
   // Video js refs
   const videoRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<ReturnType<typeof videojs> | null>(null);
@@ -203,10 +206,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ data }) => {
             alt="Owner Avatar"
             width={1000}
             height={1000}
-            className="w-10 lg:w-12 aspect-square object-cover rounded-full"
+            className="w-10 lg:w-12 aspect-square object-cover rounded-full cursor-pointer"
+            onClick={() => router.push(`/profile/${vdo?.owner?.username}`)}
           />
           <Box>
-            <Text color={textColor} fontWeight={"semibold"} noOfLines={1}>
+            <Text onClick={() => router.push(`/profile/${vdo?.owner?.username}`)} cursor={"pointer"} color={textColor} fontWeight={"semibold"} noOfLines={1}>
               {vdo?.owner?.fullName}
             </Text>
             {subscribeLoading ? (

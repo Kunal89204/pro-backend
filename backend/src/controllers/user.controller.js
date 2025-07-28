@@ -97,9 +97,10 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findOne({
-    $or: [{ username }, { email }],
+    username: username.toLowerCase(),
+    email: email
   });
-  console.log("User found:", user);
+ 
 
   if (!user) {
     return res.status(404).json({

@@ -22,7 +22,7 @@ const Results = ({ results, isLoading }: { results: SearchResult[], isLoading: b
     return <div>Loading...</div>;
   }
   return (
-    <div>
+    <div className="p-4">
       {results?.map((item: SearchResult, index: number) => (
         <Result key={index} item={item} />
       ))}

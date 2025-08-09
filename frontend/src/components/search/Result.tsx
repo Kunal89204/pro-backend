@@ -1,11 +1,20 @@
 import React from "react";
 import Image from "next/image";
 import { SearchResult } from "./Results";
-import { Box, Flex, Text, Avatar, HStack, VStack, useColorModeValue } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Text,
+  Avatar,
+  VStack,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
+import { useThemeColors } from "@/hooks/useThemeColors";
 
 const Result = ({ item }: { item: SearchResult }) => {
   const router = useRouter();
+  const { textColor, secondaryTextColor } = useThemeColors();
   const formatViews = (views: number) => {
     if (views >= 1000000) {
       return `${(views / 1000000).toFixed(1)}M`;
@@ -28,18 +37,27 @@ const Result = ({ item }: { item: SearchResult }) => {
     <Box
       p={4}
       borderRadius="lg"
-      bg={useColorModeValue("white", "#121212")}
+      // bg={useColorModeValue("white", "#111111")}
       boxShadow="sm"
-     
       transition="all 0.2s"
       cursor="pointer"
       mb={4}
       className="w-full"
     >
-      <Flex gap={4} align="start" className="w-full">
-        <Box onClick={() => {
-          router.push(`/watch/${item._id}`);
-        }} position="relative" flexShrink={0} className="w-1/4 ">
+      <Flex
+        gap={4}
+        align="start"
+        className="w-full"
+        direction={{ base: "column", md: "row" }}
+      >
+        <Box
+          onClick={() => {
+            router.push(`/watch/${item._id}`);
+          }}
+          position="relative"
+          flexShrink={0}
+          className="lg:w-1/4 w-full"
+        >
           <Image
             src={item.thumbnail}
             alt={item.title}
@@ -67,47 +85,61 @@ const Result = ({ item }: { item: SearchResult }) => {
           </Box>
         </Box>
 
-        <VStack align="start" flex={1} spacing={2} className="w-3/4 ">
-          <Text
-            fontSize="lg"
-            fontWeight="semibold"
-            lineHeight="short"
-            noOfLines={2}
-            color={useColorModeValue("gray.800", "white")}
-            onClick={() => {
-              router.push(`/watch/${item._id}`);
-            }}
-            className="cursor-pointer"
-          >
-            {item.title}
-          </Text>
+       
 
-          <Flex alignItems="center" gap={2}><Text fontSize="sm" color={useColorModeValue("gray.600", "white")}>
-            {formatViews(item.views)} views
-          </Text>
-          <Box className="w-1 h-1 rounded-full bg-gray-600" bg={useColorModeValue("gray.600", "white")}></Box>
-          <Text fontSize="sm" color={useColorModeValue("gray.600", "white")}>
-            {new Date(item.createdAt).toLocaleDateString()}
-          </Text>
-          </Flex>
-
-          <Text fontSize="sm" color={useColorModeValue("gray.600", "white")} noOfLines={2} lineHeight="base">
-            {item.description}
-          </Text>
-
-          <HStack spacing={2} align="center">
-            <Avatar
-              size="sm"
-              src={item.owner.avatar}
-              name={item.owner.fullName}
-            />
-            <VStack align="start" spacing={0}>
-              <Text fontSize="sm" fontWeight="medium" color={useColorModeValue("gray.700", "white")}>
+        <VStack align="start" flex={1} spacing={2} className="lg:w-3/4 w-full">
+          {/* Title */}
+          <Flex gap={3} align="start">
+            <Box>
+              <Avatar
+                src={item.owner.avatar}
+                name={item.owner.fullName}
+                size={{ base: "sm", md: "md" }}
+              />
+            </Box>
+            <Box>
+              <Text
+                color={textColor}
+                fontSize={{ base: "lg", md: "xl" }}
+                lineHeight="short"
+                noOfLines={2}
+                onClick={() => {
+                  router.push(`/watch/${item._id}`);
+                }}
+                className="cursor-pointer"
+              >
+                {item.title}
+              </Text>
+              <Text
+                fontSize={{ base: "xs", md: "sm" }}
+                color={secondaryTextColor}
+              >
                 {item.owner.fullName}
               </Text>
-             
-            </VStack>
-          </HStack>
+
+              {/* <Text fontSize={{ base: "xs", md: "sm" }} py={2} className="hidden md:block"  color={secondaryTextColor} noOfLines={2} lineHeight="base">
+                {item.description}
+              </Text> */}
+              <Flex align="center" gap={1}>
+                <Text
+                  fontSize={{ base: "xs", md: "sm" }}
+                  color={secondaryTextColor}
+                >
+                  {formatViews(item.views)} views
+                </Text>
+                <Box
+                  className="w-1 h-1 rounded-full bg-gray-600"
+                  bg={useColorModeValue("gray.600", "white")}
+                ></Box>
+                <Text
+                  fontSize={{ base: "xs", md: "sm" }}
+                  color={secondaryTextColor}
+                >
+                  {new Date(item.createdAt).toLocaleDateString()}
+                </Text>
+              </Flex>
+            </Box>
+          </Flex>
         </VStack>
       </Flex>
     </Box>

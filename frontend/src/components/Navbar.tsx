@@ -93,7 +93,7 @@ const Navbar: React.FC = () => {
       backdropFilter="blur(10px)"
       px={4}
       py={2}
-      boxShadow="sm"
+      // boxShadow="xl"
     >
       <Flex justify="space-between" align="center">
         <Box></Box>
@@ -108,13 +108,14 @@ const Navbar: React.FC = () => {
           ref={searchRef}
           as="form"
           onSubmit={handleSearchSubmit}
+          // bg={"red"}
         >
           <Input
             placeholder="Search..."
-            bg={colorMode == "light" ? "gray.200" : "rgba(10, 10, 10, 1)"}
+            bg={colorMode == "light" ? "gray.100" : "rgba(10, 10, 10, 1)"}
             color={inputTextColor}
             borderRadius="full"
-            py={2}
+            py={4}
             px={4}
             value={query}
             _focusVisible={{ outline: "none" }}

@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { useEffect, useState } from "react";
 import { myQuery } from "@/api/query";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const Engagement = ({
   _id,
@@ -30,11 +30,12 @@ const Engagement = ({
   const [likesCount, setLikesCount] = useState(likes);
 
   const token = useSelector((state: RootState) => state.token);
-
+  const queryClient = useQueryClient();
   const likeMutation = useMutation({
     mutationFn: () => myQuery.toggleLikeTweet(token, _id),
     onSuccess: () => {
- 
+      queryClient.invalidateQueries({ queryKey: ["home-feed"] });
+      queryClient.invalidateQueries({ queryKey: ["likeStatus", _id] });
     },
     onError: () => {
       setIsLiked(!isLiked);

@@ -15,8 +15,8 @@ import { useRouter } from "next/navigation";
 
 const SubscriptionCard = ({ channel }: { channel: Channel["channel"] }) => {
   const { textColor, secondaryTextColor } = useThemeColors();
-  const cardBg = useColorModeValue("white", "gray.800");
-  const hoverBg = useColorModeValue("gray.50", "whiteAlpha.100");
+  const cardBg = useColorModeValue("white", "black");
+  const hoverBg = useColorModeValue("gray.50", "purple.500");
   const router = useRouter();
   return (
     <Box
@@ -50,7 +50,7 @@ const SubscriptionCard = ({ channel }: { channel: Channel["channel"] }) => {
           )}
 
           <HStack>
-            <Badge colorScheme="purple" borderRadius="md" onClick={() => router.push(`/profile/${channel.username}`)} className="cursor-pointer">
+            <Badge colorScheme="black" borderRadius="md" color={"white"} onClick={() => router.push(`/profile/${channel.username}`)} className="cursor-pointer">
               {channel.subscribersCount} Subscribers
             </Badge>
           </HStack>

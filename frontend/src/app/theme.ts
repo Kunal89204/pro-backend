@@ -11,7 +11,7 @@ const colors = {
   primary: {
     base: {
       light: "#ffffff", // Primary background for light mode
-      dark: "#121212", // Primary background for dark mode
+      dark: "black", // Primary background for dark mode
     },
     text: {
       light: "#1A202C", // Text color for light mode

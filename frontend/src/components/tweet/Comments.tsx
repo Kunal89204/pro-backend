@@ -13,7 +13,7 @@ import {
   Flex,
   useColorMode,
 } from "@chakra-ui/react";
-import { IconThumbUp, IconSend, IconTrash } from "@tabler/icons-react";
+import {  IconSend, IconTrash } from "@tabler/icons-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import myQuery from "@/api/commentQueries";
 import { useSelector } from "react-redux";

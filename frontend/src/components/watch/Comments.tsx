@@ -12,13 +12,12 @@ import {
   Collapse,
   Divider,
   Flex,
-  useColorMode,
+
 } from "@chakra-ui/react";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import {
   IconMessageCircle,
-  IconThumbUp,
-  IconThumbDown,
+
   IconTrash,
 } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
@@ -58,7 +57,7 @@ const CommentItem = ({
   isLoading: boolean;
 }) => {
   const { textColor, secondaryTextColor } = useThemeColors();
-  const { colorMode } = useColorMode();
+
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyText, setReplyText] = useState("");

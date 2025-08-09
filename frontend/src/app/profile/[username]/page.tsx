@@ -182,7 +182,7 @@ const Profile = () => {
           <div>
             {/* Cover Image */}
             <Box
-              className="w-full h-64 relative rounded-xl overflow-hidden"
+              className="w-full lg:h-64 h-44 relative rounded-xl overflow-hidden"
               onClick={
                 owner === username && owner === user?.data?.username
                   ? () => coverFileInputRef.current?.click()
@@ -200,7 +200,7 @@ const Profile = () => {
                   alt="Cover"
                   width={1000}
                   height={400}
-                  className="w-full h-64 object-cover"
+                  className="w-full lg:h-64 h-44 object-cover"
                 />
               ) : (
                 <Box className="w-full h-full bg-gray-300 flex items-center justify-center">
@@ -241,8 +241,7 @@ const Profile = () => {
                   src={selectedAvatar || user?.data?.avatar}
                   name={user?.data?.fullName}
                   className="w-32 rounded-full"
-                  width={40}
-                  height={40}
+                  size={{base: "lg", md: "lg", lg: "2xl"}}
                   onClick={
                     owner === username && owner === user?.data?.username
                       ? () => avatarFileInputRef.current?.click()
@@ -267,9 +266,10 @@ const Profile = () => {
 
               <Box>
                 <Text
-                  fontSize={"4xl"}
+                  fontSize={{base:'xl', md:"4xl"}}
                   color={textColor}
                   fontWeight={"semibold"}
+                  
                 >
                   {user?.data?.fullName}
                 </Text>

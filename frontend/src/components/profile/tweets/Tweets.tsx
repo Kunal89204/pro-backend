@@ -35,7 +35,7 @@ const Tweets = ({username, userId}: {username: string | undefined, userId: strin
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-4 gap-1">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1">
         {Array.from({ length: 8 }).map((_, index) => (
           <div key={index}>
             <div className="flex items-center gap-2">
@@ -54,7 +54,7 @@ const Tweets = ({username, userId}: {username: string | undefined, userId: strin
   }
 
   return (
-    <div className="grid grid-cols-4 gap-2">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
       {tweets?.data?.map((tweet: TweetType) => (
         <Tweet key={tweet._id} tweet={tweet}  userId={userId} />
       ))}

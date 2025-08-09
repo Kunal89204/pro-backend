@@ -136,16 +136,7 @@ const CommentItem = ({
             {comment.content}
           </Text>
           <HStack mt={2} spacing={4}>
-            <IconThumbUp
-              size={16}
-              cursor="pointer"
-              color={colorMode == "light" ? "black" : "white"}
-            />
-            <IconThumbDown
-              color={colorMode == "light" ? "black" : "white"}
-              size={16}
-              cursor="pointer"
-            />
+           
             <Text
               color={textColor}
               fontSize="sm"

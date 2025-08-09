@@ -36,13 +36,13 @@ const TweetPage = () => {
 
   return (
     <div className="w-full p-2 flex gap-2">
-      <div className="w-3/5 ">
+      <div className="w-full md:w-3/5 ">
         <Tweet data={data?.data?.tweet} isLoading={isLoading} />
 
         <Comments tweetId={id as string} />
       </div>
 
-      <div className="w-2/5">
+      <div className="w-2/5 hidden md:block">
         <UserProfile
           data={data?.data?.tweet?.owner}
           tweetsCount={data?.data?.tweetsCount}

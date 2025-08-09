@@ -166,16 +166,7 @@ const CommentItem = ({
             {comment?.content}
           </Text>
           <HStack mt={2} spacing={4}>
-            <Flex alignItems="center">
-              <IconThumbUp
-                size={16}
-                cursor="pointer"
-                color={colorMode === "light" ? "black" : "white"}
-              />
-              <Text ml={1} fontSize="xs">
-                {comment?.likes || 0}
-              </Text>
-            </Flex>
+            
 
             <Text
               color={textColor}

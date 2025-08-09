@@ -281,8 +281,9 @@ const Profile = () => {
                     <Button
                       variant={"unstyled"}
                       textColor={secondaryTextColor}
-                      px={4}
-                      my={4}
+                      fontSize={{base:'sm'}}
+                      px={{base:3, md:4}}
+                      my={{base:2, md:4}}
                       bg={buttonBg}
                       onClick={onOpen}
                       borderRadius={"full"}
@@ -292,11 +293,12 @@ const Profile = () => {
                     <Button
                       variant={"unstyled"}
                       textColor={secondaryTextColor}
-                      px={4}
-                      my={4}
+                      px={{base:3, md:4}}
+                      my={{base:2, md:4}}
                       bg={buttonBg}
                       borderRadius={"full"}
-                    >
+                      fontSize={{base:'sm'}}
+                      >
                       Change Password
                     </Button>
                   </Flex>

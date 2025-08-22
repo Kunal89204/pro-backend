@@ -275,7 +275,7 @@ const Home: React.FC = () => {
           if (item.hasOwnProperty("videos")) {
             return (
               <div
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-4 3xl:grid-cols-5 mx-auto"
+                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-4 3xl:grid-cols-4 mx-auto"
                 key={i}
               >
                 {item.videos.map((video: Video, i: number) => (
@@ -298,7 +298,7 @@ const Home: React.FC = () => {
           } else if (item.hasOwnProperty("tweets")) {
             return (
               <div
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2 p-4 3xl:grid-cols-5 mx-auto  "
+                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-4 3xl:grid-cols-4 mx-auto  "
                 key={i}
               >
                 {item.tweets.map((tweet: Tweet, i: number) => (

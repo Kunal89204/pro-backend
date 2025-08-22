@@ -54,10 +54,12 @@ const registerUser = asyncHandler(async (req, res) => {
   const { fullName, email, username, password } = req.body;
   const fields = [fullName, email, username, password];
 
-  if (fields.some((field) => typeof field !== "string" || field.trim() === "")) {
+  if (
+    fields.some((field) => typeof field !== "string" || field.trim() === "")
+  ) {
     throw new ApiError(400, "All fields are required");
   }
-  
+
   const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
@@ -73,7 +75,7 @@ const registerUser = asyncHandler(async (req, res) => {
     username: username.toLowerCase(),
   });
 
-  console.log(user)
+  console.log(user);
 
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
@@ -92,7 +94,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const { email, username, password } = req.body;
   console.log("Request body:", req.body);
 
-  console.log(username,email, password)
+  console.log(username, email, password);
 
   if (!username && !email) {
     throw new ApiError(400, "Username or email is required");
@@ -100,11 +102,10 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({
     username: username.toLowerCase(),
-    email: email
+    email: email,
   });
 
-  console.log(user)
- 
+  console.log(user);
 
   if (!user) {
     return res.status(404).json({
@@ -246,17 +247,17 @@ const changeCurrentPassword = async (req, res) => {
 
 const getCurrentUser = async (req, res) => {
   const userId = req.user._id;
-  const username  = req.params.username;
+  const username = req.params.username;
 
-  const user = await User.findOne({ username }).select("-password -refreshToken -watchHistory");
+  const user = await User.findOne({ username }).select(
+    "-password -refreshToken -watchHistory"
+  );
 
   let isOwnChannel = false;
-  if(user._id.toString() === userId.toString()){
+  if (user._id.toString() === userId.toString()) {
     isOwnChannel = true;
   }
-  
 
-  
   return res
     .status(200)
     .json(new ApiResponse(200, user, "current user fetched"));
@@ -544,7 +545,7 @@ const getHomeFeed = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit) || 20;
 
   const videoChunk = 8;
-  const tweetChunk = 3;
+  const tweetChunk = 4;
 
   const cacheKey = `homeFeed:page:${page}:limit:${limit}`;
   const cacheTTL = 60 * 2; // 2 minutes

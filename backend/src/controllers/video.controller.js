@@ -278,14 +278,23 @@ const userVideos = async (req, res) => {
       "-password -refreshToken -watchHistory"
     );
 
+    // Determine if the requesting user is the owner
+    const isOwner = userId.toString() === user._id.toString();
+
+    // Build query filter based on ownership
+    const videoFilter = { owner: user._id };
+    if (!isOwner) {
+      videoFilter.isPublished = true; // Only show published videos to non-owners
+    }
+
     // Fetch videos with pagination
-    const videos = await Video.find({ owner: user._id })
+    const videos = await Video.find(videoFilter)
       .sort({ createdAt: -1 }) // Sort by newest videos first
       .skip(skip)
       .limit(limit);
 
     // Count total videos for pagination info
-    const totalVideos = await Video.countDocuments({ owner: user._id });
+    const totalVideos = await Video.countDocuments(videoFilter);
 
     res.json({
       success: true,

@@ -125,7 +125,7 @@ const EmbedVideoPlayer = () => {
             style={{ textShadow: "0 2px 8px rgba(0,0,0,0.7)" }}
           >
             <a
-              href={`https://youtube.kunalkhandelwal.dev/watch/${videoId}`}
+              href={`https://tvideo.kunalkhandelwal.dev/watch/${videoId}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{

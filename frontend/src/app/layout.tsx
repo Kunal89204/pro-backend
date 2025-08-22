@@ -21,8 +21,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "YouTube",
-  description: "Watch you favorite videos on youtube",
+  title: "Tvideo",
+  description: "Watch you favorite videos on tvideo",
 };
 
 export default function RootLayout({

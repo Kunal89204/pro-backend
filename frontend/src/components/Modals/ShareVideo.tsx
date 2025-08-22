@@ -33,7 +33,7 @@ const ShareVideo: React.FC<ShareVideoProps> = ({
 }) => {
   const toast = useToast();
 
-  const baseURL = "https://youtube.kunalkhandelwal.dev";
+  const baseURL = "https://tvideo.kunalkhandelwal.dev";
   const videoURL = `${baseURL}/watch/${videoId}`;
   const embedURL = `${baseURL}/embed/video/${videoId}`;
 

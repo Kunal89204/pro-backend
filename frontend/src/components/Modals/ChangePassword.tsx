@@ -114,6 +114,7 @@ const ChangePassword = ({
     try {
       await handleChangePasswordMutation.mutateAsync();
     } catch (error) {
+      console.log(error)
       toast({
         title: "Password Change Failed",
         description: "Failed to change password. Please try again.",

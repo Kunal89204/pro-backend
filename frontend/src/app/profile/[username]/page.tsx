@@ -27,6 +27,7 @@ import Tweets from "@/components/profile/tweets/Tweets";
 import Bookmarks from "@/components/profile/bookmarks/Bookmarks";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { logout } from "@/lib/slices/authSlice";
+import ChangePassword from "@/components/Modals/ChangePassword";
 
 const Profile = () => {
   const token = useSelector((state: RootState) => state.token);
@@ -35,6 +36,7 @@ const Profile = () => {
   const dispatch = useDispatch();
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isChangePasswordOpen, onOpen: onOpenChangePassword, onClose: onCloseChangePassword } = useDisclosure();
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
   const router = useRouter();
@@ -241,7 +243,7 @@ const Profile = () => {
                   src={selectedAvatar || user?.data?.avatar}
                   name={user?.data?.fullName}
                   className="w-32 rounded-full"
-                  size={{base: "lg", md: "lg", lg: "2xl"}}
+                  size={{ base: "lg", md: "lg", lg: "2xl" }}
                   onClick={
                     owner === username && owner === user?.data?.username
                       ? () => avatarFileInputRef.current?.click()
@@ -266,10 +268,9 @@ const Profile = () => {
 
               <Box>
                 <Text
-                  fontSize={{base:'xl', md:"4xl"}}
+                  fontSize={{ base: "xl", md: "4xl" }}
                   color={textColor}
                   fontWeight={"semibold"}
-                  
                 >
                   {user?.data?.fullName}
                 </Text>
@@ -281,9 +282,9 @@ const Profile = () => {
                     <Button
                       variant={"unstyled"}
                       textColor={secondaryTextColor}
-                      fontSize={{base:'sm'}}
-                      px={{base:3, md:4}}
-                      my={{base:2, md:4}}
+                      fontSize={{ base: "sm" }}
+                      px={{ base: 3, md: 4 }}
+                      my={{ base: 2, md: 4 }}
                       bg={buttonBg}
                       onClick={onOpen}
                       borderRadius={"full"}
@@ -293,12 +294,13 @@ const Profile = () => {
                     <Button
                       variant={"unstyled"}
                       textColor={secondaryTextColor}
-                      px={{base:3, md:4}}
-                      my={{base:2, md:4}}
+                      px={{ base: 3, md: 4 }}
+                      my={{ base: 2, md: 4 }}
                       bg={buttonBg}
                       borderRadius={"full"}
-                      fontSize={{base:'sm'}}
-                      >
+                      fontSize={{ base: "sm" }}
+                      onClick={onOpenChangePassword}
+                    >
                       Change Password
                     </Button>
                   </Flex>
@@ -387,6 +389,7 @@ const Profile = () => {
         fullName={user?.data?.fullName}
         bio={user?.data?.bio}
       />
+      <ChangePassword isOpen={isChangePasswordOpen} onClose={onCloseChangePassword} />
     </div>
   );
 };

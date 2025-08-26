@@ -11,7 +11,7 @@ import mongoose from "mongoose";
 import { getPublicIdFromUrl } from "../utils/publicIdExtracter.js";
 import { Video } from "../models/video.model.js";
 
-import { GoogleGenAI } from "@google/genai";
+
 
 import os from "os";
 import fs from "fs";

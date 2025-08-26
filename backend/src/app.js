@@ -9,7 +9,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://insanity-tube.vercel.app",
   "https://youtube.kunalkhandelwal.dev",
-  "https://tvideo.kunalkhandelwal.dev"
+  "https://tvideo.kunalkhandelwal.dev",
 ];
 
 app.use(
@@ -30,6 +30,7 @@ app.use(
     limit: "16kb",
   })
 );
+
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());

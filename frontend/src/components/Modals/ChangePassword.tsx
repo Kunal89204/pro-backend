@@ -9,7 +9,7 @@ import {
   ModalCloseButton,
   Button,
   Input,
-  Text,
+
   FormControl,
   FormLabel,
   FormErrorMessage,
@@ -19,6 +19,7 @@ import userQueries from "@/api/userQueries";
 import { useMutation } from "@tanstack/react-query";
 import { RootState } from "@/lib/store";
 import { useSelector } from "react-redux";
+import { AxiosError } from "axios";
 
 const ChangePassword = ({
   isOpen,
@@ -80,7 +81,7 @@ const ChangePassword = ({
       resetForm();
       onClose();
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<{ message: string }>) => {
       console.error("Password change error:", error);
       
       let errorMessage = "Failed to change password. Please try again.";
@@ -113,7 +114,13 @@ const ChangePassword = ({
     try {
       await handleChangePasswordMutation.mutateAsync();
     } catch (error) {
-      // Error is already handled in onError callback
+      toast({
+        title: "Password Change Failed",
+        description: "Failed to change password. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 

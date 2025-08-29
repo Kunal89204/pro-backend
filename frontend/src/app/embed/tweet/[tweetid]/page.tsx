@@ -181,7 +181,7 @@ const EmbedTweet = () => {
       {/* Footer */}
       <Box mt={4} pt={3} borderTop="1px" borderColor={colorMode === "dark" ? "gray.600" : "gray.200"}>
         <Text fontSize="xs" color={secondaryTextColor} textAlign="center">
-          View on Tvideo
+          <a href={`https://tvideo.kunalkhandelwal.dev/tweet/${tweetid}`}>View on Tvideo</a>
         </Text>
       </Box>
     </Box>

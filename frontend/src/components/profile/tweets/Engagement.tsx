@@ -1,5 +1,5 @@
 "use client";
-import { Flex, Text, IconButton } from "@chakra-ui/react";
+import { Flex, Text, IconButton, useDisclosure } from "@chakra-ui/react";
 import {
   IconHeart,
   IconEye,
@@ -13,6 +13,7 @@ import { RootState } from "@/lib/store";
 import { useEffect, useState } from "react";
 import { myQuery } from "@/api/query";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import ShareTweet from "@/components/Modals/ShareTweet";
 
 const Engagement = ({
   _id,
@@ -42,6 +43,9 @@ const Engagement = ({
       setLikesCount(isLiked ? (likesCount ?? 0) - 1 : (likesCount ?? 0) + 1);
     },
   });
+
+
+  const { isOpen: isShareTweetOpen, onOpen: onShareTweetOpen, onClose: onShareTweetClose } = useDisclosure();
 
   const { data: likeStatus } = useQuery({
     queryKey: ["likeStatus", _id],
@@ -127,7 +131,9 @@ const Engagement = ({
         variant="ghost"
         size="sm"
         _hover={{ color: "blue.500" }}
+        onClick={onShareTweetOpen}
       />
+      <ShareTweet isOpen={isShareTweetOpen} onClose={onShareTweetClose} tweetId={_id} />
     </Flex>
   );
 };

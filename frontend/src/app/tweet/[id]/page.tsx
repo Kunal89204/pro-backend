@@ -14,10 +14,16 @@ import tweetQueries from "@/api/tweetQueries";
 const TweetPage = () => {
   const { id } = useParams();
   const token = useSelector((state: RootState) => state.token);
-  const { data, isLoading } = useQuery({
+
+
+  const { data, isLoading, error, isError } = useQuery({
     queryKey: ["tweet", id],
     queryFn: () => myQuery.getTweetById(token, id as string),
   });
+
+  if (isError) {
+    return <div>Error: {error.message}</div>;
+  }
 
   const addTweetViewMutation = useMutation({
     mutationFn: () => tweetQueries.addTweetView(token, id as string),

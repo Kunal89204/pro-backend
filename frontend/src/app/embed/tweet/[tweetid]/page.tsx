@@ -90,7 +90,7 @@ const EmbedTweet = () => {
           alt={`${tweet?.owner?.fullName || "User"}'s avatar`}
           width={48}
           height={48}
-          className="rounded-full object-cover"
+          className="rounded-full object-cover aspect-square"
         />
         <Box flex={1}>
           <Text

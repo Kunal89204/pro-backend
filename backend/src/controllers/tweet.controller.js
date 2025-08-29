@@ -208,6 +208,38 @@ const addTweetView = asyncHandler(async (req, res) => {
   }
 });
 
+
+const getTweetByIdForEmbed = asyncHandler(async (req, res) => {
+  const { tweetid } = req?.params;
+
+  // Check if tweetid is provided
+  if (!tweetid) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Tweet ID is required"));
+  }
+
+  // Validate if tweetid is a valid MongoDB ObjectId
+  if (!mongoose.Types.ObjectId.isValid(tweetid)) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Invalid Tweet ID format"));
+  }
+
+  const tweet = await Tweet.findById(tweetid).populate("owner", "fullName username avatar _id");
+
+  // Check if tweet exists
+  if (!tweet) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, null, "Tweet not found"));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, tweet, "Tweet fetched successfully"));
+});
+
 export {
   createTweet,
   getTweetsOfUser,
@@ -217,4 +249,5 @@ export {
   getBookmarkedTweets,
   bookmarkStatus,
   addTweetView,
+  getTweetByIdForEmbed,
 };

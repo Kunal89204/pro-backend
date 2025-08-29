@@ -10,6 +10,12 @@ const tweetQueries = {
     });
     return response.data;
   },
+
+
+  getTweetByIdForEmbed: async (tweetId: string) => {
+      const response = await axiosInstance.get(`/tweet/embed/${tweetId}`);
+    return response.data;
+  },
 };
 
 export default tweetQueries;

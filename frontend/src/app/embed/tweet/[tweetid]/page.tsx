@@ -88,9 +88,9 @@ const EmbedTweet = () => {
         <Image
           src={tweet?.owner?.avatar || "/default-avatar.png"}
           alt={`${tweet?.owner?.fullName || "User"}'s avatar`}
-          width={48}
-          height={48}
-          className="rounded-full object-cover aspect-square"
+          width={100}
+          height={100}
+          className="rounded-full object-cover aspect-square w-10 h-10"
         />
         <Box flex={1}>
           <Text

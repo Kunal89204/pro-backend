@@ -181,7 +181,7 @@ const EmbedTweet = () => {
       {/* Footer */}
       <Box mt={4} pt={3} borderTop="1px" borderColor={colorMode === "dark" ? "gray.600" : "gray.200"}>
         <Text fontSize="xs" color={secondaryTextColor} textAlign="center">
-          View on Twitter Clone
+          View on Tvideo
         </Text>
       </Box>
     </Box>

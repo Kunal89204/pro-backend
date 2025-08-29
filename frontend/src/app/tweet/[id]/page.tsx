@@ -21,10 +21,6 @@ const TweetPage = () => {
     queryFn: () => myQuery.getTweetById(token, id as string),
   });
 
-  if (isError) {
-    return <div>Error: {error.message}</div>;
-  }
-
   const addTweetViewMutation = useMutation({
     mutationFn: () => tweetQueries.addTweetView(token, id as string),
     onSuccess: () => {
@@ -39,6 +35,10 @@ const TweetPage = () => {
     console.log("view added");
     addTweetViewMutation.mutate();
   }, []);
+
+  if (isError) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <div className="w-full p-2 flex gap-2">

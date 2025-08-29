@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import axiosInstance from "./axiosInstance";
 
 interface LoginCredentials {
@@ -68,11 +68,14 @@ export const myQuery = {
 
   getCurrentUser: async (token: string, username: string): Promise<User> => {
     try {
-      const response = await axiosInstance.get(`/users/current-user/${username}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axiosInstance.get(
+        `/users/current-user/${username}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -488,12 +491,21 @@ export const myQuery = {
   },
 
   getTweetById: async (token: string, tweetId: string | undefined) => {
-    const response = await axiosInstance.get(`/tweet/${tweetId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+    try {
+      const response = await axiosInstance.get(`/tweet/${tweetId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.log("I am error:", error);
+      if (error instanceof AxiosError && error.response?.status === 401) {
+        localStorage.clear();
+        window.location.href = "/login";
+      }
+      return error;
+    }
   },
 
   getTweetsOfUser: async (token: string, username: string) => {
@@ -580,21 +592,32 @@ export const myQuery = {
     return response.data;
   },
 
-  updateProfile: async (token: string, fullName: string|undefined, bio: string|undefined) => {
-    const response = await axiosInstance.patch("/users/update-account", { fullName, bio }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  updateProfile: async (
+    token: string,
+    fullName: string | undefined,
+    bio: string | undefined
+  ) => {
+    const response = await axiosInstance.patch(
+      "/users/update-account",
+      { fullName, bio },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   },
 
   subscribedChannels: async (token: string) => {
-    const response = await axiosInstance.get("/subscription/subscribed-channels", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axiosInstance.get(
+      "/subscription/subscribed-channels",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   },
 };

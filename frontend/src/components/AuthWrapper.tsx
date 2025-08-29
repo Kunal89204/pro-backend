@@ -17,7 +17,8 @@ const AuthWrapper = ({ children }: { children: ReactNode }) => {
       !isAuthenticated &&
       pathname !== "/login" &&
       pathname !== "/register" &&
-      !pathname.startsWith("/embed/video/")
+      !pathname.startsWith("/embed/video/") &&
+      !pathname.startsWith("/embed/tweet/")
     ) {
       router.push("/login");
     }

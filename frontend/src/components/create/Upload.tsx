@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { Text} from "@chakra-ui/react";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { useRouter } from "next/navigation";
 
 interface UploadProps {
   videoFile: File[];
@@ -26,6 +27,7 @@ const Upload: React.FC<UploadProps> = ({
   onSuccess,
 }) => {
   const token = useSelector((state: RootState) => state.token);
+  const router = useRouter();
   const uploadMutation = useMutation({
     mutationFn: async () => {
       return myQuery.uploadVideo({
@@ -37,9 +39,10 @@ const Upload: React.FC<UploadProps> = ({
         videoFile: videoFile[0],
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
  
       onSuccess();
+      // router.push(`/watch/${data.data._id}`);
     },
     onError: (error) => {
       console.error("Upload failed:", error);

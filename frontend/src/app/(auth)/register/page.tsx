@@ -12,6 +12,7 @@ import {
   useBreakpointValue,
   useToast,
   useColorModeValue,
+  useColorMode,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import React, { FormEvent, useState } from "react";
@@ -28,7 +29,7 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const { borderColor, textColor,  inputBg, secondaryTextColor } = useThemeColors();
   const toast = useToast();
-
+  const { colorMode } = useColorMode();
   // Responsive values
   const showImage = useBreakpointValue({ base: false, md: true });
   const formWidth = useBreakpointValue({ base: '100%', md: '50%' });
@@ -216,6 +217,9 @@ const Register: React.FC = () => {
                 <Link
                   href="/login"
                   className="text-black hover:underline font-semibold transition-colors"
+                  style={{
+                    color: colorMode == "light" ? "black" : "white"
+                  }}
                 >
                   Login
                 </Link>

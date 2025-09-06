@@ -85,18 +85,9 @@ const Result = ({ item }: { item: SearchResult }) => {
           </Box>
         </Box>
 
-       
-
         <VStack align="start" flex={1} spacing={2} className="lg:w-3/4 w-full">
           {/* Title */}
           <Flex gap={3} align="start">
-            <Box>
-              <Avatar
-                src={item.owner.avatar}
-                name={item.owner.fullName}
-                size={{ base: "sm", md: "md" }}
-              />
-            </Box>
             <Box>
               <Text
                 color={textColor}
@@ -110,19 +101,9 @@ const Result = ({ item }: { item: SearchResult }) => {
               >
                 {item.title}
               </Text>
-              <Text
-                fontSize={{ base: "xs", md: "sm" }}
-                color={secondaryTextColor}
-              >
-                {item.owner.fullName}
-              </Text>
-
-              {/* <Text fontSize={{ base: "xs", md: "sm" }} py={2} className="hidden md:block"  color={secondaryTextColor} noOfLines={2} lineHeight="base">
-                {item.description}
-              </Text> */}
-              <Flex align="center" gap={1}>
+              <Flex align="center" gap={1} mb={4} mt={1}>
                 <Text
-                  fontSize={{ base: "xs", md: "sm" }}
+                  fontSize={{ base: "xs", md: "xs" }}
                   color={secondaryTextColor}
                 >
                   {formatViews(item.views)} views
@@ -132,12 +113,40 @@ const Result = ({ item }: { item: SearchResult }) => {
                   bg={useColorModeValue("gray.600", "white")}
                 ></Box>
                 <Text
-                  fontSize={{ base: "xs", md: "sm" }}
+                  fontSize={{ base: "xs", md: "xs" }}
                   color={secondaryTextColor}
+                  
                 >
                   {new Date(item.createdAt).toLocaleDateString()}
                 </Text>
               </Flex>
+              <Flex align="center" gap={1}>
+                <Box>
+                  <Avatar
+                    src={item.owner.avatar}
+                    name={item.owner.fullName}
+                    size={{ base: "sm", md: "xs" }}
+                    className="cursor-pointer"
+                    onClick={() => {
+                      router.push(`/profile/${item.owner.username}`);
+                    }}
+                  />
+                </Box>
+                <Text
+                  fontSize={{ base: "xs", md: "xs" }}
+                  color={secondaryTextColor}
+                  className="cursor-pointer"
+                  onClick={() => {
+                    router.push(`/profile/${item.owner.username}`);
+                  }}
+                >
+                  {item.owner.fullName}
+                </Text>
+              </Flex>
+
+              <Text fontSize={{ base: "xs", md: "sm" }} py={2} className="hidden md:block"  color={secondaryTextColor} noOfLines={2} lineHeight="base">
+                {item.description}
+              </Text>
             </Box>
           </Flex>
         </VStack>

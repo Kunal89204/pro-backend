@@ -102,7 +102,7 @@ const Register: React.FC = () => {
           maxW="500px"
           p={{ base: 4, md: 8 }}
           borderRadius={{ base: 'none', md: 'xl' }}
-          shadow={{ base: 'none', md: 'lg' }}
+          // shadow={{ base: 'none', md: 'lg' }}
         >
           <Text
             textAlign="center"
@@ -215,7 +215,7 @@ const Register: React.FC = () => {
                 Already have an account?{" "}
                 <Link
                   href="/login"
-                  className="text-purple-500 hover:text-purple-600 font-semibold transition-colors"
+                  className="text-black hover:underline font-semibold transition-colors"
                 >
                   Login
                 </Link>

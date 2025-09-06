@@ -140,9 +140,11 @@ const Navbar: React.FC = () => {
 
           {showSuggestions && (
             <Box 
-              className="absolute top-12 rounded left-0 w-full p-4 flex items-center justify-start bg-[#424242] text-white"
+              className="absolute top-12 rounded left-0 w-full p-4 flex items-center justify-start "
               boxShadow="md"
               animation="fadeIn 0.2s ease-in-out"
+              bg={colorMode == "light" ? "gray.200" : "rgba(10, 10, 10, 1)"}
+              color={inputTextColor}
             >
               <Flex className="flex-col gap-2 w-full">
                 {isFetching ? (
@@ -152,20 +154,30 @@ const Navbar: React.FC = () => {
                   </Flex>
                 ) : suggestions?.suggestions?.length > 0 ? (
                   suggestions.suggestions.map((item: string, i: number) => (
-                    <Link
-                      onClick={() => {
-                        setQuery(item);
-                        setIsSearchFocused(false);
-                      }}
-                      href={`/search?q=${encodeURIComponent(item)}`}
+                    <Box
                       key={i}
-                      className="hover:bg-[#525252] p-2 rounded transition-colors"
+                      p={2}
+                      borderRadius="md"
+                      transition="all 0.2s"
+                      _hover={{
+                        bg: colorMode === "light" ? "gray.300" : "rgba(255, 255, 255, 0.1)"
+                      }}
+                      cursor="pointer"
                     >
-                      <Flex align="center">
-                        <IconSearch size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
-                        <Text noOfLines={1}>{item}</Text>
-                      </Flex>
-                    </Link>
+                      <Link
+                        onClick={() => {
+                          setQuery(item);
+                          setIsSearchFocused(false);
+                        }}
+                        href={`/search?q=${encodeURIComponent(item)}`}
+                        style={{ textDecoration: 'none' }}
+                      >
+                        <Flex align="center">
+                          <IconSearch size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
+                          <Text noOfLines={1}>{item}</Text>
+                        </Flex>
+                      </Link>
+                    </Box>
                   ))
                 ) : (
                   <Text py={2} opacity={0.7}>No suggestions found</Text>

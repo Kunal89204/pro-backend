@@ -91,21 +91,22 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, username, password } = req.body;
+  const { identifier, password } = req.body;
   console.log("Request body:", req.body);
 
-  console.log(username, email, password);
-
-  if (!username && !email) {
-    throw new ApiError(400, "Username or email is required");
+  if (!identifier || !password) {
+    throw new ApiError(400, "Identifier (username/email) and password are required");
   }
 
+  // Search by either username or email
   const user = await User.findOne({
-    username: username.toLowerCase(),
-    email: email,
+    $or: [
+      { username: identifier.toLowerCase() },
+      { email: identifier.toLowerCase() }
+    ]
   });
 
-  console.log(user);
+  console.log("User found:", user);
 
   if (!user) {
     return res.status(404).json({
@@ -133,6 +134,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken -watchHistory -createdAt -updatedAt -bio -subscribersCount"
   );
+
   console.log("Logged in user:", loggedInUser);
 
   const options = {

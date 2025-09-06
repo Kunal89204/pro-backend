@@ -61,7 +61,7 @@ export const myQuery = {
     }
   },
 
-  login: async (credentials: LoginCredentials) => {
+  login: async (credentials: { identifier: string; password: string }) => {
     const response = await axiosInstance.post("/users/login", credentials);
     return response.data;
   },

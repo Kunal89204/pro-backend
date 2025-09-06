@@ -24,8 +24,7 @@ import Link from 'next/link'
 import { useThemeColors } from '@/hooks/useThemeColors'
 
 interface LoginCredentials {
-  username: string
-  email: string
+  identifier: string
   password: string
 }
 
@@ -72,8 +71,7 @@ interface TypedError {
 const Login: React.FC = () => {
   const toast = useToast()
   const dispatch = useDispatch()
-  const [username, setUsername] = React.useState('')
-  const [email, setEmail] = React.useState('')
+  const [identifier, setIdentifier] = React.useState('')
   const [password, setPassword] = React.useState('')
   const { textColor, secondaryTextColor, inputBg, inputTextColor} = useThemeColors()
 
@@ -147,7 +145,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    loginMutation.mutate({ username, email, password })
+    loginMutation.mutate({ identifier, password })
   }
 
   return (
@@ -189,7 +187,7 @@ const Login: React.FC = () => {
           // bg={useBreakpointValue({ base: 'transparent', md: inputBg })}
           p={{ base: 4, md: 8 }}
           borderRadius={{ base: 'none', md: 'xl' }}
-          shadow={{ base: 'none', md: 'lg' }}
+          // shadow={{ base: 'none', md: 'lg' }}
         >
           <Text
             textAlign="center"
@@ -204,28 +202,11 @@ const Login: React.FC = () => {
           <form onSubmit={handleSubmit}>
             <VStack spacing={4}>
               <FormControl isRequired>
-                <FormLabel color={secondaryTextColor}>Username</FormLabel>
+                <FormLabel color={secondaryTextColor}>Email or Username</FormLabel>
                 <Input
                   type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  bg={inputBg}
-                  py="22px"
-                  color={inputTextColor}
-                  borderRadius="lg"
-                  _focus={{
-                    borderColor: 'purple.400',
-                    boxShadow: '0 0 0 1px var(--chakra-colors-purple-400)',
-                  }}
-                />
-              </FormControl>
-              
-              <FormControl isRequired>
-                <FormLabel color={secondaryTextColor}>Email</FormLabel>
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   bg={inputBg}
                   py="22px"
                   color={inputTextColor}
@@ -277,7 +258,7 @@ const Login: React.FC = () => {
                 Don&apos;t have an account?{' '}
                 <Link
                   href="/register"
-                  className="text-purple-500 hover:text-purple-600 font-semibold transition-colors"
+                  className="text-balck hover:underline font-semibold transition-colors"
                 >
                   Register
                 </Link>

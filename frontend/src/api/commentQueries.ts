@@ -2,9 +2,9 @@
 import axiosInstance from "./axiosInstance";
 
 const commentQueries = {
-  getComments: async (token: string, videoId: string) => {
+  getComments: async (token: string, videoId: string, page: number, limit: number) => {
     try {
-      const response = await axiosInstance.get(`/comment/${videoId}/comments`, {
+      const response = await axiosInstance.get(`/comment/${videoId}/comments?page=${page}&limit=${limit}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

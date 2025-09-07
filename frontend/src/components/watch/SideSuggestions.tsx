@@ -17,10 +17,7 @@ const SideSuggestions = ({ videoId }: { videoId: string }) => {
     queryFn: () => myQuery.onPageVideoRecommendations(token, videoId),
   });
 
-  useEffect(() => {
-  
-  }, [data, videoId]);
-
+ 
   const dummyArray = Array.from({ length: 10 });
 
   return (

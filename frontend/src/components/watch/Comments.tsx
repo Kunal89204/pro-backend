@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 import {
   Box,
@@ -12,14 +12,12 @@ import {
   Collapse,
   Divider,
   Flex,
-
+  useToast,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 import { useThemeColors } from "@/hooks/useThemeColors";
-import {
-  IconMessageCircle,
-
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconMessageCircle, IconTrash } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { myQuery } from "@/api/query";
@@ -68,14 +66,12 @@ const CommentItem = ({
   const { mutate: addReply, isPending } = useMutation({
     mutationFn: () => myQuery.addReply(token, videoId, comment._id, replyText),
     onSuccess: () => {
-    
       refetch();
     },
     onError: () => {
       console.log("Error adding reply");
     },
   });
-
   const handleReplySubmit = () => {
     addReply();
     setShowReplyInput(false); // Hide input after submitting
@@ -85,36 +81,8 @@ const CommentItem = ({
     mutationFn: (commentId: string) =>
       commentQueries.deleteComment(token, commentId),
     onSuccess: () => {
-      queryClient.setQueryData(
-        ["comments", videoId],
-        (old: Comment[] | undefined) => {
-      
-          if (!old) return old;
-
-          // Helper function to recursively remove comment from nested structure
-          const removeCommentRecursively = (
-            comments: Comment[],
-            targetId: string
-          ): Comment[] => {
-            return comments
-              .filter((c: Comment) => c._id !== targetId)
-              .map((c: Comment) => ({
-                ...c,
-                replies: c.replies
-                  ? removeCommentRecursively(c.replies, targetId)
-                  : [],
-              }));
-          };
-
-          const updatedComments = removeCommentRecursively(old, comment._id);
-
-          return {
-            ...old,
-            comments: updatedComments,
-            totalComments: Math.max(0, old.length - 1),
-          };
-        }
-      );
+    //  queryClient.invalidateQueries({ queryKey: ["commentsData", videoId] });
+     refetch();
     },
   });
 
@@ -135,7 +103,6 @@ const CommentItem = ({
             {comment.content}
           </Text>
           <HStack mt={2} spacing={4}>
-           
             <Text
               color={textColor}
               fontSize="sm"
@@ -199,8 +166,8 @@ const CommentItem = ({
             cursor="pointer"
             color={"red"}
             onClick={() => {
-             
               deleteCommentMutation.mutate(comment._id);
+       
             }}
           />
         )}
@@ -209,46 +176,115 @@ const CommentItem = ({
   );
 };
 
-
-
-
-
 const Comments = ({
   comments,
   videoId,
   refetch,
   isLoading,
+  page,
+
+  setPage,
+
+  totalComments,
 }: {
   comments: Comment[];
   videoId: string;
   refetch: () => void;
   isLoading: boolean;
+  page: number;
+  limit: number;
+  setPage: (page: number) => void;
+  setLimit: (limit: number) => void;
+  totalComments: number;
 }) => {
+  const toast = useToast();
   const { textColor } = useThemeColors();
   const { user } = useSelector((state: RootState) => state);
   const { avatarImage } = user;
   const [commentText, setCommentText] = useState("");
+  const [allComments, setAllComments] = useState<Comment[]>([]);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
   const token = useSelector((state: RootState) => state?.token);
+
+  // Update allComments when comments prop changes
+  useEffect(() => {
+    if (comments && page === 1) {
+      setAllComments(comments);
+    } else if (comments && page > 1) {
+      setAllComments(prev => [...prev, ...comments]);
+    }
+  }, [comments, page]);
+
+  // Check if there are more comments to load
+  useEffect(() => {
+    if (allComments.length >= totalComments) {
+      setHasMore(false);
+    } else {
+      setHasMore(true);
+    }
+  }, [allComments.length, totalComments]);
+
+  const loadMoreComments = useCallback(async () => {
+    if (isLoadingMore || !hasMore) return;
+    
+    setIsLoadingMore(true);
+    setPage(page + 1);
+    
+    try {
+      await refetch();
+    } catch (error) {
+      console.error("Error loading more comments:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [page, setPage, refetch, isLoadingMore, hasMore]);
+
+  const lastCommentElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (isLoading || isLoadingMore) return;
+    if (observer.current) observer.current.disconnect();
+    
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        loadMoreComments();
+      }
+    });
+    
+    if (node) observer.current.observe(node);
+  }, [isLoading, isLoadingMore, hasMore, loadMoreComments]);
+
   const { mutate: addComment, isPending } = useMutation({
     mutationFn: () => myQuery.addComment(token, videoId, commentText),
     onSuccess: () => {
- 
+      setCommentText("");
+      // Reset to first page and reload comments
+      setPage(1);
+      setAllComments([]);
       refetch();
     },
     onError: () => {
       console.log("Error adding comment");
-      refetch();
+      toast({
+        title: "Error adding comment",
+        description: "Please try again",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     },
   });
+
   const handleCommentSubmit = () => {
-    addComment();
-   
+    if (commentText.trim()) {
+      addComment();
+    }
   };
 
   return (
     <Box py={4}>
       <Text fontSize="2xl" fontWeight="semibold" color={textColor}>
-        {comments?.length} Comments
+        {totalComments} Comments
       </Text>
       {/* User's Comment Input */}
       <HStack mt={4} spacing={3}>
@@ -260,12 +296,19 @@ const Comments = ({
           value={commentText}
           color={textColor}
           onChange={(e) => setCommentText(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleCommentSubmit();
+            }
+          }}
         />
         <Button
           colorScheme="blue"
           borderRadius={"full"}
           onClick={handleCommentSubmit}
           isLoading={isPending}
+          disabled={!commentText.trim()}
         >
           <IconMessageCircle size={18} />
         </Button>
@@ -273,15 +316,40 @@ const Comments = ({
 
       <Divider pt={4} />
       <VStack align="start" mt={5} spacing={4} w="full">
-        {comments?.map((comment: Comment, i: number) => (
-          <CommentItem
-            key={i}
-            comment={comment}
-            videoId={videoId}
-            refetch={refetch}
-            isLoading={isLoading}
-          />
+        {allComments?.map((comment: Comment, i: number) => (
+          <Box
+            key={comment._id}
+            w="full"
+            ref={i === allComments.length - 1 ? lastCommentElementRef : null}
+          >
+            <CommentItem
+              comment={comment}
+              videoId={videoId}
+              refetch={() => {
+                setPage(1);
+                setAllComments([]);
+                refetch();
+              }}
+              isLoading={isLoading}
+            />
+          </Box>
         ))}
+        
+        {/* Loading indicator for infinite scroll */}
+        {isLoadingMore && (
+          <Center w="full" py={4}>
+            <Spinner size="md" color="blue.500" />
+          </Center>
+        )}
+        
+        {/* End of comments indicator */}
+        {!hasMore && allComments.length > 0 && (
+          <Center w="full" py={4}>
+            <Text fontSize="sm" color={textColor} opacity={0.7}>
+              No more comments to load
+            </Text>
+          </Center>
+        )}
       </VStack>
     </Box>
   );

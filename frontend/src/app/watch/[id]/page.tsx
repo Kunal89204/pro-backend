@@ -15,7 +15,7 @@ import {
   SkeletonText,
 } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import vdonotfound from "../../../../public/assets/videonotfound.jpg";
@@ -24,21 +24,22 @@ import Image from "next/image";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import SideSuggestions from "@/components/watch/SideSuggestions";
 import commentQueries from "@/api/commentQueries";
+import { IconAlertCircle, IconArrowLeft, IconRefresh } from "@tabler/icons-react";
 
 const Watch = ({ params }: { params: { id: string } }) => {
   const token = useSelector((state: RootState) => state.token);
   const router = useRouter();
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   const addVideoToWatchHistoryMutation = useMutation({
     mutationFn: () => myQuery.addVideoToWatchHistory(token, params.id),
     onError: (error) => {
       console.log(error);
     },
-    onSuccess: () => {
-    
-    },
+    onSuccess: () => {},
   });
 
   useEffect(() => {
@@ -50,20 +51,75 @@ const Watch = ({ params }: { params: { id: string } }) => {
     queryFn: () => myQuery.getVideoById(token, params.id),
   });
 
- 
- const {data:commentsData, isLoading:commentsDataLoading, isError:isCommentsError, error:commentsError, refetch:commentsRefetch} = useQuery({
-  queryKey: ["commentsData", params.id],
-  queryFn: () => commentQueries.getComments(token, params.id),
- })
-
-  
+  const {
+    data: commentsData,
+    isLoading: commentsDataLoading,
+    isError: isCommentsError,
+    error: commentsError,
+    refetch: commentsRefetch,
+  } = useQuery({
+    queryKey: ["commentsData", params.id],
+    queryFn: () => commentQueries.getComments(token, params.id, page, limit),
+  });
 
   if (isError) {
-    console.log("error in video", error);
+    return (
+      <Box className="mt-4 w-full flex justify-center items-center min-h-[60vh]">
+        <VStack spacing={4} textAlign="center">
+          <Image
+            src={vdonotfound}
+            alt="Video not found"
+            width={300}
+            height={200}
+            className="opacity-50"
+          />
+          <Text fontSize="xl" fontWeight="semibold" color={textColor}>
+            Video Not Found
+          </Text>
+          <Text color={secondaryTextColor}>
+            The video you're looking for doesn't exist or has been removed.
+          </Text>
+          <Button
+            colorScheme="blue"
+            onClick={() => router.push("/")}
+            leftIcon={<IconArrowLeft size={16} />}
+          >
+            Go Back Home
+          </Button>
+        </VStack>
+      </Box>
+    );
   }
 
   if (isCommentsError) {
-    console.log("error in comments", commentsError);
+    return (
+      <Box className="mt-4 w-full flex justify-center items-center min-h-[30vh]">
+        <VStack spacing={4} textAlign="center">
+          <Box
+            p={4}
+            borderRadius="full"
+            bg="red.50"
+            color="red.500"
+          >
+            <IconAlertCircle size={40} />
+          </Box>
+          <Text fontSize="lg" fontWeight="semibold" color={textColor}>
+            Comments Unavailable
+          </Text>
+          <Text color={secondaryTextColor} maxW="md">
+            We're having trouble loading the comments. Please try refreshing the page.
+          </Text>
+          <Button
+            colorScheme="red"
+            variant="outline"
+            onClick={() => commentsRefetch()}
+            leftIcon={<IconRefresh size={16} />}
+          >
+            Try Again
+          </Button>
+        </VStack>
+      </Box>
+    );
   }
 
   if (isLoading) {
@@ -153,6 +209,11 @@ const Watch = ({ params }: { params: { id: string } }) => {
           videoId={params.id}
           refetch={commentsRefetch}
           isLoading={commentsDataLoading}
+          page={page}
+          limit={limit}
+          setPage={setPage}
+          setLimit={setLimit}
+          totalComments={commentsData?.totalComments}
         />
       </Box>
       <Box className="lg:w-1/3 px-3 lg:px-0">

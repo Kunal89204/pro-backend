@@ -3,10 +3,17 @@ import { Comment } from "../models/comment.model.js";
 import { redis } from "../../index.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Tweet } from "../models/tweet.model.js";
+import { Video } from "../models/video.model.js";
+
 
 const getPaginatedCommentsForVideo = async (req, res) => {
   const { videoId } = req.params;
   const { page = 1, limit = 10 } = req.query;
+
+  const totalComments = await Comment.countDocuments({
+    video: new mongoose.Types.ObjectId(videoId),
+    parentComment: null,
+  });
 
   const aggregateQuery = Comment.aggregate([
     {
@@ -158,10 +165,10 @@ const getPaginatedCommentsForVideo = async (req, res) => {
   const result = await Comment.aggregatePaginate(aggregateQuery, options);
 
   res.status(200).json({
-    comments: result.docs,
     totalPages: result.totalPages,
     currentPage: result.page,
-    totalComments: result.totalDocs,
+    totalComments: totalComments,
+    comments: result.docs,
   });
 };
 

@@ -4,7 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { myQuery } from "@/api/query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
-import { Skeleton, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
+import { Skeleton, SkeletonCircle, SkeletonText, Box, VStack, Text, Icon } from "@chakra-ui/react";
+import { IconMessageOff } from "@tabler/icons-react";
+import { useThemeColors } from "@/hooks/useThemeColors";
 
 type TweetType = {
   viewsCount: number;
@@ -18,6 +20,7 @@ type TweetType = {
 
 const Tweets = ({username, userId}: {username: string | undefined, userId: string | undefined}) => {
   const token = useSelector((state: RootState) => state.token);
+  const { textColor, secondaryTextColor } = useThemeColors();
 
   const {
     data: tweets,
@@ -28,6 +31,27 @@ const Tweets = ({username, userId}: {username: string | undefined, userId: strin
     queryKey: ["tweets"],
     queryFn: () => myQuery.getTweetsOfUser(token, username as string),
   });
+
+  const NoTweetsComponent = () => (
+    <Box className="flex flex-col items-center justify-center py-16 px-4">
+      <VStack spacing={4} textAlign="center">
+        <Box
+          p={6}
+          borderRadius="full"
+          bg="gray.50"
+          _dark={{ bg: "gray.800" }}
+        >
+          <Icon as={IconMessageOff} boxSize={12} color="gray.400" />
+        </Box>
+        <Text fontSize="xl" fontWeight="semibold" color={textColor}>
+          No tweets yet
+        </Text>
+        <Text color={secondaryTextColor} maxW="md">
+          This user hasn't posted any tweets yet. Check back later for new content!
+        </Text>
+      </VStack>
+    </Box>
+  );
 
   if (isError) {
     return <div>Error: {error?.message}</div>;
@@ -55,9 +79,9 @@ const Tweets = ({username, userId}: {username: string | undefined, userId: strin
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-      {tweets?.data?.map((tweet: TweetType) => (
+      {tweets?.data?.length > 0 ? tweets?.data?.map((tweet: TweetType) => (
         <Tweet key={tweet._id} tweet={tweet}  userId={userId} />
-      ))}
+      )) : <div className="col-span-full"><NoTweetsComponent /></div>}
     </div>
   );
 };

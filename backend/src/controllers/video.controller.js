@@ -15,6 +15,8 @@ import { Like } from "../models/like.model.js";
 import { Comment } from "../models/comment.model.js";
 import { Playlist } from "../models/playlist.model.js";
 import WatchHistory from "../models/watchHistory.model.js";
+import { redis } from "../../index.js";
+
 
 const getAllVideos = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
@@ -168,6 +170,17 @@ const getVideoById = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Video ID is required");
   }
 
+  const cacheKey = `video;${videoId}`;
+  const cacheTTL = 60 * 3;
+
+
+  const cachedVideo = await redis.get(cacheKey);
+  if (cachedVideo) {
+    return res.status(200).json(new ApiResponse(200, JSON.parse(cachedVideo), "Video fetched successfully"));
+  }
+
+
+
   const video = await Video.findById(videoId).populate(
     "owner",
     "-password -watchHistory -email -coverImage -createdAt -updatedAt -__v -refreshToken"
@@ -179,6 +192,8 @@ const getVideoById = asyncHandler(async (req, res) => {
       message: "Video does not exist or has been removed.",
     });
   }
+
+  await redis.set(cacheKey, JSON.stringify(video), "EX", cacheTTL);
 
   return res
     .status(200)
@@ -763,6 +778,8 @@ const editVideo = asyncHandler(async (req, res) => {
   }
 
   await video.save();
+
+  await redis.del(`video;${videoId}`);
 
   return res.status(200).json({
     success: true,

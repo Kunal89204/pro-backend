@@ -110,21 +110,23 @@ const Tweet: React.FC<TweetProps> = ({
     >
       <Flex mb={3} justifyContent="space-between">
         <Flex>
-          <Avatar src={author?.avatar} size="md" mr={3} />
+          <Avatar src={author?.avatar} size="md" mr={3} onClick={() => router.push(`/profile/${author?.username}`)} cursor="pointer" />
           <Box>
             <Flex alignItems="center">
               <Text
                 fontWeight="bold"
                 mr={1}
-                color={colorMode == "light" ? "black" : "white"}
+                color={colorMode == "light" ? "black" : "white"} 
+                onClick={() => router.push(`/profile/${author?.username}`)}
+                cursor="pointer"
               >
                 {author?.name}
               </Text>
-              <Text color="gray.500" fontSize="xs" ml={1}>
+              <Text color="gray.500" fontSize="xs" ml={1} onClick={() => router.push(`/profile/${author?.username}`)} cursor="pointer">
                 • {formatPostTime(timestamp || "")}
               </Text>
             </Flex>
-            <Text color="gray.500" fontSize="xs">
+            <Text color="gray.500" fontSize="xs" onClick={() => router.push(`/profile/${author?.username}`)} cursor="pointer">
               @{author?.username}
             </Text>
           </Box>

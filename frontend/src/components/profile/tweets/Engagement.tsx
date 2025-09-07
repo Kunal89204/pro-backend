@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { myQuery } from "@/api/query";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import ShareTweet from "@/components/Modals/ShareTweet";
+import { useRouter } from "next/navigation";
 
 const Engagement = ({
   _id,
@@ -29,7 +30,7 @@ const Engagement = ({
   const { colorMode } = useColorMode();
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(likes);
-
+  const router = useRouter();
   const token = useSelector((state: RootState) => state.token);
   const queryClient = useQueryClient();
   const likeMutation = useMutation({
@@ -81,7 +82,8 @@ const Engagement = ({
           size="sm"
           _hover={{ color: "red.500" }}
           onClick={handleLike}
-        />
+          cursor="pointer"
+          />
         <Text
           fontSize="xs"
           mr={1}
@@ -97,7 +99,8 @@ const Engagement = ({
           icon={<IconEye size={18} />}
           variant="ghost"
           size="sm"
-          _hover={{ color: "blue.500" }}
+          _hover={{}}
+          cursor="default"
         />
         <Text
           fontSize="xs"
@@ -115,6 +118,8 @@ const Engagement = ({
           variant="ghost"
           size="sm"
           _hover={{ color: "blue.500" }}
+          onClick={() => router.push(`/tweet/${_id}`)}
+          cursor="pointer"
         />
         <Text
           fontSize="xs"

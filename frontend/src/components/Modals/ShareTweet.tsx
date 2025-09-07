@@ -16,7 +16,9 @@ import {
   Code,
   HStack,
   useBreakpointValue,
+  useColorMode,
 } from "@chakra-ui/react";
+
 
 interface ShareTweetProps {
   isOpen: boolean;
@@ -26,6 +28,7 @@ interface ShareTweetProps {
 
 const ShareTweet: React.FC<ShareTweetProps> = ({ isOpen, onClose, tweetId }) => {
   const toast = useToast();
+  const { colorMode } = useColorMode();
 
   const baseURL = "https://tvideo.kunalkhandelwal.dev";
   const tweetURL = tweetId ? `${baseURL}/tweet/${tweetId}` : "";
@@ -60,7 +63,7 @@ const ShareTweet: React.FC<ShareTweetProps> = ({ isOpen, onClose, tweetId }) => 
     <Modal isOpen={isOpen} onClose={onClose} size={modalSize} isCentered>
       <ModalOverlay />
       <ModalContent
-        bg="rgba(30, 30, 40, 0.55)"
+        bg={colorMode == "light" ? "rgba(255,255,255,0.08)" : "rgba(30, 30, 40, 0.55)"}
         borderRadius="2xl"
         boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.37)"
         backdropFilter="blur(24px) saturate(180%)"
@@ -109,7 +112,7 @@ const ShareTweet: React.FC<ShareTweetProps> = ({ isOpen, onClose, tweetId }) => 
             </Box>
 
             <Box>
-              <Text color="gray.2 00" mb={1} fontWeight="semibold" fontSize={{ base: "sm", md: "md" }}>
+              <Text color={colorMode == "light" ? "white" : "black"} mb={1} fontWeight="semibold" fontSize={{ base: "sm", md: "md" }}>
                 Embed Code
               </Text>
               <HStack align="start" spacing={2} flexWrap="wrap" position="relative">

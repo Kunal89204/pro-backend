@@ -42,7 +42,7 @@ const Upload: React.FC<UploadProps> = ({
     onSuccess: (data) => {
  
       onSuccess();
-      // router.push(`/watch/${data.data._id}`);
+      router.push(`/watch/${data.data._id}`);
     },
     onError: (error) => {
       console.error("Upload failed:", error);

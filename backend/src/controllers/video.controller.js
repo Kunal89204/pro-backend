@@ -17,7 +17,6 @@ import { Playlist } from "../models/playlist.model.js";
 import WatchHistory from "../models/watchHistory.model.js";
 import { redis } from "../../index.js";
 
-
 const getAllVideos = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
 
@@ -158,6 +157,19 @@ const publishAVideo = asyncHandler(async (req, res) => {
     owner: req.user._id,
   });
 
+  // Invalidate home feed cache for all pages/limits
+  // This assumes redis is available in scope
+  try {
+    // Get all keys matching the homeFeed pattern
+    const keys = await redis.keys("homeFeed:page:*:limit:*");
+    if (keys.length > 0) {
+      await redis.del(...keys);
+    }
+  } catch (err) {
+    console.error("Error invalidating home feed cache:", err);
+    // Don't throw, just log
+  }
+
   return res
     .status(201)
     .json(new ApiResponse(201, video, "Video published successfully"));
@@ -173,13 +185,18 @@ const getVideoById = asyncHandler(async (req, res) => {
   const cacheKey = `video;${videoId}`;
   const cacheTTL = 60 * 3;
 
-
   const cachedVideo = await redis.get(cacheKey);
   if (cachedVideo) {
-    return res.status(200).json(new ApiResponse(200, JSON.parse(cachedVideo), "Video fetched successfully"));
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          JSON.parse(cachedVideo),
+          "Video fetched successfully"
+        )
+      );
   }
-
-
 
   const video = await Video.findById(videoId).populate(
     "owner",
@@ -237,6 +254,28 @@ const updateVideo = asyncHandler(async (req, res) => {
   if (description) video.description = description;
 
   await video.save();
+
+  // Invalidate all homeFeed cache keys
+  // This will delete all keys matching homeFeed:page:*:limit:*
+  // Requires Redis >= 6.0 for the 'SCAN' command
+  try {
+    const stream = redis.scanStream({
+      match: "homeFeed:page:*:limit:*",
+      count: 100,
+    });
+    stream.on("data", (keys = []) => {
+      if (keys.length) {
+        const pipeline = redis.pipeline();
+        keys.forEach(function (key) {
+          pipeline.del(key);
+        });
+        pipeline.exec();
+      }
+    });
+    // Optionally, you can wait for the stream to end, but not required for response
+  } catch (err) {
+    console.error("Error invalidating homeFeed cache:", err);
+  }
 
   return res
     .status(200)
@@ -383,6 +422,18 @@ const deleteVideo = asyncHandler(async (req, res) => {
       }),
       Comment.deleteMany({ video: videoId }),
     ]);
+
+    // Invalidate all homeFeed cache keys
+    // Assumes redis is available in scope and supports 'keys' and 'del'
+    try {
+      const homeFeedKeys = await redis.keys("homeFeed:page:*:limit:*");
+      if (homeFeedKeys.length > 0) {
+        await redis.del(homeFeedKeys);
+      }
+    } catch (cacheErr) {
+      console.error("Error invalidating homeFeed cache:", cacheErr);
+      // Don't block deletion on cache error
+    }
 
     return res.status(200).json({
       success: true,
@@ -753,7 +804,7 @@ const editVideo = asyncHandler(async (req, res) => {
   const video = await Video.findById(videoId);
 
   if (!video) {
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       status: 404,
       message: "Video not found",
@@ -779,7 +830,28 @@ const editVideo = asyncHandler(async (req, res) => {
 
   await video.save();
 
+  // Invalidate video cache
   await redis.del(`video;${videoId}`);
+
+  // Invalidate all homeFeed cache keys
+  try {
+    const stream = redis.scanStream({
+      match: "homeFeed:page:*:limit:*",
+      count: 100,
+    });
+    stream.on("data", (keys = []) => {
+      if (keys.length) {
+        const pipeline = redis.pipeline();
+        keys.forEach(function (key) {
+          pipeline.del(key);
+        });
+        pipeline.exec();
+      }
+    });
+    // Optionally, you can wait for the stream to end, but not required for response
+  } catch (err) {
+    console.error("Error invalidating homeFeed cache:", err);
+  }
 
   return res.status(200).json({
     success: true,

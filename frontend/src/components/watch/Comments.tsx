@@ -24,7 +24,7 @@ import { myQuery } from "@/api/query";
 import { useMutation } from "@tanstack/react-query";
 import { formatPostTime } from "@/utils/relativeTime";
 import commentQueries from "@/api/commentQueries";
-import { useQueryClient } from "@tanstack/react-query";
+
 
 // Define comment type
 interface Comment {
@@ -62,7 +62,7 @@ const CommentItem = ({
 
   const token = useSelector((state: RootState) => state?.token);
   const userId = useSelector((state: RootState) => state.user._id);
-  const queryClient = useQueryClient();
+
   const { mutate: addReply, isPending } = useMutation({
     mutationFn: () => myQuery.addReply(token, videoId, comment._id, replyText),
     onSuccess: () => {

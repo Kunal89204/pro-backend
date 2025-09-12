@@ -1,6 +1,6 @@
 "use client";
 import { Box, Flex, Heading, Skeleton, Text } from "@chakra-ui/react";
-import React, { useEffect } from "react";
+import React from "react";
 import Suggestions from "./Suggestions";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { myQuery } from "@/api/query";

@@ -47,7 +47,7 @@ const Tweets = ({username, userId}: {username: string | undefined, userId: strin
           No tweets yet
         </Text>
         <Text color={secondaryTextColor} maxW="md">
-          This user hasn't posted any tweets yet. Check back later for new content!
+          This user hasn&apos;t posted any tweets yet. Check back later for new content!
         </Text>
       </VStack>
     </Box>

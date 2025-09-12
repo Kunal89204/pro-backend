@@ -46,7 +46,7 @@ const Watch = ({ params }: { params: { id: string } }) => {
     addVideoToWatchHistoryMutation.mutate();
   }, [params.id]);
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["video", params.id],
     queryFn: () => myQuery.getVideoById(token, params.id),
   });
@@ -55,7 +55,6 @@ const Watch = ({ params }: { params: { id: string } }) => {
     data: commentsData,
     isLoading: commentsDataLoading,
     isError: isCommentsError,
-    error: commentsError,
     refetch: commentsRefetch,
   } = useQuery({
     queryKey: ["commentsData", params.id],
@@ -77,7 +76,7 @@ const Watch = ({ params }: { params: { id: string } }) => {
             Video Not Found
           </Text>
           <Text color={secondaryTextColor}>
-            The video you're looking for doesn't exist or has been removed.
+            The video you&apos;re looking for doesn&apos;t exist or has been removed.
           </Text>
           <Button
             colorScheme="blue"
@@ -107,7 +106,7 @@ const Watch = ({ params }: { params: { id: string } }) => {
             Comments Unavailable
           </Text>
           <Text color={secondaryTextColor} maxW="md">
-            We're having trouble loading the comments. Please try refreshing the page.
+            We&apos;re having trouble loading the comments. Please try refreshing the page.
           </Text>
           <Button
             colorScheme="red"

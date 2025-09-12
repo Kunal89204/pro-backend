@@ -36,7 +36,7 @@ const Myvideos: React.FC<{username: string | undefined}> = ({username}) => {
                     No videos yet
                 </Text>
                 <Text color={secondaryTextColor} maxW="md">
-                    This channel hasn't uploaded any videos yet. Check back later for new content!
+                    This channel hasn&apos;t uploaded any videos yet. Check back later for new content!
                 </Text>
             </VStack>
         </Box>

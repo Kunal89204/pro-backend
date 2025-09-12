@@ -11,8 +11,6 @@ import mongoose from "mongoose";
 import { getPublicIdFromUrl } from "../utils/publicIdExtracter.js";
 import { Video } from "../models/video.model.js";
 
-
-
 import os from "os";
 import fs from "fs";
 import WatchHistory from "../models/watchHistory.model.js";
@@ -95,15 +93,18 @@ const loginUser = asyncHandler(async (req, res) => {
   console.log("Request body:", req.body);
 
   if (!identifier || !password) {
-    throw new ApiError(400, "Identifier (username/email) and password are required");
+    throw new ApiError(
+      400,
+      "Identifier (username/email) and password are required"
+    );
   }
 
   // Search by either username or email
   const user = await User.findOne({
     $or: [
       { username: identifier.toLowerCase() },
-      { email: identifier.toLowerCase() }
-    ]
+      { email: identifier.toLowerCase() },
+    ],
   });
 
   console.log("User found:", user);

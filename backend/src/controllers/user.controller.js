@@ -514,7 +514,11 @@ const addToWatchHistory = asyncHandler(async (req, res) => {
     });
   }
 
-  // Step 4: Respond
+  // Step 4: Invalidate watch history cache for this user
+  const cacheKey = `watchHistory:${userId}`;
+  await redis.del(cacheKey);
+
+  // Step 5: Respond
   res.status(200).json({
     message: "Watch history updated successfully",
     videoId,
@@ -536,6 +540,10 @@ const removeFromWatchHistory = asyncHandler(async (req, res) => {
   }
 
   await WatchHistory.findOneAndDelete({ userId, videoId });
+
+  // Invalidate watch history cache for this user
+  const cacheKey = `watchHistory:${userId}`;
+  await redis.del(cacheKey);
 
   return res
     .status(200)

@@ -201,6 +201,8 @@ const Home: React.FC = () => {
     "Other",
   ];
 
+  console.log(setLimit, setPage)
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["home-feed"],
     queryFn: () => myQuery.getHomeFeed(token, page, limit),

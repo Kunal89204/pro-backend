@@ -480,10 +480,14 @@ export const myQuery = {
     return response.data;
   },
 
-  getHomeFeed: async (token: string) => {
+  getHomeFeed: async (token: string, page: number, limit: number) => {
     const response = await axiosInstance.get("/users/home-feed", {
       headers: {
         Authorization: `Bearer ${token}`,
+      },
+      params: {
+        page,
+        limit,
       },
     });
 

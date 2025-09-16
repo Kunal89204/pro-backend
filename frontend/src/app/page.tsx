@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { myQuery } from "@/api/query";
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import Video from "@/components/Video";
@@ -52,6 +52,8 @@ const Home: React.FC = () => {
   const token = useSelector((state: RootState) => state.token);
   const dispatch = useDispatch();
   const router = useRouter();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10); 
   const arr = [
     "All",
     "Music",
@@ -201,7 +203,7 @@ const Home: React.FC = () => {
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["home-feed"],
-    queryFn: () => myQuery.getHomeFeed(token),
+    queryFn: () => myQuery.getHomeFeed(token, page, limit),
   });
 
   if (error) {
@@ -217,11 +219,11 @@ const Home: React.FC = () => {
   }
   if (isLoading) {
     return (
-      <Box className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 3xl:grid-cols-5">
-        {Array.from({ length: 8 }).map((_, i) => (
+      <Box className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 3xl:grid-cols-4">
+        {Array.from({ length: 12 }).map((_, i) => (
           <Box key={i}>
             <Skeleton
-              height="200px"
+              height="220px"
               width="100%"
               borderRadius={"14px"}
               isLoaded={!isLoading}

@@ -12,8 +12,11 @@ import {
   Divider,
   Flex,
   useColorMode,
+  Skeleton,
+  SkeletonCircle,
+  SkeletonText,
 } from "@chakra-ui/react";
-import {  IconSend, IconTrash } from "@tabler/icons-react";
+import { IconSend, IconTrash } from "@tabler/icons-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import myQuery from "@/api/commentQueries";
 import { useSelector } from "react-redux";
@@ -49,8 +52,27 @@ interface AddCommentResponse {
   comment: Comment;
 }
 
-// Placeholder data
-// Placeholder data with deeply nested comment structure
+const CommentSkeleton = ({ depth = 0 }: { depth?: number }) => {
+  return (
+    <Box w="full" pl={depth * 4} mb={4}>
+      <HStack align="start" spacing={3}>
+        <SkeletonCircle size="32px" />
+        <Box w="full">
+          <Flex alignItems="center" gap={2}>
+            <Skeleton height="16px" width="80px" />
+            <Skeleton height="12px" width="40px" />
+          </Flex>
+          <SkeletonText mt={1} noOfLines={2} spacing="2" width="80%" />
+          <HStack mt={2} spacing={4}>
+            <Skeleton height="16px" width="40px" />
+            <Skeleton height="16px" width="60px" />
+          </HStack>
+        </Box>
+        <Skeleton height="20px" width="20px" borderRadius="full" />
+      </HStack>
+    </Box>
+  );
+};
 
 const CommentItem = ({
   comment,
@@ -115,27 +137,38 @@ const CommentItem = ({
   const deleteCommentMutation = useMutation({
     mutationFn: (commentId: string) => myQuery.deleteComment(token, commentId),
     onSuccess: () => {
-      queryClient.setQueryData(["tweet-comments", tweetId], (old: TweetCommentsData | undefined) => {
-        if (!old) return old;
-        
-        // Helper function to recursively remove comment from nested structure
-        const removeCommentRecursively = (comments: Comment[], targetId: string): Comment[] => {
-          return comments
-            .filter((c: Comment) => c._id !== targetId)
-            .map((c: Comment) => ({
-              ...c,
-              replies: c.replies ? removeCommentRecursively(c.replies, targetId) : []
-            }));
-        };
+      queryClient.setQueryData(
+        ["tweet-comments", tweetId],
+        (old: TweetCommentsData | undefined) => {
+          if (!old) return old;
 
-        const updatedComments = removeCommentRecursively(old.comments, comment._id);
-        
-        return {
-          ...old,
-          comments: updatedComments,
-          totalComments: Math.max(0, old.totalComments - 1),
-        };
-      });
+          // Helper function to recursively remove comment from nested structure
+          const removeCommentRecursively = (
+            comments: Comment[],
+            targetId: string
+          ): Comment[] => {
+            return comments
+              .filter((c: Comment) => c._id !== targetId)
+              .map((c: Comment) => ({
+                ...c,
+                replies: c.replies
+                  ? removeCommentRecursively(c.replies, targetId)
+                  : [],
+              }));
+          };
+
+          const updatedComments = removeCommentRecursively(
+            old.comments,
+            comment._id
+          );
+
+          return {
+            ...old,
+            comments: updatedComments,
+            totalComments: Math.max(0, old.totalComments - 1),
+          };
+        }
+      );
     },
     onError: (error) => {
       console.log(error);
@@ -143,7 +176,6 @@ const CommentItem = ({
   });
 
   const handleReply = () => {
- 
     addReplyMutation.mutate(replyText);
     setReplyText("");
     setShowReplyInput(false);
@@ -166,8 +198,6 @@ const CommentItem = ({
             {comment?.content}
           </Text>
           <HStack mt={2} spacing={4}>
-            
-
             <Text
               color={textColor}
               fontSize="sm"
@@ -229,7 +259,6 @@ const CommentItem = ({
             cursor="pointer"
             color={"red"}
             onClick={() => {
-          
               deleteCommentMutation.mutate(comment._id);
             }}
           />
@@ -247,7 +276,7 @@ const Comments = ({ tweetId }: { tweetId: string }) => {
   const textColor = colorMode === "light" ? "gray.800" : "gray.100";
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["tweet-comments", tweetId],
     queryFn: () => myQuery.getTweetComments(token, tweetId),
   });
@@ -274,11 +303,30 @@ const Comments = ({ tweetId }: { tweetId: string }) => {
   });
 
   if (isLoading) {
-    return <div className="text-red-500">Loading...</div>;
+    // Skeleton loader for comments section
+    return (
+      <Box w="full" py={4}>
+        <Skeleton height="28px" width="180px" mb={4} />
+        <HStack mb={6}>
+          <SkeletonCircle size="32px" />
+          <Skeleton height="32px" width="100%" borderRadius="md" />
+          <Skeleton height="32px" width="70px" borderRadius="md" />
+        </HStack>
+        <Divider mb={4} />
+        <VStack spacing={4} align="start" w="full">
+          {[...Array(3)].map((_, idx) => (
+            <CommentSkeleton key={idx} />
+          ))}
+        </VStack>
+      </Box>
+    );
+  }
+
+  if (isError) {
+    return <div>Error: {error.message}</div>;
   }
 
   const handleComment = () => {
-
     addCommentMutation.mutate(commentText);
     setCommentText("");
   };

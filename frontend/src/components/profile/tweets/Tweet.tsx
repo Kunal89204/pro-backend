@@ -4,6 +4,7 @@ import {
   Flex,
   Text,
   useColorMode,
+  useToast,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import { useThemeColors } from "@/hooks/useThemeColors";
@@ -23,6 +24,8 @@ import {
 } from "@chakra-ui/react";
 import { RootState } from "@/lib/store";
 import { useSelector } from "react-redux";
+import tweetQueries from "@/api/tweetQueries";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Tweet = ({
   tweet,
@@ -42,12 +45,13 @@ const Tweet = ({
  
   userId: string | undefined;
 }) => {
+  const toast = useToast();
   const { colorMode } = useColorMode();
   const { textColor, secondaryTextColor } = useThemeColors();
   const router = useRouter();
   const userIdAccount = useSelector((state: RootState) => state.user?._id);
-  
- 
+  const token = useSelector((state: RootState) => state.token);
+  const queryClient = useQueryClient();
   // Markdown processing function
   const processMarkdown = (text: string) => {
     if (!text) return "";
@@ -58,6 +62,33 @@ const Tweet = ({
       .replace(/`(.*?)`/g, `<code style="background: ${colorMode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}; padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 0.9em;">$1</code>`) // Code
       .replace(/\n/g, '<br>'); // Line breaks
   };
+
+  const handleDeleteMutation = useMutation({
+    mutationFn: () => tweetQueries.deleteTweet(token, tweet._id),
+    onSuccess: () => {
+      console.log("Tweet deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["user-tweets"] });
+      toast({
+        title: "Tweet deleted successfully",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+    onError: () => {
+      console.log("Error deleting tweet");
+      toast({
+        title: "Error deleting tweet",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+  })
+
+  const handleDelete = () => {
+    handleDeleteMutation.mutate();
+  }
 
   return (
     <Box
@@ -82,7 +113,7 @@ const Tweet = ({
               {userIdAccount === userId && (
                 <>
                   {/* <MenuItem onClick={() => router.push(`/tweet/${tweet._id}/edit`)} textColor={textColor}>Edit</MenuItem> */}
-                  <MenuItem onClick={() => router.push(`/tweet/${tweet._id}/delete`)} textColor={textColor}>Delete</MenuItem>
+                  <MenuItem onClick={handleDelete} textColor={textColor}>Delete</MenuItem>
                 </>
               )}
             </MenuList>

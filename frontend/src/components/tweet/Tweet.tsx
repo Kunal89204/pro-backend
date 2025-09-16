@@ -4,6 +4,9 @@ import {
   Flex,
   Text,
   useColorMode,
+  Skeleton,
+  SkeletonCircle,
+  SkeletonText,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import React from "react";
@@ -30,25 +33,62 @@ const Tweet = ({
   };
   isLoading: boolean;
 }) => {
-  
   const { textColor, secondaryTextColor } = useThemeColors();
   const { colorMode } = useColorMode();
 
   // Markdown processing function
   const processMarkdown = (text: string) => {
     if (!text) return "";
-    
+
     return text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
-      .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
-      .replace(/`(.*?)`/g, `<code style="background: ${colorMode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}; padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 0.9em;">$1</code>`) // Code
-      .replace(/\n/g, '<br>'); // Line breaks
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Bold
+      .replace(/\*(.*?)\*/g, "<em>$1</em>") // Italic
+      .replace(
+        /`(.*?)`/g,
+        `<code style="background: ${
+          colorMode === "dark"
+            ? "rgba(255,255,255,0.1)"
+            : "rgba(0,0,0,0.1)"
+        }; padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 0.9em;">$1</code>`
+      ) // Code
+      .replace(/\n/g, "<br>"); // Line breaks
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
-  }
+    return (
+      <Box>
+        {/* Header Skeleton */}
+        <Flex alignItems="center" gap={2}>
+          <SkeletonCircle size="40px" />
+          <Box flex="1">
+            <Skeleton height="16px" width="120px" mb={1} />
+            <Skeleton height="12px" width="60px" />
+          </Box>
+        </Flex>
 
+        {/* Content Skeleton */}
+        <Box my={3}>
+          <SkeletonText noOfLines={3} spacing="3" />
+        </Box>
+
+        {/* Image Skeleton */}
+        <Box
+          className="w-full min-h-[400px] max-h-[600px] overflow-hidden flex justify-center items-center relative rounded-lg -z-0"
+        >
+          <Skeleton height="400px" width="100%" borderRadius="lg" />
+        </Box>
+
+        <Divider my={2} />
+
+        {/* Engagement Skeleton */}
+        <Flex gap={6} mt={2}>
+          <Skeleton height="20px" width="60px" />
+          <Skeleton height="20px" width="60px" />
+          <Skeleton height="20px" width="60px" />
+        </Flex>
+      </Box>
+    );
+  }
 
   return (
     <div>
@@ -56,9 +96,7 @@ const Tweet = ({
       <div className="flex items-center gap-2">
         <div>
           <Image
-            src={
-              data?.owner?.avatar
-            }
+            src={data?.owner?.avatar}
             className="object-cover rounded-full w-10 aspect-square"
             alt="tweet"
             width={1000}
@@ -85,22 +123,22 @@ const Tweet = ({
         className="my-3"
         color={textColor}
         dangerouslySetInnerHTML={{
-          __html: processMarkdown(data?.content || "")
+          __html: processMarkdown(data?.content || ""),
         }}
         sx={{
           // Custom styles for markdown elements
-          'strong': {
-            fontWeight: 'bold',
+          strong: {
+            fontWeight: "bold",
           },
-          'em': {
-            fontStyle: 'italic',
+          em: {
+            fontStyle: "italic",
           },
-          'code': {
-            fontSize: '0.9em',
+          code: {
+            fontSize: "0.9em",
           },
           // Ensure line breaks are preserved
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word',
+          whiteSpace: "pre-wrap",
+          wordBreak: "break-word",
         }}
       />
 
@@ -126,7 +164,12 @@ const Tweet = ({
 
       <Divider my={2} />
 
-      <Engagement _id={data._id}  likes={data.likesCount} comments={data.comments} views={data.viewsCount} />
+      <Engagement
+        _id={data?._id}
+        likes={data?.likesCount}
+        comments={data?.comments}
+        views={data?.viewsCount}
+      />
     </div>
   );
 };

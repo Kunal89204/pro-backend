@@ -16,6 +16,15 @@ const tweetQueries = {
       const response = await axiosInstance.get(`/tweet/embed/${tweetId}`);
     return response.data;
   },
+
+  deleteTweet: async (token: string, tweetId: string) => {
+    const response = await axiosInstance.delete(`/tweet/delete/${tweetId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
 };
 
 export default tweetQueries;

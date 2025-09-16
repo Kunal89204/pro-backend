@@ -6,6 +6,8 @@ import { Bookmark } from "../models/bookmark.model.js";
 import WatchHistory from "../models/watchHistory.model.js";
 import mongoose from "mongoose";
 import { User } from "../models/user.model.js";
+import { Like } from "../models/like.model.js";
+import { Comment } from "../models/comment.model.js";
 
 const createTweet = asyncHandler(async (req, res) => {
   console.log("requested");
@@ -76,6 +78,10 @@ const getTweetById = asyncHandler(async (req, res) => {
     "owner",
     "fullName username email avatar coverImage subscribersCount bio"
   );
+
+  if(!tweet) {
+    return res.status(404).json(new ApiResponse(404, null, "Tweet not found"));
+  }
 
   const tweetsCount = await Tweet.countDocuments({ owner: tweet?.owner });
 
@@ -240,6 +246,52 @@ const getTweetByIdForEmbed = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, tweet, "Tweet fetched successfully"));
 });
 
+const deleteTweet = asyncHandler(async (req, res) => {
+  const { tweetId } = req.params;
+  const userId = req.user._id;
+
+  if (!mongoose.Types.ObjectId.isValid(tweetId)) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Invalid tweet ID"));
+  }
+
+  const tweet = await Tweet.findById(tweetId);
+  if (!tweet) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, null, "Tweet not found"));
+  }
+
+  if (tweet.owner.toString() !== userId.toString()) {
+    return res
+      .status(403)
+      .json(new ApiResponse(403, null, "You are not authorized to delete this tweet"));
+  }
+
+  const session = await mongoose.startSession();
+
+  try {
+    await session.withTransaction(async () => {
+      await Bookmark.deleteMany({ tweet: tweetId }).session(session);
+      await Like.deleteMany({ tweet: tweetId }).session(session);
+      await Comment.deleteMany({ tweet: tweetId }).session(session);
+      await WatchHistory.deleteMany({ tweetId }).session(session);
+      await Tweet.deleteOne({ _id: tweetId }).session(session);
+    });
+
+    session.endSession();
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, { deletedTweetId: tweetId }, "Tweet deleted successfully"));
+  } catch (error) {
+    session.endSession();
+    throw error;
+  }
+});
+
+
 export {
   createTweet,
   getTweetsOfUser,
@@ -250,4 +302,5 @@ export {
   bookmarkStatus,
   addTweetView,
   getTweetByIdForEmbed,
+  deleteTweet,
 };

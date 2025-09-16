@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import UserProfile from "@/components/tweet/UserProfile";
 import tweetQueries from "@/api/tweetQueries";
+import { AxiosError } from "axios";
 
 const TweetPage = () => {
   const { id } = useParams();
@@ -26,8 +27,9 @@ const TweetPage = () => {
     onSuccess: () => {
       console.log("after success: view added");
     },
-    onError: () => {
-      console.log("error");
+    onError: (error:AxiosError) => {
+      console.log("error", error?.response?.data);
+      // console.log()
     },
   });
 
@@ -37,8 +39,23 @@ const TweetPage = () => {
   }, []);
 
   if (isError) {
+    console.log("error:", error);
     return <div>Error: {error.message}</div>;
   }
+
+  console.log("data::::", data?.status);
+
+
+  if (data?.status === 404) {
+    return (
+      <div className="flex flex-col items-center justify-center h-40">
+        <span className="text-red-500 text-lg font-semibold">Tweet not found</span>
+        <span className="text-gray-400 mt-2">The tweet you are looking for does not exist or has been deleted.</span>
+      </div>
+    );
+  }
+
+  
 
   return (
     <div className="w-full p-2 flex gap-2">

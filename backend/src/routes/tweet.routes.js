@@ -1,5 +1,16 @@
 import express from "express";
-import { createTweet, getTweetsOfUser, getTweets, getTweetById, bookmarkTweet, getBookmarkedTweets, bookmarkStatus, addTweetView, getTweetByIdForEmbed   } from "../controllers/tweet.controller.js";
+import {
+  createTweet,
+  getTweetsOfUser,
+  getTweets,
+  getTweetById,
+  bookmarkTweet,
+  getBookmarkedTweets,
+  bookmarkStatus,
+  addTweetView,
+  getTweetByIdForEmbed,
+  deleteTweet,
+} from "../controllers/tweet.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 const router = express.Router();
@@ -12,6 +23,8 @@ router.post("/bookmark/:id", verifyJWT, bookmarkTweet);
 router.get("/bookmark-status/:id", verifyJWT, bookmarkStatus);
 router.get("/:id", verifyJWT, getTweetById);
 router.post("/view/:id", verifyJWT, addTweetView);
+router.delete("/delete/:tweetId", verifyJWT, deleteTweet);
+router.get("/embed/:tweetid", getTweetByIdForEmbed);
 
-    router.get("/embed/:tweetid", getTweetByIdForEmbed);
+
 export default router;

@@ -16,7 +16,6 @@ const TweetPage = () => {
   const { id } = useParams();
   const token = useSelector((state: RootState) => state.token);
 
-
   const { data, isLoading, error, isError } = useQuery({
     queryKey: ["tweet", id],
     queryFn: () => myQuery.getTweetById(token, id as string),
@@ -27,7 +26,7 @@ const TweetPage = () => {
     onSuccess: () => {
       console.log("after success: view added");
     },
-    onError: (error:AxiosError) => {
+    onError: (error: AxiosError) => {
       console.log("error", error?.response?.data);
       // console.log()
     },
@@ -45,17 +44,18 @@ const TweetPage = () => {
 
   console.log("data::::", data?.status);
 
-
   if (data?.status === 404) {
     return (
       <div className="flex flex-col items-center justify-center h-40">
-        <span className="text-red-500 text-lg font-semibold">Tweet not found</span>
-        <span className="text-gray-400 mt-2">The tweet you are looking for does not exist or has been deleted.</span>
+        <span className="text-red-500 text-lg font-semibold">
+          Tweet not found
+        </span>
+        <span className="text-gray-400 mt-2">
+          The tweet you are looking for does not exist or has been deleted.
+        </span>
       </div>
     );
   }
-
-  
 
   return (
     <div className="w-full p-2 flex gap-2">

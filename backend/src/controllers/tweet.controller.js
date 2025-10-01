@@ -300,6 +300,24 @@ const deleteTweet = asyncHandler(async (req, res) => {
       await Tweet.deleteOne({ _id: tweetId }).session(session);
     });
 
+    // Invalidate all home feed cache pages in Redis
+    try {
+      const keys = [];
+      for await (const key of redis.scanIterator({
+        MATCH: "homeFeed:page:*",
+        COUNT: 100,
+      })) {
+        keys.push(key);
+      }
+      if (keys.length > 0) {
+        await redis.del(...keys);
+        console.log(`🔁 Redis home feed cache invalidated (${keys.length} keys)`);
+      }
+    } catch (err) {
+      console.error("❌ Error invalidating home feed cache after tweet deletion:", err);
+      // Don't block tweet deletion on cache error
+    }
+
     session.endSession();
 
     return res

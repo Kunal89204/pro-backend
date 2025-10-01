@@ -255,8 +255,9 @@ const getComments = asyncHandler(async (req, res) => {
 
 const addComment = asyncHandler(async (req, res) => {
   const { content, videoId, parentComment } = req.body;
-  const userId = req.user._id;
+  const userId = req.user?._id; // safe access in case req.user is missing
 
+  // 1. Basic validation
   if (!content || !videoId || !userId) {
     return res.status(400).json({ message: "Missing required fields" });
   }
@@ -268,45 +269,51 @@ const addComment = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Invalid videoId or userId" });
   }
 
+  if (
+    parentComment &&
+    !mongoose.Types.ObjectId.isValid(parentComment)
+  ) {
+    return res.status(400).json({ message: "Invalid parentComment id" });
+  }
+
   try {
-    // 1. Save new comment
+    // 2. Save new comment
     const newComment = new Comment({
       content,
       video: videoId,
       owner: userId,
-      parentComment: parentComment || null,
+      parentComment: parentComment?.trim() || null,
     });
 
     await newComment.save();
 
-    // 2. Invalidate all related Redis comment cache entries
-    const stream = redis.scanStream({
-      match: `videoComments:${videoId}:page:*`,
-    });
+    // 3. Invalidate related Redis cache (awaitable + safe)
+    const keys = [];
+    for await (const keyBatch of redis.scanIterator({
+      MATCH: `videoComments:${videoId}:page:*`,
+      COUNT: 100, // scan in chunks
+    })) {
+      keys.push(keyBatch);
+    }
 
-    stream.on("data", async (keys) => {
-      if (keys.length) {
-        await redis.del(...keys);
-      }
-    });
-
-    stream.on("end", () => {
+    if (keys.length > 0) {
+      await redis.del(...keys);
       console.log(`🔁 Redis cache invalidated for video ${videoId}`);
-    });
+    }
 
-    // 3. Response
+    // 4. Response
     return res.status(201).json({
       message: "Comment added successfully",
       comment: newComment,
     });
   } catch (error) {
-    console.error("❌ Error adding comment:", error);
+    console.error("❌ Error adding comment:", error.message);
     return res.status(500).json({
       message: "Internal Server Error",
-      error,
     });
   }
 });
+
 
 const checkComment = (req, res) => {
   res.json({ message: "I am working" });

@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import { User } from "../models/user.model.js";
 import { Like } from "../models/like.model.js";
 import { Comment } from "../models/comment.model.js";
+import { redis } from "../../index.js";
 
 const createTweet = asyncHandler(async (req, res) => {
   console.log("requested");
@@ -40,6 +41,25 @@ const createTweet = asyncHandler(async (req, res) => {
     image: imageUrl,
     owner: userId,
   });
+
+  // Invalidate all home feed cache pages
+  try {
+    // Use Redis SCAN to find all homeFeed:page:* keys and delete them
+    const keys = [];
+    for await (const key of redis.scanIterator({
+      MATCH: "homeFeed:page:*",
+      COUNT: 100,
+    })) {
+      keys.push(key);
+    }
+    if (keys.length > 0) {
+      await redis.del(...keys);
+      console.log(`🔁 Redis home feed cache invalidated (${keys.length} keys)`);
+    }
+  } catch (err) {
+    console.error("❌ Error invalidating home feed cache:", err);
+    // Don't block tweet creation on cache error
+  }
 
   res
     .status(201)

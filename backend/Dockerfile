@@ -1,20 +1,21 @@
-FROM node
+FROM node:20
 
-# Set the working directory
-WORKDIR /usr/src/app
+# Set working directory
+WORKDIR /
 
-# Copy package files and other necessary files
-COPY package.json package.json
-COPY package-lock.json package-lock.json
-COPY public public
-COPY src src
-COPY .env .env
+# Copy package files first (for caching)
+COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install
 
-# Expose the port your app runs on
+# Copy app source
+COPY public public
+COPY src src
+COPY index.js index.js
+
+# Expose port
 EXPOSE 8000
 
-# Set the command to run your app
-CMD ["node", "src/index.js"]
+# Command to run the app
+CMD ["node", "index.js"]

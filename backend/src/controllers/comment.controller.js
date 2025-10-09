@@ -287,18 +287,26 @@ const addComment = asyncHandler(async (req, res) => {
 
     await newComment.save();
 
-    // 3. Invalidate related Redis cache (awaitable + safe)
-    const keys = [];
-    for await (const keyBatch of redis.scanIterator({
-      MATCH: `videoComments:${videoId}:page:*`,
-      COUNT: 100, // scan in chunks
-    })) {
-      keys.push(keyBatch);
-    }
+    // 3. Invalidate related Redis cache (compatible with ioredis, not using scanIterator)
+    try {
+      let cursor = '0';
+      const keys = [];
+      do {
+        const reply = await redis.scan(cursor, 'MATCH', `videoComments:${videoId}:page:*`, 'COUNT', 100);
+        cursor = reply[0];
+        const batch = reply[1];
+        if (batch && batch.length > 0) {
+          keys.push(...batch);
+        }
+      } while (cursor !== '0');
 
-    if (keys.length > 0) {
-      await redis.del(...keys);
-      console.log(`🔁 Redis cache invalidated for video ${videoId}`);
+      if (keys.length > 0) {
+        await redis.del(...keys);
+        console.log(`🔁 Redis cache invalidated for video ${videoId}`);
+      }
+    } catch (err) {
+      console.error("❌ Error invalidating Redis cache for comments:", err);
+      // Don't block comment creation on cache error
     }
 
     // 4. Response
@@ -313,7 +321,6 @@ const addComment = asyncHandler(async (req, res) => {
     });
   }
 });
-
 
 const checkComment = (req, res) => {
   res.json({ message: "I am working" });

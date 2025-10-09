@@ -558,17 +558,8 @@ const getHomeFeed = asyncHandler(async (req, res) => {
   const videoChunk = 8;
   const tweetChunk = 4;
 
-  const cacheKey = `homeFeed:page:${page}:limit:${limit}`;
-  const cacheTTL = 60 * 2; // 2 minutes
-
   try {
-    // 1. Try cache first
-    const cachedFeed = await redis.get(cacheKey);
-    if (cachedFeed) {
-      return res.status(200).json(JSON.parse(cachedFeed));
-    }
-
-    // 2. Fetch raw videos and tweets
+    // 1. Fetch raw videos and tweets (always fresh, no cache)
     const rawVideos = await Video.find({ isPublished: true })
       .select("-viewers")
       .populate("owner", "_id username avatar")
@@ -581,7 +572,7 @@ const getHomeFeed = asyncHandler(async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(limit * 2);
 
-    // 3. Interleave video and tweet blocks
+    // 2. Interleave video and tweet blocks
     let vi = 0;
     let ti = 0;
     const structuredFeed = [];
@@ -602,7 +593,7 @@ const getHomeFeed = asyncHandler(async (req, res) => {
       if (structuredFeed.length >= limit) break;
     }
 
-    // 4. Paginate final interleaved feed
+    // 3. Paginate final interleaved feed
     const start = (page - 1) * limit;
     const paginatedFeed = structuredFeed.slice(start, start + limit);
 
@@ -613,9 +604,6 @@ const getHomeFeed = asyncHandler(async (req, res) => {
       feed: paginatedFeed,
       hasMore: start + limit < structuredFeed.length,
     };
-
-    // 5. Store in Redis
-    await redis.set(cacheKey, JSON.stringify(response), "EX", cacheTTL);
 
     return res.status(200).json(response);
   } catch (error) {

@@ -12,7 +12,8 @@ It combines a **Next.js + TypeScript** frontend with a **Node.js + Express** bac
 -  **TypeScript** – Type-safe, maintainable codebase  
 -  **Chakra UI** – Beautiful, accessible component library  
 -  **Tanstack Query** – Data fetching and caching  
--  **Zustand** – Lightweight global state management  
+-  **Zustand** – Lightweight global state management
+-  **VideoJs** - Custom video player
 
 ###  Backend
 -  **Express.js** – Scalable web framework for Node.js  

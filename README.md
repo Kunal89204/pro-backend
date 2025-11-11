@@ -77,3 +77,11 @@ Run it with your environment variables:
 docker run --env-file .env -p 5000:5000 kunal89204/tvideo-backend:latest
 ```
 Make sure the .env file has all required credentials before starting.
+
+
+## Acknowledgements
+
+A special thank you to [Hitesh Choudhary](https://github.com/hiteshchoudhary)
+ Sir for his outstanding Node.js and backend development playlist,
+which played a pivotal role in building the foundational backend structure for this project.
+His clear teaching style and practical approach made complex concepts easy to understand and apply effectively.

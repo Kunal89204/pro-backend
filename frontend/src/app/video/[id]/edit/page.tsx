@@ -361,7 +361,7 @@ const EditVideo = () => {
               <CardBody>
                 <AspectRatio ratio={16 / 9}>
                   <iframe
-                    src={`https://youtube.kunalkhandelwal.dev/embed/video/${data?.data?._id}`}
+                    src={`https://tvideo.kunalkhandelwal.dev/embed/video/${data?.data?._id}`}
                     frameBorder="0"
                     style={{
                       borderRadius: "12px",
